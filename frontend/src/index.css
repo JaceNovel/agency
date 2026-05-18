@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  color: #071333;
+  background: #f6f8fc;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  zoom: 75%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+main section,
+main [class*="rounded-lg"][class*="bg-white"],
+main [class*="rounded-lg"][class*="border"] {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    color 220ms ease,
+    opacity 220ms ease;
+}
+
+button:hover,
+a:hover {
+  transform: translateY(-1px);
+}
+
+main [class*="rounded-lg"][class*="bg-white"]:hover,
+main [class*="rounded-lg"][class*="border"]:hover {
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+main img {
+  transition: transform 260ms ease, filter 260ms ease, opacity 260ms ease;
+}
+
+main [class*="rounded-lg"]:hover > img,
+main [class*="rounded-lg"]:hover img.object-cover {
+  transform: scale(1.025);
+}
+
+.process-line {
+  position: relative;
+}
+
+.process-line::before {
+  content: "";
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #10b981 0%, #10b981 var(--progress, 45%), #dbe4f0 var(--progress, 45%), #dbe4f0 100%);
+}
+
+.process-step {
+  position: relative;
+  z-index: 1;
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 420ms ease both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(17, 50, 116, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 50, 116, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
