@@ -1449,34 +1449,8 @@ function Messages() {
         ))}
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
-        <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-black text-blue-950">Votre support</h2>
-            <div className="mt-5 space-y-4">
-              {[
-                ['Dossier visa', 'En vérification', 'bg-amber-50 text-amber-700'],
-                ['Logement', 'Action requise', 'bg-blue-50 text-blue-700'],
-                ['Paiement', 'Confirmé', 'bg-emerald-50 text-emerald-700'],
-              ].map(([label, status, tone]) => (
-                <div key={label} className="flex items-center justify-between rounded-lg border border-slate-100 p-4">
-                  <span className="font-black text-slate-800">{label}</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-black ${tone}`}>{status}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-black text-blue-950">Questions fréquentes</h2>
-            <div className="mt-4 space-y-3">
-              {['Comment suivre mon dossier ?', 'Quels documents sont manquants ?', 'Comment contacter mon conseiller ?', 'Que faire avant mon départ ?'].map((item) => (
-                <button key={item} className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800">{item}<ChevronDown className="-rotate-90" size={16} /></button>
-              ))}
-            </div>
-          </section>
-        </aside>
-
-        <section className="messaging-shell grid min-h-[720px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:grid-cols-[390px_1fr]">
+      <div className="-mx-6 lg:-mx-8">
+        <section className="messaging-shell grid min-h-[720px] overflow-hidden border-y border-slate-200 bg-white shadow-sm xl:grid-cols-[430px_1fr]">
           <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
           <div className="grid shrink-0 grid-cols-3 gap-3 border-b border-slate-100 p-5">
             {[
