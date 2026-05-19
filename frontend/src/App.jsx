@@ -7,6 +7,7 @@ import {
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
+  Menu, X,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
@@ -243,16 +244,23 @@ function Shell() {
   const [languageOpen, setLanguageOpen] = useState(false)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
-      <aside className={`fixed inset-y-0 left-0 z-40 w-72 rounded-r-2xl bg-[#061b47] text-white transition lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-full flex-col p-6">
-          <Logo />
-          <nav className="mt-10 space-y-2">{navItems.map(({ label, icon: Icon, to, badge }) => <NavLink key={label} to={to} onClick={() => setOpen(false)} className={({ isActive }) => `flex h-12 items-center gap-3 rounded-lg px-4 text-sm font-bold transition ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}><Icon size={21} /><span className="flex-1">{label}</span>{badge && <span className="grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}</NavLink>)}</nav>
-          <div className="mt-auto rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><button className="mt-4 h-11 w-full rounded-lg bg-blue-600 text-sm font-bold">Contacter le support</button></div>
+      {open && <button type="button" className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px]" aria-label="Fermer la navigation" onClick={() => setOpen(false)} />}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 overflow-hidden rounded-r-2xl bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 transition ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex h-full min-h-0 flex-col p-6">
+          <div className="flex items-center justify-between">
+            <Logo />
+            <button type="button" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-lg text-blue-100 hover:bg-white/10" aria-label="Fermer la navigation"><X size={22} /></button>
+          </div>
+          <nav className="sidebar-nav mt-10 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">{navItems.map(({ label, icon: Icon, to, badge }) => <NavLink key={label} to={to} onClick={() => setOpen(false)} className={({ isActive }) => `flex h-12 items-center gap-3 rounded-lg px-4 text-sm font-bold transition ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}><Icon size={21} /><span className="flex-1">{label}</span>{badge && <span className="grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}</NavLink>)}</nav>
+          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><button className="mt-4 h-11 w-full rounded-lg bg-blue-600 text-sm font-bold">Contacter le support</button></div>
         </div>
       </aside>
-      <div className="lg:pl-72">
+      <div>
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
-          <div className="hidden h-12 w-[420px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-200/80" aria-label="Ouvrir la navigation"><Menu size={24} /></button>
+            <div className="hidden h-12 w-[420px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
+          </div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <button type="button" onClick={() => setLanguageOpen((value) => !value)} className="flex h-10 items-center gap-1 rounded-lg px-2 text-blue-950 hover:bg-slate-100" aria-label="Changer de langue"><Globe2 size={22} /><ChevronDown size={15} /></button>

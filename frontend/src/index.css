@@ -66,6 +66,24 @@ a:hover {
   transform: translateY(-1px);
 }
 
+.sidebar-nav {
+  scrollbar-color: rgba(191, 219, 254, 0.45) transparent;
+  scrollbar-width: thin;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(191, 219, 254, 0.35);
+  border-radius: 999px;
+}
+
 main [class*="rounded-lg"][class*="bg-white"]:hover,
 main [class*="rounded-lg"][class*="border"]:hover {
   border-color: rgba(37, 99, 235, 0.22);
