@@ -212,6 +212,26 @@ main [class*="rounded-lg"]:hover img.object-cover {
   background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.2), transparent);
 }
 
+.finance-hero-banner {
+  isolation: isolate;
+}
+
+.finance-hero-bg {
+  opacity: 1;
+  filter: drop-shadow(0 30px 34px rgba(15, 23, 42, 0.14));
+}
+
+@media (max-width: 1279px) {
+  .finance-hero-bg {
+    opacity: 0.22;
+  }
+}
+
+.transport-tab {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 main button[class*="bg-blue"],
 main a[class*="bg-blue"] {
   box-shadow:
@@ -323,11 +343,119 @@ main textarea:focus {
 }
 
 .esim-hero {
-  animation: esim-hero-in 520ms ease both;
+  animation: esim-hero-in 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .dashboard-hero {
   animation: hero-enter 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.support-page > section:first-child {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 28px 80px rgba(15, 23, 42, 0.08);
+}
+
+.support-step-card {
+  transform-origin: top center;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  will-change: transform;
+}
+
+.support-step-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(37, 99, 235, 0.24);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+}
+
+.current-esim-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.current-esim-card::before {
+  content: "";
+  position: absolute;
+  inset: -35% -20% auto auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.18), transparent 65%);
+  pointer-events: none;
+}
+
+.esim-active-pill {
+  animation: esim-active-blink 1.85s ease-in-out infinite;
+  box-shadow:
+    0 0 0 0 rgba(16, 185, 129, 0.42),
+    0 0 18px rgba(52, 211, 153, 0.42);
+}
+
+.transport-arrival-pack::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.arrival-pack-bg {
+  opacity: 0.92;
+  object-position: center;
+  pointer-events: none;
+}
+
+.arrival-pack-icon {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.arrival-pack-icon:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 24px rgba(37, 99, 235, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+.career-help-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.career-help-card::after {
+  content: "";
+  position: absolute;
+  right: -42px;
+  top: -42px;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.13), transparent 66%);
+  animation: career-orbit 4.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.career-help-cta svg {
+  animation: career-icon-float 1.9s ease-in-out infinite;
+}
+
+.career-help-contact {
+  animation: career-contact-glow 2.4s ease-in-out infinite;
+}
+
+.career-help-contact:nth-child(2) {
+  animation-delay: 180ms;
+}
+
+.career-help-contact:nth-child(3) {
+  animation-delay: 360ms;
 }
 
 .service-3d-card {
@@ -396,8 +524,15 @@ main textarea:focus {
 }
 
 .messages-page {
-  height: calc((100vh - 5rem) / 0.58);
-  zoom: 0.7733333;
+  position: fixed;
+  top: 5rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  height: auto;
+  max-height: none;
+  width: 100vw;
 }
 
 .message-bubble {
@@ -553,6 +688,50 @@ main textarea:focus {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes esim-active-blink {
+  0%, 100% {
+    filter: brightness(1);
+    transform: scale(1);
+    box-shadow:
+      0 0 0 0 rgba(16, 185, 129, 0.42),
+      0 0 16px rgba(52, 211, 153, 0.42);
+  }
+  50% {
+    filter: brightness(1.18);
+    transform: scale(1.04);
+    box-shadow:
+      0 0 0 8px rgba(16, 185, 129, 0),
+      0 0 26px rgba(52, 211, 153, 0.7);
+  }
+}
+
+@keyframes career-orbit {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-18px, 16px) scale(1.08);
+  }
+}
+
+@keyframes career-icon-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(-4deg);
+  }
+}
+
+@keyframes career-contact-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+  }
+  50% {
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.13);
   }
 }
 

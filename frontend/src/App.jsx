@@ -16,6 +16,7 @@ import supportHero from './assets/support-student-hero.png'
 import dashboardStudentHero from './assets/dashboard-african-student.png'
 import esimPhoneHero from './assets/esim-phone-hero.png'
 import financeHero from './assets/finance-student-hero.png'
+import parisPackBackground from './assets/paris-pack-background.png'
 
 const queryClient = new QueryClient()
 
@@ -67,8 +68,6 @@ const navItems = [
   { label: 'Accompagnement', icon: UserRound, to: '/accompagnement' },
   { label: 'eSIM & Forfait', icon: Smartphone, to: '/esim' },
   { label: 'Support client', icon: MessageCircle, to: '/messages', badge: 5 },
-  { label: 'Mon profil', icon: Users, to: '/profil' },
-  { label: 'Paramètres', icon: Settings, to: '/parametres' },
 ]
 
 function App() {
@@ -256,11 +255,11 @@ function Shell() {
         </div>
       </aside>
       <div>
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-200/80" aria-label="Ouvrir la navigation"><Menu size={24} /></button>
-            <div className="hidden h-12 w-[420px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
+            <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-xl bg-slate-700 text-slate-100 shadow-sm hover:bg-slate-800" aria-label="Ouvrir la navigation"><Menu size={24} /></button>
           </div>
+          <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <button type="button" onClick={() => setLanguageOpen((value) => !value)} className="flex h-10 items-center gap-1 rounded-lg px-2 text-blue-950 hover:bg-slate-100" aria-label="Changer de langue"><Globe2 size={22} /><ChevronDown size={15} /></button>
@@ -272,6 +271,7 @@ function Shell() {
             </div>
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
+            <Link to="/parametres" className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100" aria-label="Paramètres"><Settings size={22} /></Link>
           </div>
         </header>
         <main className="p-5 lg:p-8"><AnimatedRoutes /></main>
@@ -461,16 +461,17 @@ function Finance() {
   return (
     <div className="finance-page grid gap-7 xl:grid-cols-[1fr_360px]">
       <div className="space-y-7">
-        <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }} className="finance-hero-banner relative min-h-[560px] overflow-hidden rounded-lg border border-slate-200 bg-[#f8fbff] p-8 shadow-sm xl:p-10">
+          <img src={financeHero} alt="" className="finance-hero-bg absolute inset-0 h-full w-full object-contain object-right-bottom" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,251,255,.98)_0%,rgba(248,251,255,.92)_38%,rgba(248,251,255,.48)_68%,rgba(248,251,255,.12)_100%)]" />
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Banque & Finance</div>
-          <div className="relative z-10 mt-7 max-w-[620px]">
+          <div className="relative z-10 mt-8 max-w-[620px] xl:max-w-[50%] xl:min-w-[520px]">
             <h1 className="text-5xl font-black leading-tight tracking-tight text-slate-950">Banque & Finance pour étudiants internationaux</h1>
             <p className="mt-5 text-lg leading-8 text-slate-600">Ouvrez un compte bancaire, transférez de l'argent, gérez votre budget et explorez des solutions de financement adaptées à votre parcours.</p>
           </div>
-          <img src={financeHero} alt="Étudiant avec carte bancaire" className="absolute right-[7%] top-0 hidden h-[340px] w-[360px] object-contain object-top xl:block" />
-          <div className="relative z-10 mt-8 grid gap-4 lg:grid-cols-4">
+          <div className="relative z-10 mt-12 grid gap-4 lg:grid-cols-4">
             {quickServices.map(([Icon, title, text], index) => (
-              <motion.article key={title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -6 }} className="rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm">
+              <motion.article key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -6 }} className="rounded-lg border border-white/80 bg-white/90 p-5 shadow-lg shadow-blue-950/5 backdrop-blur">
                 <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={22} /></div>
                 <h3 className="font-black leading-tight text-slate-950">{title}</h3>
                 <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{text}</p>
@@ -785,7 +786,7 @@ function Universities() {
 
   return (
     <div className="university-page -mx-5 space-y-8 lg:-mx-8">
-      <div className="grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
+      <div className="relative grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <section className="university-hero relative min-h-[430px] overflow-visible rounded-lg bg-[#f4f8ff] p-8 md:p-10">
           <img src={universityHero} alt="Étudiante avec cahier" className="university-hero-image absolute inset-y-0 right-0 h-full w-full rounded-lg object-cover" />
           <div className="absolute inset-0 rounded-lg bg-[linear-gradient(90deg,rgba(244,248,255,.92)_0%,rgba(244,248,255,.72)_38%,rgba(244,248,255,.08)_70%,rgba(244,248,255,0)_100%)]" />
@@ -800,25 +801,25 @@ function Universities() {
           <div className="absolute right-20 top-44 hidden w-52 rounded-lg bg-white/95 p-5 shadow-xl shadow-blue-100 2xl:block">
             <div className="flex items-center gap-4"><Globe2 className="text-blue-800" /><div><div className="text-xl font-black">+ 50</div><div className="text-sm font-semibold text-slate-500">Pays couverts</div></div></div>
           </div>
-          <div className="scroll-cue absolute -bottom-6 left-1/2 z-20 grid h-12 w-12 -translate-x-1/2 place-items-center rounded-full bg-white/90 text-blue-800 shadow-lg shadow-blue-100">
-            <ChevronDown size={26} />
-          </div>
         </section>
+        <div className="scroll-cue absolute -bottom-6 left-1/2 z-20 grid h-12 w-12 -translate-x-1/2 place-items-center rounded-full bg-white/90 text-blue-800 shadow-lg shadow-blue-100">
+          <ChevronDown size={26} />
+        </div>
 
         <aside className="space-y-6">
-          <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="career-help-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">Besoin d'aide pour choisir ?</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600">Nos conseillers sont là pour vous aider à trouver la formation idéale.</p>
-            <button className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#082f7a] font-black text-white"><MessageCircle size={18} />Parler à un conseiller</button>
+            <motion.button whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }} className="career-help-cta mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#082f7a] font-black text-white"><MessageCircle size={18} />Parler à un conseiller</motion.button>
             <div className="mt-6 text-sm font-semibold text-slate-500">Où contactez-nous</div>
             <div className="mt-4 grid grid-cols-3 gap-4">
-              {[MessageCircle, Phone, Mail].map((Icon, index) => <button className="grid h-12 place-items-center rounded-lg bg-blue-50 text-blue-800" key={index}><Icon size={20} /></button>)}
+              {[MessageCircle, Phone, Mail].map((Icon, index) => <motion.button initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.16 + index * 0.08, type: 'spring', stiffness: 280, damping: 20 }} whileHover={{ y: -4 }} className="career-help-contact grid h-12 place-items-center rounded-lg bg-blue-50 text-blue-800" key={index}><Icon size={20} /></motion.button>)}
             </div>
           </motion.section>
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">Guide étudiant</h3>
             <div className="mt-4 space-y-4 text-sm font-semibold text-slate-600">
-              {['Comment choisir son université ?', "Préparer son dossier d'admission", 'Demande de visa étudiant'].map((item) => <div className="flex items-center gap-3" key={item}><FileText size={17} />{item}</div>)}
+              {['Comment choisir son université ?', "Préparer son dossier d'admission", 'Demande de visa étudiant'].map((item, index) => <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + index * 0.08 }} className="flex items-center gap-3" key={item}><FileText size={17} />{item}</motion.div>)}
             </div>
             <button className="mt-6 font-black text-blue-800">Voir tous les guides →</button>
           </motion.section>
@@ -930,26 +931,29 @@ function SupportJourney() {
 
   return (
     <div className="support-page -mx-5 space-y-8 lg:-mx-8">
-      <section className="relative overflow-hidden bg-white px-5 py-10 lg:px-8 xl:min-h-[520px]">
+      <motion.section initial={{ opacity: 0, y: 18, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1] }} className="relative overflow-hidden bg-white px-5 py-10 lg:px-8 xl:min-h-[520px]">
         <div className="absolute right-[7%] top-10 h-[430px] w-[560px] rounded-full bg-blue-50" />
         <div className="absolute right-[10%] top-16 h-[360px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,.12),transparent_68%)]" />
         <img src={supportHero} alt="Étudiant accompagne" className="absolute bottom-0 right-[7%] z-10 hidden h-[500px] w-[520px] object-contain xl:block" />
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="relative z-20 max-w-xl">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.36, ease: [0.22, 1, 0.36, 1] }} className="relative z-20 max-w-xl">
           <div className="text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Accompagnement</div>
           <h1 className="mt-8 text-6xl font-black leading-tight tracking-tight text-slate-950">Accompagnement<br />personnalisé</h1>
           <p className="mt-7 text-xl font-medium leading-9 text-slate-700">Nous vous accompagnons à chaque étape de votre projet d'études à l'étranger. De la préparation du dossier à votre installation, vous n'êtes jamais seul.</p>
-          <div className="mt-9 flex flex-wrap gap-5"><button className="flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight size={19} /></button><button className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800">Voir la vidéo</button></div>
+          <div className="mt-9 flex flex-wrap gap-5">
+            <motion.button initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight size={19} /></motion.button>
+            <motion.button initial={{ opacity: 0, x: 54, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.56, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800"><Video size={19} />Voir la vidéo</motion.button>
+          </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="absolute right-[32%] top-[235px] z-30 hidden rounded-lg bg-white p-5 shadow-xl shadow-blue-100 xl:block"><div className="flex items-center gap-4"><Users className="text-emerald-600" /><div><div className="text-xl font-black">98%</div><div className="text-sm text-slate-500">Taux de satisfaction</div></div></div></motion.div>
         <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} className="absolute right-10 top-24 z-30 hidden rounded-lg bg-white p-5 shadow-xl shadow-blue-100 xl:block"><div className="flex items-center gap-4"><Users className="text-blue-700" /><div><div className="text-xl font-black">+ 1500</div><div className="text-sm text-slate-500">Étudiants accompagnés</div></div></div></motion.div>
         <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} className="absolute bottom-20 right-20 z-30 hidden rounded-lg bg-white p-5 shadow-xl shadow-blue-100 xl:block"><div className="flex items-center gap-4"><Globe2 className="text-blue-700" /><div><div className="text-xl font-black">+ 50</div><div className="text-sm text-slate-500">Pays partenaires</div></div></div></motion.div>
-      </section>
+      </motion.section>
 
       <div className="grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <div className="space-y-7">
           <div><h2 className="text-3xl font-black text-slate-950">Nos étapes d'accompagnement</h2><p className="mt-2 text-lg font-medium text-slate-500">Un parcours clair et complet pour réussir votre départ.</p></div>
           <section className="grid gap-6 md:grid-cols-5">
-            {steps.map(([Icon, title, text], index) => <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }} key={title} className="relative rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm"><div className="absolute -top-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-blue-800 font-black text-white">{index + 1}</div><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={28} /></div><h3 className="mt-5 font-black text-slate-950">{title}</h3><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p></motion.div>)}
+            {steps.map(([Icon, title, text], index) => <motion.div initial={{ opacity: 0, y: -24, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ amount: 0.28, once: false, margin: '0px 0px -80px 0px' }} transition={{ delay: index * 0.045, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} key={title} className="support-step-card relative rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm"><div className="absolute -top-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-blue-800 font-black text-white">{index + 1}</div><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={28} /></div><h3 className="mt-5 font-black text-slate-950">{title}</h3><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p></motion.div>)}
           </section>
           <section className="flex gap-5 rounded-lg border border-blue-100 bg-blue-50 p-6"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-blue-800"><ShieldCheck size={26} /></div><div><h3 className="font-black text-blue-950">Important</h3><p className="mt-2 leading-7 text-blue-950">Nous accompagnons nos étudiants dans toutes les démarches administratives. Cependant, la décision finale d'octroi du visa appartient exclusivement aux autorités consulaires.</p></div></section>
         </div>
@@ -980,12 +984,12 @@ function Transport() {
   return (
     <div className="transport-page space-y-7">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5">
-        <div className="flex items-start gap-4"><button className="mt-2 text-slate-700"><ArrowRight className="rotate-180" /></button><div><h1 className="text-4xl font-black tracking-tight">Billets & Transport</h1><p className="mt-2 text-lg font-medium text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p></div></div>
+        <div><h1 className="text-4xl font-black tracking-tight">Billets & Transport</h1><p className="mt-2 text-lg font-medium text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p></div>
         <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm"><div className="text-xs font-semibold text-slate-500">Mon portefeuille</div><div className="font-black text-emerald-600">1 250,00 €</div></div>
       </motion.div>
 
       <section className="flex flex-wrap gap-4 border-b border-slate-200 pb-6">
-        {transportModes.map(([label, Icon], index) => <button key={label} className={`transport-tab flex h-14 items-center gap-3 rounded-lg border px-7 font-black shadow-sm ${index === 0 ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}><Icon size={22} />{label}</button>)}
+        {transportModes.map(([label, Icon], index) => <motion.button initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + index * 0.055, duration: 0.26, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} key={label} className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${index === 0 ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}><Icon size={22} />{label}</motion.button>)}
       </section>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
@@ -1018,13 +1022,28 @@ function Transport() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Réservation sécurisée</h2><div className="mt-5 space-y-3">{['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}</div></section>
         </aside>
 
-        <section className="-mr-5 relative overflow-hidden rounded-lg border border-blue-100 bg-blue-50 p-5 shadow-sm lg:-mr-8 xl:col-span-2">
-          <h2 className="text-xl font-black text-blue-950">Pack Arrivée France</h2>
-          <p className="mt-2 text-sm font-medium text-slate-600">Vol + Train + eSIM + Chauffeur + Logement</p>
-          <p className="mt-2 text-sm text-slate-500">Tout ce qu'il vous faut pour une arrivée sans stress.</p>
-          <div className="mt-5 flex flex-wrap items-center gap-4 text-blue-800">{[Plane, Train, Smartphone, Car, Home].map((Icon, index) => <span className="grid h-10 w-10 place-items-center rounded-full bg-white shadow-sm" key={index}><Icon size={19} /></span>)}</div>
-          <button className="absolute right-7 top-1/2 hidden -translate-y-1/2 rounded-lg border border-blue-700 bg-white px-7 py-3 font-black text-blue-800 md:block">Découvrir les packs</button>
-        </section>
+        <motion.section initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="transport-arrival-pack relative overflow-hidden rounded-lg border border-blue-100 bg-[#f3f7ff] px-6 py-5 text-blue-950 shadow-sm xl:col-span-2">
+          <img src={parisPackBackground} alt="" className="arrival-pack-bg absolute inset-0 h-full w-full object-contain" />
+          <div className="relative z-10 grid gap-5 lg:grid-cols-[300px_auto_1fr_auto] lg:items-center">
+            <div>
+              <h2 className="text-2xl font-black">Pack Arrivée France</h2>
+              <p className="mt-1 text-sm font-black text-blue-950">Vol + Train + eSIM + Chauffeur + Logement</p>
+              <p className="mt-3 text-sm font-semibold text-slate-600">Tout ce qu'il vous faut pour une arrivée sans stress.</p>
+            </div>
+            <div className="arrival-pack-icons flex flex-wrap items-center gap-3 text-blue-950 lg:justify-self-start">
+              {[[Plane, 'Vol'], [Train, 'Train'], [Smartphone, 'eSIM'], [Car, 'Chauffeur'], [Home, 'Logement']].map(([Icon, label], index) => (
+                <div className="flex items-center gap-3" key={label}>
+                  <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.045, duration: 0.24 }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-white text-blue-900 shadow-sm" title={label}>
+                    <Icon size={21} />
+                  </motion.span>
+                  {index < 4 && <span className="text-lg font-black text-slate-400">+</span>}
+                </div>
+              ))}
+            </div>
+            <div className="hidden lg:block" aria-hidden="true" />
+            <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="h-12 rounded-lg border-2 border-blue-200 bg-white/80 px-7 font-black text-blue-950 shadow-sm">Découvrir les packs</motion.button>
+          </div>
+        </motion.section>
       </div>
     </div>
   )
@@ -1093,12 +1112,12 @@ function Esim() {
           <div className="absolute right-6 top-7 grid h-12 w-12 place-items-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-200"><Plane size={22} /></div>
         </section>
 
-        <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm">
-          <div className="flex items-center justify-between"><h2 className="text-lg font-black">Mon eSIM actuelle</h2><span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-black">Active</span></div>
+        <section className="current-esim-card rounded-lg bg-[#061b47] p-6 text-white shadow-sm">
+          <div className="flex items-center justify-between"><h2 className="text-lg font-black">Mon eSIM actuelle</h2><span className="esim-active-pill rounded-full bg-emerald-500 px-3 py-1 text-xs font-black">Active</span></div>
           <div className="mt-7 flex items-center gap-4"><img src={logos.europe} alt="Europe" className="h-12 w-12 rounded-full" /><div><div className="text-xl font-black">Europe 10 Go</div><div className="text-sm text-blue-100">Valable jusqu'au 25 juin 2024</div></div></div>
           <div className="mt-7 flex items-end justify-between"><div><div className="text-xl font-black">10 Go / 10 Go</div><div className="text-sm text-blue-100">Consommation</div></div><span className="text-sm font-bold">100%</span></div>
           <div className="mt-3 h-2 rounded-full bg-white/20"><motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1 }} className="h-2 rounded-full bg-cyan-300" /></div>
-          <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto]"><div><div className="text-sm text-blue-100">Numéro</div><div className="font-black">+33 7 12 34 56 78</div></div><button className="rounded-lg bg-white/10 px-6 py-3 font-black">Voir les détails</button></div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto]"><div><div className="text-sm text-blue-100">Numéro</div><div className="font-black">+33 7 12 34 56 78</div></div><button className="rounded-lg bg-white px-6 py-3 font-black text-[#061b47] shadow-lg shadow-blue-950/20">Voir les détails</button></div>
         </section>
       </div>
 
@@ -1352,13 +1371,8 @@ function Messages() {
   }
 
   return (
-    <div className="messages-page -m-5 flex min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 p-6 lg:-m-8 lg:p-8">
-      <div className="mb-5 shrink-0">
-        <h1 className="text-3xl font-black tracking-tight text-blue-950">Messages</h1>
-        <p className="mt-1 text-base font-medium text-slate-600">Communiquez avec l'équipe StudyWay</p>
-      </div>
-
-      <div className="messaging-shell grid min-h-0 flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:grid-cols-[430px_1fr]">
+    <div className="messages-page flex min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 p-0">
+      <div className="messaging-shell grid h-full min-h-0 w-full flex-1 overflow-hidden bg-white xl:grid-cols-[430px_1fr]">
         <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
           <div className="grid shrink-0 grid-cols-3 gap-3 border-b border-slate-100 p-5">
             {[
