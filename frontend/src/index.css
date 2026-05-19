@@ -84,6 +84,21 @@ a:hover {
   border-radius: 999px;
 }
 
+.sidebar-panel {
+  opacity: 0;
+  transform: translateX(-104%) scale(0.985);
+  transform-origin: left center;
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 320ms ease;
+  will-change: transform, opacity;
+}
+
+.sidebar-panel.is-open {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
 main [class*="rounded-lg"][class*="bg-white"]:hover,
 main [class*="rounded-lg"][class*="border"]:hover {
   border-color: rgba(37, 99, 235, 0.22);
@@ -229,6 +244,11 @@ main [class*="rounded-lg"]:hover img.object-cover {
 
 .transport-tab {
   transform: translateZ(0);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
   will-change: transform;
 }
 
@@ -410,15 +430,15 @@ main textarea:focus {
 
 .arrival-pack-icon {
   transition:
-    transform 200ms ease,
-    box-shadow 200ms ease;
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 260ms ease;
   box-shadow:
     0 8px 18px rgba(37, 99, 235, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 .arrival-pack-icon:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow:
     0 12px 24px rgba(37, 99, 235, 0.16),
     0 1px 0 rgba(255, 255, 255, 0.95) inset;
@@ -459,7 +479,9 @@ main textarea:focus {
 }
 
 .service-3d-card {
+  min-height: 218px;
   transform-style: preserve-3d;
+  transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0);
   transition:
     transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 360ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -467,14 +489,58 @@ main textarea:focus {
   will-change: transform;
 }
 
-.service-3d-card:hover {
-  transform: perspective(900px) rotateX(8deg) rotateY(-10deg) translateY(-10px) translateZ(18px);
-  border-color: rgba(37, 99, 235, 0.32);
-  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.16);
+.service-3d-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.18));
+  pointer-events: none;
 }
 
-.service-3d-card:hover > div:first-child {
-  transform: translateZ(28px) scale(1.04);
+.service-card-glow {
+  position: absolute;
+  right: -36px;
+  top: -36px;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.1;
+  filter: blur(3px);
+  transform: translateZ(10px);
+}
+
+.service-card-icon {
+  position: relative;
+  z-index: 1;
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms ease;
+}
+
+.service-featured-card {
+  box-shadow:
+    0 16px 34px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.82) inset;
+}
+
+.service-3d-card:hover {
+  transform: perspective(900px) rotateX(7deg) rotateY(-8deg) translateY(-10px);
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow:
+    0 28px 60px rgba(15, 23, 42, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.82) inset;
+}
+
+.service-3d-card:hover .service-card-icon {
+  transform: translateZ(30px) scale(1.06);
+  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.14);
+}
+
+.service-3d-card:hover .service-card-glow {
+  opacity: 0.16;
+  transform: translateZ(18px) scale(1.08);
 }
 
 .esim-plan-rail {
@@ -524,15 +590,24 @@ main textarea:focus {
 }
 
 .messages-page {
-  position: fixed;
-  top: 5rem;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 20;
+  position: relative;
   height: auto;
   max-height: none;
-  width: 100vw;
+}
+
+.service-client-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.service-client-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 76% 18%, rgba(59, 130, 246, 0.28), transparent 24rem),
+    radial-gradient(circle at 12% 88%, rgba(16, 185, 129, 0.16), transparent 22rem);
+  pointer-events: none;
 }
 
 .message-bubble {
