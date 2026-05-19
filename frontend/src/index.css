@@ -233,7 +233,7 @@ main [class*="rounded-lg"]:hover img.object-cover {
 
 .finance-hero-bg {
   opacity: 1;
-  filter: drop-shadow(0 30px 34px rgba(15, 23, 42, 0.14));
+  filter: drop-shadow(0 18px 18px rgba(15, 23, 42, 0.12));
 }
 
 @media (max-width: 1279px) {
@@ -309,6 +309,100 @@ main textarea:focus {
 .esim-page article:hover,
 .transport-page article:hover {
   filter: saturate(1.03);
+}
+
+.finance-page .finance-quick-card {
+  background: linear-gradient(135deg, #2f6fed 0%, #4f8df7 56%, #7db7ff 100%);
+  border-color: rgba(219, 234, 254, 0.72);
+}
+
+.finance-page .finance-quick-card:hover {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(191, 219, 254, 0.95);
+}
+
+.finance-quick-arrow {
+  transform: translateX(0);
+}
+
+.finance-quick-card:hover .finance-quick-arrow {
+  animation: finance-arrow-click 920ms ease-in-out infinite;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+}
+
+.finance-bank-card {
+  transition:
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    filter 260ms ease;
+}
+
+.finance-bank-card:hover {
+  border-color: rgba(37, 99, 235, 0.34);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 24px 52px rgba(37, 99, 235, 0.14);
+}
+
+.finance-bank-card img {
+  filter: invert(30%) sepia(92%) saturate(2543%) hue-rotate(214deg) brightness(92%) contrast(96%);
+}
+
+.finance-student-badge {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.08);
+}
+
+.finance-student-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.85) 45%, transparent 72%);
+  transform: translateX(-120%);
+}
+
+.finance-bank-card:hover .finance-student-badge {
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  animation: finance-badge-pop 780ms ease both;
+}
+
+.finance-bank-card:hover .finance-student-badge::after {
+  animation: finance-badge-shine 1050ms ease;
+}
+
+@keyframes finance-arrow-click {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+
+  45% {
+    transform: translateX(7px) scale(1.08);
+  }
+
+  70% {
+    transform: translateX(3px) scale(1);
+  }
+}
+
+@keyframes finance-badge-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes finance-badge-shine {
+  to {
+    transform: translateX(120%);
+  }
 }
 
 .message-bubble,

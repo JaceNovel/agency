@@ -26,16 +26,16 @@ const logos = {
   parisSaclay: 'https://logo.clearbit.com/universite-paris-saclay.fr',
   edhec: 'https://logo.clearbit.com/edhec.edu',
   escp: 'https://logo.clearbit.com/escp.eu',
-  societeGenerale: 'https://logo.clearbit.com/societegenerale.com',
-  bnp: 'https://logo.clearbit.com/bnpparibas.com',
+  societeGenerale: 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/societegenerale.svg',
+  bnp: 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/bnpparibas.svg',
   bpifrance: 'https://logo.clearbit.com/bpifrance.fr',
   sorbonne: 'https://logo.clearbit.com/sorbonne-universite.fr',
   montreal: 'https://logo.clearbit.com/umontreal.ca',
   tum: 'https://logo.clearbit.com/tum.de',
   uclouvain: 'https://logo.clearbit.com/uclouvain.be',
-  creditMutuel: 'https://logo.clearbit.com/creditmutuel.fr',
-  n26: 'https://logo.clearbit.com/n26.com',
-  revolut: 'https://logo.clearbit.com/revolut.com',
+  creditMutuel: 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/creditmutuel.svg',
+  n26: 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/n26.svg',
+  revolut: 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/revolut.svg',
   airFrance: 'https://logo.clearbit.com/airfrance.com',
   ethiopian: 'https://logo.clearbit.com/ethiopianairlines.com',
   turkish: 'https://logo.clearbit.com/turkishairlines.com',
@@ -462,6 +462,48 @@ function DashboardOffer({ title, price, location, image, logo, index }) {
   )
 }
 
+function AnimatedStatValue({ value }) {
+  const parsed = useMemo(() => {
+    const match = String(value).match(/^([+]?)(\d+)(.*)$/)
+    if (!match) return null
+    return {
+      prefix: match[1],
+      target: Number(match[2]),
+      suffix: match[3],
+    }
+  }, [value])
+  const [count, setCount] = useState(parsed ? 0 : value)
+
+  useEffect(() => {
+    if (!parsed) {
+      setCount(value)
+      return undefined
+    }
+
+    const duration = 1100
+    const start = performance.now()
+    let frame = 0
+
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const nextCount = progress === 1 ? parsed.target : Math.round(parsed.target * eased)
+      setCount(nextCount)
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick)
+      }
+    }
+
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [parsed, value])
+
+  if (!parsed) return <>{value}</>
+
+  return <>{parsed.prefix}{count}{parsed.suffix}</>
+}
+
 function Finance() {
   const quickServices = [
     [Landmark, 'Ouvrir un compte bancaire', 'Compte étudiant 100% en ligne'],
@@ -495,7 +537,7 @@ function Finance() {
       <div className="space-y-7">
         <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }} className="finance-hero-banner relative min-h-[560px] overflow-hidden rounded-lg border border-slate-200 bg-[#f8fbff] p-8 shadow-sm xl:p-10">
           <img src={financeHero} alt="" className="finance-hero-bg absolute inset-0 h-full w-full object-contain object-right-bottom" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,251,255,.98)_0%,rgba(248,251,255,.92)_38%,rgba(248,251,255,.48)_68%,rgba(248,251,255,.12)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,251,255,.98)_0%,rgba(248,251,255,.9)_42%,rgba(248,251,255,.22)_58%,rgba(248,251,255,0)_74%)]" />
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Banque & Finance</div>
           <div className="relative z-10 mt-8 max-w-[620px] xl:max-w-[50%] xl:min-w-[520px]">
             <h1 className="text-5xl font-black leading-tight tracking-tight text-slate-950">Banque & Finance pour étudiants internationaux</h1>
@@ -503,11 +545,13 @@ function Finance() {
           </div>
           <div className="relative z-10 mt-12 grid gap-4 lg:grid-cols-4">
             {quickServices.map(([Icon, title, text], index) => (
-              <motion.article key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -6 }} className="rounded-lg border border-white/80 bg-white/90 p-5 shadow-lg shadow-blue-950/5 backdrop-blur">
-                <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={22} /></div>
-                <h3 className="font-black leading-tight text-slate-950">{title}</h3>
-                <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{text}</p>
-                <ArrowRight className="mt-3 text-blue-800" size={18} />
+              <motion.article key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -14 }} className="finance-quick-card group rounded-lg border p-5 text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
+                <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700 shadow-sm shadow-blue-950/10 transition duration-300 group-hover:bg-blue-50 group-hover:text-blue-800"><Icon size={22} /></div>
+                <h3 className="font-black leading-tight text-white transition duration-300 group-hover:text-slate-950">{title}</h3>
+                <p className="mt-2 text-sm font-medium leading-6 text-blue-100 transition duration-300 group-hover:text-slate-500">{text}</p>
+                <span className="finance-quick-arrow mt-3 inline-grid h-8 w-8 place-items-center rounded-full text-blue-100 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                  <ArrowRight size={18} />
+                </span>
               </motion.article>
             ))}
           </div>
@@ -517,7 +561,7 @@ function Finance() {
           {stats.map(([Icon, value, label]) => (
             <div key={`${value}-${label}`} className="flex items-center gap-4">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={21} /></div>
-              <div><div className="text-lg font-black text-slate-950">{value}</div><div className="text-sm font-semibold text-slate-500">{label}</div></div>
+              <div><div className="text-lg font-black text-slate-950"><AnimatedStatValue value={value} /></div><div className="text-sm font-semibold text-slate-500">{label}</div></div>
             </div>
           ))}
         </section>
@@ -529,13 +573,18 @@ function Finance() {
           </div>
           <div className="grid gap-5 lg:grid-cols-5">
             {banks.map(([bank, logo, tag, perks], index) => (
-              <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -7 }} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <img src={logo} alt={bank} className="h-10 max-w-36 object-contain" />
-                <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold"><span className="rounded-lg bg-slate-50 px-3 py-1 text-slate-600">Compte étudiant</span><span className="rounded-lg bg-blue-50 px-3 py-1 text-blue-700">{tag}</span></div>
+              <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -15 }} className="finance-bank-card rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex min-h-12 items-center gap-3">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
+                    <img src={logo} alt="" className="h-6 w-6 object-contain" />
+                  </span>
+                  <h3 className="text-base font-black leading-tight text-slate-950">{bank}</h3>
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold"><span className="finance-student-badge rounded-lg px-3 py-1 text-blue-800">Compte étudiant</span><span className="rounded-lg bg-blue-50 px-3 py-1 text-blue-700">{tag}</span></div>
                 <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
                   {perks.map((perk) => <div key={perk} className="flex gap-2"><CheckCircle2 className="shrink-0 text-emerald-600" size={16} />{perk}</div>)}
                 </div>
-                <div className="mt-5 border-t border-slate-100 pt-4 text-sm font-bold text-slate-500">Ouverture en ligne</div>
+                <div className="mt-5 border-t border-blue-200 pt-4"><span className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</span></div>
               </motion.article>
             ))}
           </div>
