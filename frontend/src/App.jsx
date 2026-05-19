@@ -256,7 +256,16 @@ function Shell() {
       </aside>
       <div>
         <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex items-center gap-3 rounded-lg pr-2">
+              <div className="grid h-11 w-11 place-items-center rounded-lg bg-white text-blue-700 shadow-md shadow-slate-200">
+                <img src={logos.studyway} alt="StudyWay" className="h-7 w-7" />
+              </div>
+              <div className="hidden leading-tight sm:block">
+                <div className="text-2xl font-black tracking-tight text-blue-950">Study<span className="text-blue-600">Way</span></div>
+                <div className="text-[11px] font-semibold text-slate-500">Votre avenir, notre mission</div>
+              </div>
+            </Link>
             <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-xl bg-slate-700 text-slate-100 shadow-sm hover:bg-slate-800" aria-label="Ouvrir la navigation"><Menu size={24} /></button>
           </div>
           <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
@@ -282,6 +291,10 @@ function Shell() {
 
 function AnimatedRoutes() {
   const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [location.pathname])
 
   return (
     <motion.div
