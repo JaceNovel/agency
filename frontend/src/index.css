@@ -192,6 +192,10 @@ main [class*="rounded-lg"]:hover img.object-cover {
     0 24px 70px rgba(15, 23, 42, 0.1);
 }
 
+.university-hero-image {
+  object-position: right top;
+}
+
 .housing-page > div:first-child,
 .transport-page > div:first-child {
   position: relative;
@@ -391,6 +395,11 @@ main textarea:focus {
   animation: message-shell-in 360ms ease both;
 }
 
+.messages-page {
+  height: calc((100vh - 5rem) / 0.58);
+  zoom: 0.7733333;
+}
+
 .message-bubble {
   animation: message-pop 280ms ease both;
 }
@@ -577,9 +586,5 @@ main textarea:focus {
 
   .messaging-shell aside {
     border-right: 0;
-  }
-
-  .messaging-shell section {
-    min-height: 640px;
   }
 }

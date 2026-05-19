@@ -7,7 +7,7 @@ import {
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
-  Menu, X,
+  Menu, X, Video, SlidersHorizontal,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
@@ -787,7 +787,7 @@ function Universities() {
     <div className="university-page -mx-5 space-y-8 lg:-mx-8">
       <div className="grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <section className="university-hero relative min-h-[430px] overflow-visible rounded-lg bg-[#f4f8ff] p-8 md:p-10">
-          <img src={universityHero} alt="Étudiante avec cahier" className="absolute inset-y-0 right-0 h-full w-full rounded-lg object-cover object-right" />
+          <img src={universityHero} alt="Étudiante avec cahier" className="university-hero-image absolute inset-y-0 right-0 h-full w-full rounded-lg object-cover" />
           <div className="absolute inset-0 rounded-lg bg-[linear-gradient(90deg,rgba(244,248,255,.92)_0%,rgba(244,248,255,.72)_38%,rgba(244,248,255,.08)_70%,rgba(244,248,255,0)_100%)]" />
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Universités</div>
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 mt-8 max-w-[600px]">
@@ -1175,49 +1175,239 @@ function EsimPlan({ plan, featured = false, index }) {
 }
 
 function Messages() {
-  const supportThread = { title: 'Support StudyWay', avatar: 'SW', tone: 'blue' }
-  const [draft, setDraft] = useState('')
-  const [messages, setMessages] = useState([
+  const initialThreads = [
     {
-      id: 1,
-      side: 'left',
-      text: "Bonjour Christelle,\n\nNous avons bien reçu tous vos documents pour votre demande de visa étudiant.\n\nVotre dossier est en cours de vérification par notre équipe.\n\nNous reviendrons vers vous dans les prochaines 24h avec une réponse.\n\nCordialement,\nL'équipe StudyWay",
-      time: '10:30',
-    },
-    {
-      id: 2,
-      side: 'right',
-      text: "Bonjour,\nMerci beaucoup pour l'information.\nJ'attends votre retour avec impatience.\nBonne journée 😊",
-      time: '10:32',
-    },
-    {
-      id: 3,
-      side: 'left',
-      text: "Avec plaisir 😊\nN'hésitez pas si vous avez d'autres questions.",
+      id: 'support',
+      title: 'Support StudyWay',
+      preview: "N'hésitez pas si vous avez d'autres questions.",
       time: '10:33',
+      unread: 2,
+      avatar: 'SW',
+      tone: 'blue',
+      online: true,
+      messages: [
+        {
+          id: 1,
+          side: 'left',
+          text: "Bonjour Christelle,\n\nNous avons bien reçu tous vos documents pour votre demande de visa étudiant.\n\nVotre dossier est en cours de vérification par notre équipe.\n\nNous reviendrons vers vous dans les prochaines 24h avec une réponse.\n\nCordialement,\nL'équipe StudyWay",
+          time: '10:30',
+        },
+        {
+          id: 2,
+          side: 'right',
+          text: "Bonjour,\nMerci beaucoup pour l'information.\nJ'attends votre retour avec impatience.\nBonne journée 😊",
+          time: '10:32',
+        },
+        {
+          id: 3,
+          side: 'left',
+          text: "Avec plaisir 😊\nN'hésitez pas si vous avez d'autres questions.",
+          time: '10:33',
+        },
+      ],
     },
-  ])
+    {
+      id: 'visa-agent',
+      title: 'Agent - Visa France',
+      preview: 'Merci pour les documents fournis.',
+      time: '09:15',
+      unread: 1,
+      image: avatars.koffi,
+      messages: [
+        { id: 1, side: 'left', text: 'Bonjour Christelle, il manque uniquement votre attestation de logement.', time: '09:02' },
+        { id: 2, side: 'right', text: 'Je viens de la téléverser dans mon espace.', time: '09:10' },
+        { id: 3, side: 'left', text: 'Merci pour les documents fournis. Je transmets votre dossier au centre visa.', time: '09:15' },
+      ],
+    },
+    {
+      id: 'residence',
+      title: 'Résidence Paris 15',
+      preview: 'Appartement disponible à partir du...',
+      time: 'Hier',
+      unread: 1,
+      icon: Building2,
+      tone: 'sky',
+      messages: [
+        { id: 1, side: 'left', text: 'Bonjour, un studio meublé est disponible à partir du 2 juin.', time: 'Hier' },
+        { id: 2, side: 'right', text: 'Merci, est-ce que les charges sont incluses ?', time: 'Hier' },
+      ],
+    },
+    {
+      id: 'paris-group',
+      title: 'Groupe - Étudiants Paris',
+      preview: 'Sarah: Bonjour à tous 👋',
+      time: 'Hier',
+      icon: Users,
+      tone: 'violet',
+      group: true,
+      messages: [
+        { id: 1, side: 'left', text: 'Sarah: Bonjour à tous 👋', time: 'Hier' },
+        { id: 2, side: 'left', text: 'Yao: Qui arrive à Paris cette semaine ?', time: 'Hier' },
+      ],
+    },
+    {
+      id: 'finance',
+      title: 'Service Finance',
+      preview: 'Votre paiement a été confirmé.',
+      time: 'Lun.',
+      icon: Landmark,
+      tone: 'emerald',
+      messages: [
+        { id: 1, side: 'left', text: 'Votre paiement a été confirmé. Le reçu est disponible dans vos documents.', time: 'Lun.' },
+      ],
+    },
+    {
+      id: 'mom',
+      title: 'Maman ❤️',
+      preview: 'Prends bien soin de toi ma chérie.',
+      time: 'Lun.',
+      image: avatars.parent,
+      online: true,
+      messages: [
+        { id: 1, side: 'left', text: 'Prends bien soin de toi ma chérie.', time: 'Lun.' },
+        { id: 2, side: 'right', text: "Oui maman, je t'appelle ce soir ❤️", time: 'Lun.' },
+      ],
+    },
+    {
+      id: 'travel',
+      title: 'Support Voyage',
+      preview: 'Rappel: Vol dans 3 jours ✈️',
+      time: 'Dim.',
+      icon: Plane,
+      tone: 'cyan',
+      messages: [
+        { id: 1, side: 'left', text: 'Rappel: votre vol est prévu dans 3 jours. Pensez à vérifier vos bagages.', time: 'Dim.' },
+      ],
+    },
+    {
+      id: 'saclay',
+      title: 'Université Paris-Saclay',
+      preview: 'Votre admission est confirmée.',
+      time: 'Sam.',
+      image: logos.parisSaclay,
+      messages: [
+        { id: 1, side: 'left', text: 'Félicitations, votre admission est confirmée pour la rentrée prochaine.', time: 'Sam.' },
+      ],
+    },
+  ]
+  const [threads, setThreads] = useState(initialThreads)
+  const [activeThreadId, setActiveThreadId] = useState(initialThreads[0].id)
+  const [filter, setFilter] = useState('all')
+  const [search, setSearch] = useState('')
+  const [draft, setDraft] = useState('')
+  const [attachment, setAttachment] = useState(null)
+  const [emojiOpen, setEmojiOpen] = useState(false)
+  const messagesEndRef = useRef(null)
+  const fileInputRef = useRef(null)
+  const activeThread = threads.find((thread) => thread.id === activeThreadId) || threads[0]
+  const filteredThreads = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    return threads.filter((thread) => {
+      const matchesFilter = filter === 'all' || (filter === 'unread' && thread.unread) || (filter === 'groups' && thread.group)
+      const matchesSearch = !query || `${thread.title} ${thread.preview}`.toLowerCase().includes(query)
+      return matchesFilter && matchesSearch
+    })
+  }, [filter, search, threads])
+  const unreadCount = threads.reduce((total, thread) => total + (thread.unread || 0), 0)
+  const groupCount = threads.filter((thread) => thread.group).length
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [activeThreadId, activeThread.messages.length])
+
+  const selectThread = (threadId) => {
+    setActiveThreadId(threadId)
+    setDraft('')
+    setAttachment(null)
+    setEmojiOpen(false)
+    setThreads((items) => items.map((thread) => thread.id === threadId ? { ...thread, unread: 0 } : thread))
+  }
+
+  const handleAttachment = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setAttachment({
+      name: file.name,
+      size: file.size,
+      type: file.type || 'application/octet-stream',
+      url: URL.createObjectURL(file),
+    })
+    event.target.value = ''
+  }
 
   const sendMessage = () => {
     const cleanDraft = draft.trim()
-    if (!cleanDraft) return
-    setMessages((items) => [...items, { id: Date.now(), side: 'right', text: cleanDraft, time: '10:34' }])
+    if (!cleanDraft && !attachment) return
+    const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    const messageText = cleanDraft || (attachment ? `Pièce jointe: ${attachment.name}` : '')
+    setThreads((items) => items.map((thread) => thread.id === activeThreadId ? {
+      ...thread,
+      preview: attachment ? `📎 ${attachment.name}` : messageText,
+      time: now,
+      messages: [...thread.messages, { id: Date.now(), side: 'right', text: messageText, time: now, attachment }],
+    } : thread))
     setDraft('')
+    setAttachment(null)
+    setEmojiOpen(false)
   }
 
   return (
-    <div className="messaging-shell -m-5 flex min-h-[calc(100vh-5rem)] overflow-hidden border border-slate-200 bg-white shadow-sm lg:-m-8">
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-[calc(100vh-5rem)] w-full flex-col bg-white">
-          <header className="flex h-24 items-center justify-between border-b border-slate-200 px-7">
+    <div className="messages-page -m-5 flex min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 p-6 lg:-m-8 lg:p-8">
+      <div className="mb-5 shrink-0">
+        <h1 className="text-3xl font-black tracking-tight text-blue-950">Messages</h1>
+        <p className="mt-1 text-base font-medium text-slate-600">Communiquez avec l'équipe StudyWay</p>
+      </div>
+
+      <div className="messaging-shell grid min-h-0 flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:grid-cols-[430px_1fr]">
+        <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
+          <div className="grid shrink-0 grid-cols-3 gap-3 border-b border-slate-100 p-5">
+            {[
+              ['all', 'Toutes', threads.length],
+              ['unread', 'Non lues', unreadCount],
+              ['groups', 'Groupes', groupCount],
+            ].map(([key, label, count]) => (
+              <button type="button" key={key} onClick={() => setFilter(key)} className={`flex h-11 items-center justify-center gap-2 rounded-lg text-sm font-black ${filter === key ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}>
+                {label}
+                <span className={`grid h-7 w-7 place-items-center rounded-full text-xs ${filter === key ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{count}</span>
+              </button>
+            ))}
+          </div>
+          <div className="grid shrink-0 grid-cols-[1fr_48px] gap-3 border-b border-slate-100 p-5">
+            <label className="flex h-12 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-500 shadow-sm">
+              <Search size={19} />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" placeholder="Rechercher un message..." />
+            </label>
+            <button type="button" className="grid h-12 place-items-center rounded-lg border border-slate-200 text-slate-600 shadow-sm hover:bg-blue-50 hover:text-blue-700" aria-label="Filtrer les messages"><SlidersHorizontal size={21} /></button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {filteredThreads.map((thread) => (
+              <button type="button" key={thread.id} onClick={() => selectThread(thread.id)} className={`flex w-full items-center gap-4 border-b border-slate-100 px-5 py-5 text-left transition ${thread.id === activeThreadId ? 'bg-blue-50/70 shadow-[inset_3px_0_0_#2563eb]' : 'hover:bg-slate-50'}`}>
+                <ThreadAvatar thread={thread} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-base font-black text-blue-950">{thread.title}</span>
+                  <span className="mt-1 block truncate text-sm font-semibold text-slate-600">{thread.preview}</span>
+                </span>
+                <span className="flex flex-col items-end gap-3">
+                  <span className="text-xs font-semibold text-slate-500">{thread.time}</span>
+                  {thread.unread && <span className="grid h-6 w-6 place-items-center rounded-full bg-blue-600 text-xs font-black text-white">{thread.unread}</span>}
+                </span>
+              </button>
+            ))}
+            {!filteredThreads.length && <div className="px-6 py-10 text-center text-sm font-semibold text-slate-500">Aucune conversation trouvée.</div>}
+          </div>
+        </aside>
+
+        <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-col overflow-hidden bg-white">
+          <header className="flex h-24 shrink-0 items-center justify-between border-b border-slate-200 px-7">
             <div className="flex items-center gap-4">
-              <ThreadAvatar thread={supportThread} large />
+              <ThreadAvatar thread={activeThread} large />
               <div>
-                <h2 className="text-lg font-black text-slate-950">{supportThread.title}</h2>
-                <div className="mt-1 flex items-center gap-2 text-sm font-bold text-emerald-600"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> En ligne</div>
+                <h2 className="text-lg font-black text-slate-950">{activeThread.title}</h2>
+                <div className={`mt-1 flex items-center gap-2 text-sm font-bold ${activeThread.online ? 'text-emerald-600' : 'text-slate-500'}`}><span className={`h-2.5 w-2.5 rounded-full ${activeThread.online ? 'bg-emerald-500' : 'bg-slate-300'}`} /> {activeThread.online ? 'En ligne' : 'Hors ligne'}</div>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              {[Phone, Info].map((Icon, index) => (
+              {[Phone, Video, Info].map((Icon, index) => (
                 <button type="button" key={index} className="grid h-12 w-12 place-items-center rounded-lg border border-slate-200 text-blue-700 shadow-sm hover:bg-blue-50" aria-label="Action conversation">
                   <Icon size={22} />
                 </button>
@@ -1225,10 +1415,10 @@ function Messages() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-auto px-7 py-8">
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 lg:px-16">
             <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd'hui</div>
             <div className="space-y-7">
-              {messages.map((message, index) => (
+              {activeThread.messages.map((message, index) => (
                 <motion.div
                   key={message.id}
                   initial={{ opacity: 0, y: 14, scale: 0.98 }}
@@ -1236,9 +1426,24 @@ function Messages() {
                   transition={{ delay: index * 0.045, duration: 0.26 }}
                   className={`flex items-end gap-4 ${message.side === 'right' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.side === 'left' && <ThreadAvatar thread={supportThread} compact />}
+                  {message.side === 'left' && <ThreadAvatar thread={activeThread} compact />}
                   <div className={`message-bubble relative max-w-[560px] whitespace-pre-line rounded-lg px-6 py-5 text-[15px] font-semibold leading-7 ${message.side === 'right' ? 'message-out bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'message-in border border-slate-200 bg-slate-50 text-slate-950 shadow-sm'}`}>
                     {message.text}
+                    {message.attachment && (
+                      <div className={`mt-4 overflow-hidden rounded-lg border ${message.side === 'right' ? 'border-white/25 bg-white/10' : 'border-slate-200 bg-white'}`}>
+                        {message.attachment.type.startsWith('image/') ? (
+                          <img src={message.attachment.url} alt={message.attachment.name} className="max-h-64 w-full object-cover" />
+                        ) : (
+                          <div className="flex items-center gap-3 p-4">
+                            <div className={`grid h-11 w-11 place-items-center rounded-lg ${message.side === 'right' ? 'bg-white/15 text-white' : 'bg-blue-50 text-blue-700'}`}><FileText size={22} /></div>
+                            <div className="min-w-0">
+                              <div className="truncate font-black">{message.attachment.name}</div>
+                              <div className={`text-xs ${message.side === 'right' ? 'text-blue-100' : 'text-slate-500'}`}>{Math.max(1, Math.round(message.attachment.size / 1024))} Ko</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <span className={`ml-4 inline-flex items-center gap-1 text-xs font-bold ${message.side === 'right' ? 'text-blue-100' : 'text-slate-500'}`}>
                       {message.time}
                       {message.side === 'right' && <CheckCheck size={14} />}
@@ -1246,27 +1451,50 @@ function Messages() {
                   </div>
                 </motion.div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
           </div>
 
           <form
-            className="grid grid-cols-[1fr_56px] gap-4 border-t border-slate-100 p-6"
+            className="grid shrink-0 grid-cols-[1fr_56px] gap-4 border-t border-slate-100 p-6"
             onSubmit={(event) => {
               event.preventDefault()
               sendMessage()
             }}
           >
-            <label className="flex min-h-14 items-center gap-4 rounded-lg border border-slate-200 bg-white px-5 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
-              <Paperclip size={23} className="text-slate-500" />
-              <input value={draft} onChange={(event) => setDraft(event.target.value)} className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder="Écrire un message..." />
-              <Smile size={23} className="text-slate-500" />
-            </label>
+            <div className="relative flex min-h-14 items-center gap-4 rounded-lg border border-slate-200 bg-white px-5 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
+              <input ref={fileInputRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" className="hidden" onChange={handleAttachment} />
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-slate-500 hover:text-blue-700" aria-label="Joindre une image, un PDF ou un document">
+                <Paperclip size={23} />
+              </button>
+              <div className="min-w-0 flex-1">
+                {attachment && (
+                  <div className="mb-2 flex w-fit max-w-full items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-black text-blue-800">
+                    <Paperclip size={14} />
+                    <span className="truncate">{attachment.name}</span>
+                    <button type="button" onClick={() => setAttachment(null)} className="text-blue-500 hover:text-blue-900" aria-label="Retirer la pièce jointe"><X size={14} /></button>
+                  </div>
+                )}
+                <input value={draft} onChange={(event) => setDraft(event.target.value)} className="w-full min-w-0 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder="Écrire un message..." />
+              </div>
+              <button type="button" onClick={() => setEmojiOpen((value) => !value)} className="text-slate-500 hover:text-blue-700" aria-label="Ajouter un emoji">
+                <Smile size={23} />
+              </button>
+              {emojiOpen && (
+                <div className="absolute bottom-20 right-0 z-20 grid w-[420px] grid-cols-8 gap-3 rounded-lg border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-300">
+                  {['😊', '😂', '😍', '🙏', '👍', '🎉', '❤️', '👋', '😎', '😅', '🤝', '📚', '✈️', '🏠', '💳', '✅', '🔥', '⭐', '💬', '📎', '🇫🇷', '🇨🇦', '🇩🇪', '🇧🇪'].map((emoji) => (
+                    <button type="button" key={emoji} onClick={() => { setDraft((value) => `${value}${emoji}`); setEmojiOpen(false) }} className="grid h-11 w-11 place-items-center rounded-lg text-2xl hover:bg-blue-50" aria-label={`Ajouter ${emoji}`}>{emoji}</button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button type="submit" className="grid h-14 w-14 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700" aria-label="Envoyer le message">
               <Send size={24} />
             </button>
           </form>
         </motion.section>
       </div>
+    </div>
   )
 }
 
