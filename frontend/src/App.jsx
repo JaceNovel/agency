@@ -66,7 +66,6 @@ const navItems = [
   { label: 'Finance & Banque', icon: CreditCard, to: '/finance' },
   { label: 'Billets & Transport', icon: Plane, to: '/transport' },
   { label: 'Accompagnement', icon: UserRound, to: '/accompagnement' },
-  { label: 'Messages', icon: MessageCircle, to: '/messages', badge: 3 },
   { label: 'eSIM & Forfait', icon: Smartphone, to: '/esim' },
 ]
 
@@ -251,7 +250,7 @@ function Shell() {
             <button type="button" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-lg text-blue-100 hover:bg-white/10" aria-label="Fermer la navigation"><X size={22} /></button>
           </div>
           <nav className="sidebar-nav mt-10 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">{navItems.map(({ label, icon: Icon, to, badge }) => <NavLink key={label} to={to} onClick={() => setOpen(false)} className={({ isActive }) => `flex h-12 items-center gap-3 rounded-lg px-4 text-sm font-bold transition ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}><Icon size={21} /><span className="flex-1">{label}</span>{badge && <span className="grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}</NavLink>)}</nav>
-          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><button className="mt-4 h-11 w-full rounded-lg bg-blue-600 text-sm font-bold">Contacter le support</button></div>
+          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><Link to="/messages" onClick={() => setOpen(false)} className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Message</span><span className="message-menu-badge">3</span></Link></div>
         </div>
       </aside>
       <div>
@@ -434,7 +433,7 @@ function Dashboard() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d'examen</span><button className="font-black text-blue-700">Voir détails</button></div></section>
           <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black">Ajouter de l'argent</button></section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>{['Uploader un document', 'Réserver un logement', 'Prendre rendez-vous', 'Demander une AVI', 'Ouvrir un compte bancaire'].map((item) => <div key={item} className="flex items-center gap-3 py-3 text-sm font-semibold text-slate-600"><FileText size={17} />{item}</div>)}</section>
-          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-sky-300 px-5 font-black text-blue-950 shadow-sm shadow-sky-950/10">Parrainer maintenant <ArrowRight size={18} /></button></section>
+          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-blue-600 px-5 font-black text-white">Parrainer maintenant <ArrowRight size={18} /></button></section>
         </aside>
       </div>
 
