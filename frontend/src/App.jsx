@@ -1551,11 +1551,11 @@ function Visa() {
   const { country, type } = useParams()
   const [activeVisaTab, setActiveVisaTab] = useState('Aperçu')
   const countries = [
-    ['france', 'France', logos.france, 'Paris', 'EUR', '/visa-france-travel.png', 'Passeport, avion et ambiance France', 'from-blue-50 to-white', 'object-cover'],
-    ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR', '/visa-germany-travel.png', 'Passeport, avion et ambiance Allemagne', 'from-amber-50 to-red-50', 'object-cover'],
-    ['belgique', 'Belgique', logos.belgium, 'Bruxelles', 'EUR', '/visa-belgium-travel.png', 'Passeport, avion et ambiance Belgique', 'from-yellow-50 to-slate-50', 'object-cover'],
-    ['suisse', 'Suisse', logos.swiss, 'Berne', 'CHF', '/visa-switzerland-travel.png', 'Passeport, avion et ambiance Suisse', 'from-red-50 to-sky-50', 'object-cover'],
-    ['canada', 'Canada', logos.canada, 'Ottawa', 'CAD', '/visa-canada-travel.png', 'Passeport, avion et ambiance Canada', 'from-red-50 to-blue-50', 'object-cover'],
+    ['france', 'France', logos.france, 'Paris', 'EUR', '/visa-france-real.jpeg', 'Passeports français, carte et avion', 'from-blue-50 to-white', 'object-cover object-center'],
+    ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR', '/visa-germany-real.jpeg', 'Avion au roulage sur une piste', 'from-amber-50 to-red-50', 'object-cover object-center'],
+    ['belgique', 'Belgique', logos.belgium, 'Bruxelles', 'EUR', '/visa-belgium-real.jpeg', 'Avions stationnés devant un terminal', 'from-yellow-50 to-slate-50', 'object-cover object-center'],
+    ['suisse', 'Suisse', logos.swiss, 'Berne', 'CHF', '/visa-switzerland-real.jpeg', 'Bagages devant un avion à l’aéroport', 'from-red-50 to-sky-50', 'object-cover object-center'],
+    ['canada', 'Canada', logos.canada, 'Ottawa', 'CAD', '/visa-canada-real.jpeg', 'Cabine avion avant le départ', 'from-red-50 to-blue-50', 'object-cover object-center'],
   ]
   const visaTypes = [
     {
