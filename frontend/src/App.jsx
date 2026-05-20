@@ -1549,6 +1549,7 @@ function FormRadio({ label, options }) {
 
 function Visa() {
   const { country, type } = useParams()
+  const [activeVisaTab, setActiveVisaTab] = useState('Aperçu')
   const countries = [
     ['france', 'France', logos.france, 'Paris', 'EUR', '/visa-france-travel.png', 'Passeport, avion et ambiance France', 'from-blue-50 to-white', 'object-cover'],
     ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR', '/visa-germany-travel.png', 'Passeport, avion et ambiance Allemagne', 'from-amber-50 to-red-50', 'object-cover'],
@@ -1659,6 +1660,14 @@ function Visa() {
     ['Prenez rendez-vous', 'Réservez un rendez-vous au centre de visa.'],
     ['Suivez votre dossier', 'Suivez l’état d’avancement en temps réel.'],
   ]
+  const allDocuments = ['Passeport valide', ...selectedVisa.documents, 'Photo d’identité']
+  const timelineItems = ['Dépôt de la demande', 'Traitement consulaire', 'Entretien si requis', 'Décision', 'Réception du visa']
+  const costRows = [
+    ['Frais de visa', `${selectedVisa.cost - 99},00 ${currency}`],
+    ['Service StudyWay', '49,00 €'],
+    ['Assurance', '30,00 €'],
+    ['Total estimé', `${selectedVisa.cost},00 €`],
+  ]
 
   return (
     <div className="visa-page space-y-6">
@@ -1681,45 +1690,60 @@ function Visa() {
               </div>
             </div>
             <div className="grid border-t border-slate-100 text-sm font-black text-slate-600 md:grid-cols-6">
-              {['Aperçu', 'Documents requis', 'Étapes', 'Coûts', 'Délai & traitement', 'FAQ'].map((tab, index) => <button key={tab} className={`h-14 border-b-2 ${index === 0 ? 'border-blue-600 text-blue-700' : 'border-transparent hover:text-blue-700'}`}>{tab}</button>)}
+              {['Aperçu', 'Documents requis', 'Étapes', 'Coûts', 'Délai & traitement', 'FAQ'].map((tab) => <button type="button" key={tab} onClick={() => setActiveVisaTab(tab)} className={`h-14 border-b-2 transition ${activeVisaTab === tab ? 'border-blue-600 text-blue-700' : 'border-transparent hover:text-blue-700'}`}>{tab}</button>)}
             </div>
           </section>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-black text-slate-950">Description du visa</h2>
-              <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">Le {selectedVisa.title.toLowerCase()} pour {countryName} accompagne les voyageurs dans la constitution d’un dossier clair, complet et adapté aux exigences du pays.</p>
-              <div className="mt-6 border-t border-slate-100 pt-5">
-                <h3 className="font-black text-slate-950">Conditions d’éligibilité</h3>
-                <div className="mt-4 space-y-3">{selectedVisa.eligibility.map((item) => <div key={item} className="flex gap-3 text-sm font-semibold text-slate-600"><CheckCircle2 className="shrink-0 text-emerald-600" size={17} />{item}</div>)}</div>
+          <motion.div key={activeVisaTab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24 }}>
+            {activeVisaTab === 'Aperçu' && (
+              <div className="grid gap-6 lg:grid-cols-2">
+                <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-black text-slate-950">Description du visa</h2>
+                  <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">Le {selectedVisa.title.toLowerCase()} pour {countryName} accompagne les voyageurs dans la constitution d’un dossier clair, complet et adapté aux exigences du pays.</p>
+                  <div className="mt-6 border-t border-slate-100 pt-5"><h3 className="font-black text-slate-950">Conditions d’éligibilité</h3><div className="mt-4 space-y-3">{selectedVisa.eligibility.map((item) => <div key={item} className="flex gap-3 text-sm font-semibold text-slate-600"><CheckCircle2 className="shrink-0 text-emerald-600" size={17} />{item}</div>)}</div></div>
+                </section>
+                <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-black text-slate-950">Informations clés</h2>
+                  <div className="mt-5 divide-y divide-slate-100">{keyInfo.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-5 py-3 text-sm"><span className="font-bold text-slate-600">{label}</span><b className="text-right text-slate-950">{value}</b></div>)}</div>
+                </section>
               </div>
-            </section>
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-black text-slate-950">Informations clés</h2>
-              <div className="mt-5 divide-y divide-slate-100">{keyInfo.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-5 py-3 text-sm"><span className="font-bold text-slate-600">{label}</span><b className="text-right text-slate-950">{value}</b></div>)}</div>
-            </section>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-black text-slate-950">Documents requis</h2>
-              <div className="mt-5 space-y-3">{['Passeport valide', ...selectedVisa.documents, 'Photo d’identité'].map((doc, index) => <div key={doc} className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-600"><span className="flex items-center gap-2"><FileText size={16} className="text-blue-700" />{doc}</span><span className={`rounded-full px-2 py-1 text-xs font-black ${index < 4 ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>{index < 4 ? 'Requis' : 'Optionnel'}</span></div>)}</div>
-            </section>
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-black text-slate-950">Coûts associés</h2>
-              <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
-                <div className="flex justify-between"><span>Frais de visa</span><b>{selectedVisa.cost - 99},00 {currency}</b></div>
-                <div className="flex justify-between"><span>Service StudyWay</span><b>49,00 €</b></div>
-                <div className="flex justify-between"><span>Assurance</span><b>30,00 €</b></div>
-                <div className="flex justify-between border-t border-slate-100 pt-3 text-blue-800"><span>Total estimé</span><b>{selectedVisa.cost},00 €</b></div>
-              </div>
-              <button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande</button>
-            </section>
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-black text-slate-950">Délai & traitement</h2>
-              <div className="mt-5 space-y-4">{['Dépôt de la demande', 'Traitement consulaire', 'Entretien si requis', 'Décision', 'Réception du visa'].map((item, index) => <div key={item} className="flex gap-3 text-sm font-semibold text-slate-600"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-blue-700">{index + 1}</span>{item}</div>)}</div>
-            </section>
-          </div>
+            )}
+            {activeVisaTab === 'Documents requis' && (
+              <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-black text-slate-950">Documents requis</h2>
+                <div className="mt-5 grid gap-4 md:grid-cols-2">{allDocuments.map((doc, index) => <div key={doc} className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 p-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><FileText size={18} className="text-blue-700" />{doc}</span><span className={`rounded-full px-3 py-1 text-xs font-black ${index < 4 ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>{index < 4 ? 'Requis' : 'Optionnel'}</span></div>)}</div>
+              </section>
+            )}
+            {activeVisaTab === 'Étapes' && (
+              <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-black text-slate-950">Étapes de la demande</h2>
+                <div className="mt-6 grid gap-4 md:grid-cols-5">{progress.map(([title, text], index) => <div key={title} className="rounded-lg border border-slate-200 p-5"><span className="grid h-9 w-9 place-items-center rounded-full bg-blue-600 font-black text-white">{index + 1}</span><h3 className="mt-4 font-black text-slate-950">{title}</h3><p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{text}</p></div>)}</div>
+              </section>
+            )}
+            {activeVisaTab === 'Coûts' && (
+              <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-black text-slate-950">Coûts associés</h2>
+                <div className="mt-5 divide-y divide-slate-100">{costRows.map(([label, value], index) => <div key={label} className={`flex justify-between gap-5 py-4 text-sm font-semibold ${index === costRows.length - 1 ? 'text-blue-800' : 'text-slate-600'}`}><span>{label}</span><b>{value}</b></div>)}</div>
+                <button className="mt-6 h-12 rounded-lg bg-blue-600 px-8 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande</button>
+              </section>
+            )}
+            {activeVisaTab === 'Délai & traitement' && (
+              <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-black text-slate-950">Délai & traitement</h2>
+                <div className="mt-6 space-y-4">{timelineItems.map((item, index) => <div key={item} className="grid grid-cols-[36px_1fr_auto] items-center gap-4 rounded-lg border border-slate-100 p-4 text-sm font-semibold text-slate-600"><span className="grid h-8 w-8 place-items-center rounded-full bg-blue-50 text-xs font-black text-blue-700">{index + 1}</span><span>{item}</span><b>{index === 0 ? 'Jour 1' : index === 1 ? selectedVisa.delay : 'Selon dossier'}</b></div>)}</div>
+              </section>
+            )}
+            {activeVisaTab === 'FAQ' && (
+              <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-black text-slate-950">Questions fréquentes</h2>
+                <div className="mt-5 space-y-4">{[
+                  ['Quand commencer la demande ?', 'Le plus tôt possible, idéalement 2 à 3 mois avant votre départ.'],
+                  ['StudyWay garantit-il le visa ?', 'Non, la décision appartient aux autorités consulaires. Nous vous aidons à préparer un dossier solide.'],
+                  ['Puis-je ajouter des documents après dépôt ?', 'Oui, si le centre de visa ou le conseiller vous le demande.'],
+                ].map(([question, answer]) => <div key={question} className="rounded-lg border border-slate-100 p-5"><h3 className="font-black text-slate-950">{question}</h3><p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{answer}</p></div>)}</div>
+              </section>
+            )}
+          </motion.div>
         </div>
 
         <aside className="space-y-5">
