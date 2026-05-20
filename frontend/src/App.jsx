@@ -1131,17 +1131,23 @@ function HousingChecks({ title, items, compact = false }) {
 
 function Universities() {
   const [filters, setFilters] = useState({ q: '', city: '', specialization: '', formation_type: '', admission_rate: '' })
+  const [perPage, setPerPage] = useState(12)
   const debouncedFilters = useDebouncedValue(filters, 380)
   const params = new URLSearchParams(Object.entries(debouncedFilters).filter(([, value]) => value))
-  params.set('per_page', '12')
+  params.set('per_page', String(perPage))
   const { data, isLoading } = useQuery({
-    queryKey: ['parcoursup-formations', debouncedFilters],
+    queryKey: ['parcoursup-formations', debouncedFilters, perPage],
     queryFn: () => fetchJson(`/api/v1/parcoursup/search?${params.toString()}`),
     staleTime: 1000 * 60 * 5,
     retry: 1,
   })
+  useEffect(() => {
+    setPerPage(12)
+  }, [debouncedFilters])
   const isFallback = !data?.data?.length
   const formations = isFallback ? parcoursupFallbackFormations : data.data
+  const totalResults = data?.meta?.total ?? formations.length
+  const canShowMore = !isFallback && formations.length < totalResults
   const stats = [
     [Landmark, '23k+', 'Formations Parcoursup'],
     [Globe2, '18', 'Régions françaises'],
@@ -1221,8 +1227,18 @@ function Universities() {
 
         <section>
           <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-2xl font-black text-slate-950">Parcourir par domaine d'études</h2>
+            <button className="font-black text-blue-800">Voir tous les domaines →</button>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-6">
+            {domains.map((label) => <button onClick={() => setFilters((current) => ({ ...current, specialization: label }))} key={label} className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 font-black shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"><GraduationCap className="text-blue-700" size={23} />{label}</button>)}
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-5 flex items-center justify-between">
             <h2 className="text-2xl font-black text-slate-950">Formations disponibles</h2>
-            <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${data?.meta?.total ?? formations.length} résultats`}</span>
+            <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${totalResults} résultats`}</span>
           </div>
           {isFallback && (
             <div className="mb-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
@@ -1232,15 +1248,18 @@ function Universities() {
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             {formations.map((formation, index) => <UniversityResultCard key={formation.id ?? formation.formation_id} formation={formation} index={index} />)}
           </div>
-        </section>
-
-        <section>
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-2xl font-black text-slate-950">Parcourir par domaine d'études</h2>
-            <button className="font-black text-blue-800">Voir tous les domaines →</button>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-6">
-            {domains.map((label) => <button onClick={() => setFilters((current) => ({ ...current, specialization: label }))} key={label} className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 font-black shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"><GraduationCap className="text-blue-700" size={23} />{label}</button>)}
+          <div className="mt-7 flex flex-col items-center gap-3">
+            {!isFallback && <div className="text-sm font-bold text-slate-500">Affichage de {formations.length} formations sur {totalResults}</div>}
+            {canShowMore && (
+              <motion.button
+                whileHover={{ y: -3, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setPerPage((value) => value + 12)}
+                className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-8 font-black text-white shadow-lg shadow-blue-600/20"
+              >
+                Afficher 12 formations de plus <ArrowRight className="support-start-arrow" size={18} />
+              </motion.button>
+            )}
           </div>
         </section>
       </div>
