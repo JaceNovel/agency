@@ -257,14 +257,7 @@ function Shell() {
       <div>
         <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
           <div>
-            <button type="button" onClick={() => setOpen(true)} className="flex h-14 items-center gap-3 rounded-2xl bg-slate-300 px-3 pr-3 shadow-sm shadow-slate-00 transition hover:bg-slate-400/80" aria-label="Ouvrir la navigation">
-              <div className="grid h-11 w-11 place-items-center rounded-lg bg-white text-blue-700 shadow-md shadow-slate-200">
-                <img src={logos.studyway} alt="StudyWay" className="h-7 w-7" />
-              </div>
-              <div className="hidden leading-tight sm:block">
-                <div className="text-2xl font-black tracking-tight text-blue-950">Study<span className="text-blue-600">Way</span></div>
-                <div className="text-[11px] font-semibold text-slate-500">Votre avenir, notre mission</div>
-              </div>
+            <button type="button" onClick={() => setOpen(true)} className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-300 shadow-sm shadow-slate-00 transition hover:bg-slate-400/80" aria-label="Ouvrir la navigation">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-700 text-slate-100 shadow-sm">
                 <Menu size={24} />
               </span>
@@ -420,10 +413,11 @@ function Dashboard() {
           <h2 className="mb-4 text-xl font-black">Nos services principaux</h2>
           <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
             {services.map(([label, Icon, sub], index) => (
-              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.015 }} className="service-3d-card group relative rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm" key={label}>
+              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.015 }} className="service-3d-card group relative flex flex-col rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm" key={label}>
                 <div className={`service-card-icon mx-auto grid h-14 w-14 place-items-center rounded-full ${serviceTones[index]}`}><Icon size={25} /></div>
                 <div className="mt-4 min-h-[44px] font-black leading-tight text-slate-950">{label}</div>
                 <p className="mt-2 min-h-[44px] text-sm font-medium leading-5 text-slate-500">{sub}</p>
+                {index < 4 && <div className="relative z-10 mt-auto pt-4 text-xs font-black uppercase tracking-wide text-current">Démarrer →</div>}
               </motion.div>
             ))}
           </div>
@@ -440,7 +434,7 @@ function Dashboard() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d'examen</span><button className="font-black text-blue-700">Voir détails</button></div></section>
           <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black">Ajouter de l'argent</button></section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>{['Uploader un document', 'Réserver un logement', 'Prendre rendez-vous', 'Demander une AVI', 'Ouvrir un compte bancaire'].map((item) => <div key={item} className="flex items-center gap-3 py-3 text-sm font-semibold text-slate-600"><FileText size={17} />{item}</div>)}</section>
-          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-white/15 px-5 font-black">Parrainer maintenant <ArrowRight size={18} /></button></section>
+          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-sky-300 px-5 font-black text-blue-950 shadow-sm shadow-sky-950/10">Parrainer maintenant <ArrowRight size={18} /></button></section>
         </aside>
       </div>
 
@@ -572,7 +566,7 @@ function Finance() {
           </div>
           <div className="grid gap-5 lg:grid-cols-5">
             {banks.map(([bank, logo, tag, perks], index) => (
-              <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -15 }} className="finance-bank-card rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -15 }} className="finance-bank-card flex flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex min-h-12 items-center gap-3">
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
                     <img src={logo} alt="" className="h-6 w-6 object-contain" />
@@ -583,7 +577,7 @@ function Finance() {
                 <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
                   {perks.map((perk) => <div key={perk} className="flex gap-2"><CheckCircle2 className="shrink-0 text-emerald-600" size={16} />{perk}</div>)}
                 </div>
-                <div className="mt-5 border-t border-blue-200 pt-4"><span className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</span></div>
+                <div className="mt-auto border-t border-blue-200 pt-4"><span className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</span></div>
               </motion.article>
             ))}
           </div>
