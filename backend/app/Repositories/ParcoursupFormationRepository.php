@@ -7,6 +7,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ParcoursupFormationRepository
 {
@@ -82,17 +83,65 @@ class ParcoursupFormationRepository
         return ParcoursupFormation::query()
             ->when($request->filled('q'), function (Builder $query) use ($request) {
                 $search = trim((string) $request->query('q'));
-                $query->where(function (Builder $query) use ($search) {
-                    $query->where('formation_name', 'like', "%{$search}%")
-                        ->orWhere('university_name', 'like', "%{$search}%")
-                        ->orWhere('city', 'like', "%{$search}%")
-                        ->orWhere('specialization', 'like', "%{$search}%");
-                });
+                $this->applyTextSearch($query, $search);
             })
-            ->when($request->filled('city'), fn (Builder $query) => $query->where('city', $request->query('city')))
-            ->when($request->filled('region'), fn (Builder $query) => $query->where('region', $request->query('region')))
-            ->when($request->filled('specialization'), fn (Builder $query) => $query->where('specialization', 'like', '%'.$request->query('specialization').'%'))
-            ->when($request->filled('formation_type'), fn (Builder $query) => $query->where('formation_type', $request->query('formation_type')))
+            ->when($request->filled('city'), fn (Builder $query) => $query->where('city', 'like', '%'.trim((string) $request->query('city')).'%'))
+            ->when($request->filled('region'), fn (Builder $query) => $query->where('region', 'like', '%'.trim((string) $request->query('region')).'%'))
+            ->when($request->filled('specialization'), function (Builder $query) use ($request) {
+                $this->applyDomainSearch($query, trim((string) $request->query('specialization')));
+            })
+            ->when($request->filled('formation_type'), fn (Builder $query) => $query->where('formation_type', 'like', '%'.trim((string) $request->query('formation_type')).'%'))
             ->when($request->filled('admission_rate'), fn (Builder $query) => $query->where('admission_rate', '>=', (float) $request->query('admission_rate')));
+    }
+
+    private function applyTextSearch(Builder $query, string $search): void
+    {
+        $terms = collect(preg_split('/\s+/', $search) ?: [])
+            ->map(fn (string $term) => trim($term))
+            ->filter()
+            ->values();
+
+        $query->where(function (Builder $query) use ($search, $terms) {
+            foreach ([$search, ...$terms] as $term) {
+                $query->orWhere(function (Builder $query) use ($term) {
+                    $like = "%{$term}%";
+                    $query->where('formation_name', 'like', $like)
+                        ->orWhere('university_name', 'like', $like)
+                        ->orWhere('city', 'like', $like)
+                        ->orWhere('region', 'like', $like)
+                        ->orWhere('formation_type', 'like', $like)
+                        ->orWhere('specialization', 'like', $like);
+                });
+            }
+        });
+    }
+
+    private function applyDomainSearch(Builder $query, string $domain): void
+    {
+        $terms = $this->domainTerms($domain);
+
+        $query->where(function (Builder $query) use ($terms) {
+            foreach ($terms as $term) {
+                $like = "%{$term}%";
+                $query->orWhere('specialization', 'like', $like)
+                    ->orWhere('formation_name', 'like', $like)
+                    ->orWhere('formation_type', 'like', $like);
+            }
+        });
+    }
+
+    private function domainTerms(string $domain): array
+    {
+        $normalized = Str::of($domain)->ascii()->lower()->toString();
+
+        return match ($normalized) {
+            'sante' => ['Santé', 'Sante', 'sanitaire', 'social', 'médecine', 'medecine', 'infirmier', 'biologie', 'opticien', 'diététique', 'dietetique', 'STAPS'],
+            'informatique' => ['Informatique', 'numérique', 'numerique', 'cybersécurité', 'cybersecurite', 'réseaux', 'reseaux', 'multimédia', 'multimedia'],
+            'droit' => ['Droit', 'juridique', 'notarial', 'administration publique'],
+            'commerce' => ['Commerce', 'commercial', 'management', 'gestion', 'marketing', 'vente', 'relation client'],
+            'ingenierie' => ['Ingénieur', 'Ingenieur', 'ingénierie', 'ingenierie', 'industriel', 'maintenance', 'électronique', 'electronique', 'mécanique', 'mecanique'],
+            'arts' => ['Arts', 'design', 'mode', 'audiovisuel', 'audio-visuel', 'architecture', 'graphique'],
+            default => [$domain, Str::ascii($domain)],
+        };
     }
 }

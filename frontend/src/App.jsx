@@ -1257,7 +1257,7 @@ function Universities() {
                 onClick={() => setPerPage((value) => value + 12)}
                 className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-8 font-black text-white shadow-lg shadow-blue-600/20"
               >
-                Afficher 12 formations de plus <ArrowRight className="support-start-arrow" size={18} />
+                Afficher plus <ArrowRight className="support-start-arrow" size={18} />
               </motion.button>
             )}
           </div>
