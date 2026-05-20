@@ -165,9 +165,9 @@ function InfoCard({ icon: Icon, title, text }) {
 
 function AccountPage() {
   const overview = [
-    [WalletCards, 'Paiements totaux', '2 450 €', 'Ce mois-ci', 'bg-blue-50 text-blue-700'],
-    [CheckCircle2, 'Paiements effectués', '2 100 €', 'Ce mois-ci', 'bg-emerald-50 text-emerald-700'],
-    [CalendarDays, 'Paiements à venir', '350 €', 'Ce mois-ci', 'bg-amber-50 text-amber-700'],
+    [WalletCards, 'Paiements totaux', '1 607 000 FCFA', 'Ce mois-ci', 'bg-blue-50 text-blue-700'],
+    [CheckCircle2, 'Paiements effectués', '1 378 000 FCFA', 'Ce mois-ci', 'bg-emerald-50 text-emerald-700'],
+    [CalendarDays, 'Paiements à venir', '230 000 FCFA', 'Ce mois-ci', 'bg-amber-50 text-amber-700'],
     [FileText, 'Documents', '12', 'Total', 'bg-violet-50 text-violet-700'],
   ]
   const services = [
@@ -178,9 +178,9 @@ function AccountPage() {
     [Smartphone, 'Forfait mobile (eSIM)', 'Orange 50Go', 'Actif', 'Expire le 12/06/2025', 'bg-amber-50 text-amber-700'],
   ]
   const activities = [
-    [CheckCircle2, 'Paiement loyer', 'Mai 2025', '10 mai 2025', '- 550 €', 'text-emerald-600'],
+    [CheckCircle2, 'Paiement loyer', 'Mai 2025', '10 mai 2025', '- 361 000 FCFA', 'text-emerald-600'],
     [FileText, 'Document ajouté', 'Attestation de scolarité', '8 mai 2025', '', 'text-blue-600'],
-    [Landmark, 'Paiement université', "Frais d'inscription", '5 mai 2025', '- 1 500 €', 'text-violet-600'],
+    [Landmark, 'Paiement université', "Frais d'inscription", '5 mai 2025', '- 984 000 FCFA', 'text-violet-600'],
   ]
   const actions = [
     [WalletCards, 'Effectuer un paiement', "Payer le loyer, l'université, etc.", 'text-amber-600'],
@@ -303,6 +303,7 @@ function AnimatedRoutes() {
     >
       <Routes location={location}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/finance/:process" element={<FinanceProcess />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
         <Route path="/universites" element={<Universities />} />
@@ -311,6 +312,7 @@ function AnimatedRoutes() {
         <Route path="/profil" element={<Profile />} />
         <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
+        <Route path="/visa/:country/:type/demande" element={<VisaApplication />} />
         <Route path="/visa/:country/:type" element={<Visa />} />
         <Route path="/visa" element={<Visa />} />
         <Route path="/transport" element={<Transport />} />
@@ -333,6 +335,7 @@ function StatCard({ icon: Icon, label, value, tone = 'blue' }) {
 }
 
 function Dashboard() {
+  const [unavailableService, setUnavailableService] = useState(null)
   const heroSlides = [
     {
       lead: 'Votre',
@@ -341,6 +344,7 @@ function Dashboard() {
       text: 'Visa, logement, financement, universités... Tout ce dont vous avez besoin, au même endroit.',
       image: dashboardStudentHero,
       cta: 'Commencer ma demande',
+      ctaTo: '/accompagnement/demarrer',
       tone: 'from-[#061b47]/95 via-[#102a63]/72 to-transparent',
     },
     {
@@ -350,6 +354,7 @@ function Dashboard() {
       text: 'Billets, logement, assurance et accompagnement réunis dans un seul espace fluide.',
       image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85',
       cta: 'Préparer mon départ',
+      ctaTo: '/transport',
       tone: 'from-[#061b47]/95 via-[#1e3a8a]/65 to-transparent',
     },
     {
@@ -359,12 +364,18 @@ function Dashboard() {
       text: 'Un conseiller, des services vérifiés, et des solutions pour chaque étape de votre projet.',
       image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=85',
       cta: 'Voir mes services',
+      ctaTo: '/accompagnement',
       tone: 'from-[#061b47]/95 via-[#0f766e]/58 to-transparent',
     },
   ]
   const [activeSlide, setActiveSlide] = useState(0)
   const services = [
-    ['Traduction & Documents', FileText, 'Traduction certifiée, apostille'], ['Visa & Immigration', Plane, 'Dossier complet, suivi et assistance'], ['Logement Étudiant', Home, 'Résidences, studios, colocations'], ['Paiement Frais Universitaires', CreditCard, 'Payez vos frais en sécurité'], ['Billets & Transport', Plane, 'Vols, trains, transferts'], ['Banque & Financement', Landmark, 'Compte étudiant, AVI, prêts'],
+    ['Traduction & Documents', FileText, 'Traduction certifiée, apostille', null],
+    ['Visa & Immigration', Plane, 'Dossier complet, suivi et assistance', '/visa'],
+    ['Logement Étudiant', Home, 'Résidences, studios, colocations', '/logement'],
+    ['Paiement Frais Universitaires', CreditCard, 'Payez vos frais en sécurité', '/finance'],
+    ['Billets & Transport', Plane, 'Vols, trains, transferts', '/transport'],
+    ['Banque & Financement', Landmark, 'Compte étudiant, AVI, prêts', '/finance'],
   ]
   const serviceTones = [
     'bg-blue-600 text-white',
@@ -375,16 +386,16 @@ function Dashboard() {
     'bg-blue-600 text-white',
   ]
   const offers = [
-    ['Résidence Paris 15', '450 €/mois', 'Paris, France', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80', logos.parisSaclay],
+    ['Résidence Paris 15', '295 000 FCFA/mois', 'Paris, France', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80', logos.parisSaclay],
     ['Vol Lomé → Paris', '350 000 FCFA', '15 juin 2024', 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80', logos.airFrance],
     ['Compte Étudiant', 'Gratuit', 'Ouverture 100% en ligne', 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=700&q=80', logos.societeGenerale],
-    ['Assurance Santé', '120 €/an', 'Couverture complète', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=700&q=80', logos.orange],
+    ['Assurance Santé', '79 000 FCFA/an', 'Couverture complète', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=700&q=80', logos.orange],
   ]
   const partnerLogos = [
-    ['/image.png', 'Partenaire'],
-    ['/image copy.png', 'Ecobank'],
-    ['/image copy 3.png', 'Wise'],
-    ['/image copy 2.png', 'Ecobank'],
+    ['Partenaire', '/image.png'],
+    ['Ecobank', '/image copy.png'],
+    ['Wise', '/image copy 3.png'],
+    ['Ecobank', '/image copy 2.png'],
   ]
 
   useEffect(() => {
@@ -413,7 +424,16 @@ function Dashboard() {
               </motion.span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-blue-50">{slide.text}</p>
-            <div className="mt-8 flex flex-wrap gap-4"><button className="rounded-lg bg-blue-600 px-7 py-4 font-black shadow-lg shadow-blue-950/20">{slide.cta}</button><button className="rounded-lg bg-white px-7 py-4 font-black text-blue-950">Découvrir nos services</button></div>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link to={slide.ctaTo} className="support-start-button flex items-center gap-3 rounded-lg bg-blue-600 px-7 py-4 font-black text-white shadow-lg shadow-blue-950/20">
+                {slide.cta}
+                <ArrowRight className="support-start-arrow" size={18} />
+              </Link>
+              <Link to="/accompagnement" className="support-start-button flex items-center gap-3 rounded-lg bg-white px-7 py-4 font-black text-blue-950">
+                Découvrir nos services
+                <ArrowRight className="support-start-arrow" size={18} />
+              </Link>
+            </div>
           </motion.div>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
             {heroSlides.map((item, index) => <button key={item.title} onClick={() => setActiveSlide(index)} className={`h-2 rounded-full transition-all ${activeSlide === index ? 'w-8 bg-blue-500' : 'w-2 bg-white/60'}`} aria-label={`Slide ${index + 1}`} />)}
@@ -423,14 +443,29 @@ function Dashboard() {
         <section>
           <h2 className="mb-4 text-xl font-black">Nos services principaux</h2>
           <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
-            {services.map(([label, Icon, sub], index) => (
-              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.015 }} className="service-3d-card group relative flex flex-col rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm" key={label}>
-                <div className={`service-card-icon mx-auto grid h-14 w-14 place-items-center rounded-full ${serviceTones[index]}`}><Icon size={25} /></div>
-                <div className="mt-4 min-h-[44px] font-black leading-tight text-slate-950">{label}</div>
-                <p className="mt-2 min-h-[44px] text-sm font-medium leading-5 text-slate-500">{sub}</p>
-                {index < 4 && <div className="relative z-10 mt-auto pt-4 text-xs font-black uppercase tracking-wide text-current">Démarrer →</div>}
+            {services.map(([label, Icon, sub, to], index) => {
+              const content = (
+                <>
+                  <div className={`service-card-icon mx-auto grid h-14 w-14 place-items-center rounded-full ${serviceTones[index]}`}><Icon size={25} /></div>
+                  <div className="mt-4 min-h-[44px] font-black leading-tight text-slate-950">{label}</div>
+                  <p className="mt-2 min-h-[44px] text-sm font-medium leading-5 text-slate-500">{sub}</p>
+                  <div className="service-start-link support-start-button relative z-10 mt-auto inline-flex items-center justify-center gap-2 pt-4 text-xs font-black uppercase tracking-wide text-blue-700">
+                    Démarrer
+                    <ArrowRight className="support-start-arrow" size={15} />
+                  </div>
+                </>
+              )
+
+              return (
+              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.015 }} key={label}>
+                {to ? (
+                  <Link to={to} className="service-3d-card group relative flex h-full flex-col rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm">{content}</Link>
+                ) : (
+                  <button type="button" onClick={() => setUnavailableService(label)} className="service-3d-card group relative flex h-full w-full flex-col rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm">{content}</button>
+                )}
               </motion.div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
@@ -451,20 +486,70 @@ function Dashboard() {
 
       <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm lg:-mr-8">
         <h2 className="mb-7 text-2xl font-black">Ils nous font confiance</h2>
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-10 gap-y-6">
-          {partnerLogos.map(([src, name]) => <img key={src} src={src} alt={name} className="max-h-14 w-auto max-w-[190px] object-contain" />)}
-        </div>
+        <div className="mx-auto grid max-w-4xl items-center gap-8 sm:grid-cols-2 lg:grid-cols-4">{partnerLogos.map(([name, src]) => <PartnerLogo key={`${name}-${src}`} name={name} src={src} />)}</div>
       </section>
+      {unavailableService && <UnavailableServiceModal service={unavailableService} onClose={() => setUnavailableService(null)} />}
     </div>
   )
 }
 
 function DashboardOffer({ title, price, location, image, logo, index }) {
+  const [favorite, setFavorite] = useState(false)
+
   return (
     <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -8 }} className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="relative h-36 overflow-hidden"><img src={image} alt={title} className="h-full w-full object-cover transition duration-300 hover:scale-105" /><button className="absolute right-3 top-3 rounded-full bg-white p-2 shadow"><Heart size={18} /></button>{logo && <img src={logo} alt="" className="absolute bottom-3 left-3 h-10 w-10 rounded-lg bg-white object-contain p-1 shadow" />}</div>
+      <div className="relative h-36 overflow-hidden">
+        <img src={image} alt={title} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
+        <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md ${favorite ? 'is-favorite text-rose-600' : 'text-slate-800'}`} aria-label="Ajouter aux favoris">
+          <Heart size={19} fill={favorite ? 'currentColor' : 'none'} />
+        </button>
+        {logo && <BrandLogo src={logo} name={title} className="absolute bottom-3 left-3 h-10 w-10 rounded-lg bg-white object-contain p-1 shadow" />}
+      </div>
       <div className="p-4"><h3 className="font-black">{title}</h3><p className="mt-1 text-sm text-slate-500">{location}</p><div className="mt-4 flex items-center justify-between"><span className="text-xl font-black text-emerald-700">{price}</span><span className="text-sm font-bold text-amber-500">★ 4.{index + 5}</span></div></div>
     </motion.article>
+  )
+}
+
+function BrandLogo({ src, name, className }) {
+  const [broken, setBroken] = useState(false)
+  const initials = name.split(/\s+/).slice(0, 2).map((word) => word[0]).join('').toUpperCase()
+
+  if (broken) {
+    return <div className={`${className} grid place-items-center object-none text-xs font-black text-blue-700`}>{initials}</div>
+  }
+
+  return <img src={src} alt={name} onError={() => setBroken(true)} className={className} />
+}
+
+function PartnerLogo({ name, src }) {
+  const [broken, setBroken] = useState(false)
+
+  return (
+    <div className="mx-auto flex h-16 w-full max-w-40 items-center justify-center">
+      {broken ? (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-black text-slate-700">{name}</div>
+      ) : (
+        <img src={src} alt={name} onError={() => setBroken(true)} className="max-h-14 max-w-40 object-contain" />
+      )}
+    </div>
+  )
+}
+
+function UnavailableServiceModal({ service, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 px-4 backdrop-blur-sm">
+      <motion.div initial={{ opacity: 0, y: 18, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-6 shadow-2xl shadow-blue-950/20">
+        <div className="flex items-start justify-between gap-5">
+          <div>
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-700"><Languages size={23} /></div>
+            <h2 className="mt-5 text-xl font-black text-slate-950">{service}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Ce service n’est pas encore disponible dans votre espace. L’équipe StudyWay le prépare et il sera activé prochainement.</p>
+          </div>
+          <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50" aria-label="Fermer"><X size={18} /></button>
+        </div>
+        <button type="button" onClick={onClose} className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20">Compris</button>
+      </motion.div>
+    </div>
   )
 }
 
@@ -512,15 +597,15 @@ function AnimatedStatValue({ value }) {
 
 function Finance() {
   const quickServices = [
-    [Landmark, 'Ouvrir un compte bancaire', 'Compte étudiant 100% en ligne'],
-    [CreditCard, "Transfert d'argent international", 'Frais réduits & rapide vers 150+ pays'],
-    [GraduationCap, 'Financement étudiant', 'Prêts étudiants et solutions sur mesure'],
-    [ShieldCheck, 'Assurance & Protection', 'Assurance santé, habitation et responsabilité civile'],
+    [Landmark, 'Ouvrir un compte bancaire', 'Compte étudiant 100% en ligne', '/finance/compte'],
+    [CreditCard, "Transfert d'argent international", 'Frais réduits & rapide vers 150+ pays', '/finance/transfert'],
+    [GraduationCap, 'Financement étudiant', 'Prêts étudiants et solutions sur mesure', '/finance/financement'],
+    [ShieldCheck, 'Assurance & Protection', 'Assurance santé, habitation et responsabilité civile', '/finance/assurance'],
   ]
   const stats = [
     [Landmark, '+25', 'Banques partenaires'],
     [Globe2, '150+', 'Pays couverts'],
-    [CircleDollarSign, '0 €', "Frais d'ouverture"],
+    [CircleDollarSign, '0 FCFA', "Frais d'ouverture"],
     [ShieldCheck, 'Sécurisé', 'Données protégées'],
     [Users, 'Rapide', 'Ouverture en 24-48h'],
   ]
@@ -550,15 +635,17 @@ function Finance() {
             <p className="mt-5 text-lg leading-8 text-slate-600">Ouvrez un compte bancaire, transférez de l'argent, gérez votre budget et explorez des solutions de financement adaptées à votre parcours.</p>
           </div>
           <div className="relative z-10 mt-12 grid gap-4 lg:grid-cols-4">
-            {quickServices.map(([Icon, title, text], index) => (
-              <motion.article key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -14 }} className="finance-quick-card group rounded-lg border p-5 text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
+            {quickServices.map(([Icon, title, text, to], index) => (
+              <motion.div key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -14 }}>
+              <Link to={to} className="finance-quick-card group block h-full rounded-lg border p-5 text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
                 <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700 shadow-sm shadow-blue-950/10 transition duration-300 group-hover:bg-blue-50 group-hover:text-blue-800"><Icon size={22} /></div>
                 <h3 className="font-black leading-tight text-white transition duration-300 group-hover:text-slate-950">{title}</h3>
                 <p className="mt-2 text-sm font-medium leading-6 text-blue-100 transition duration-300 group-hover:text-slate-500">{text}</p>
                 <span className="finance-quick-arrow mt-3 inline-grid h-8 w-8 place-items-center rounded-full text-blue-100 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">
                   <ArrowRight size={18} />
                 </span>
-              </motion.article>
+              </Link>
+              </motion.div>
             ))}
           </div>
         </motion.section>
@@ -575,14 +662,14 @@ function Finance() {
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-black text-slate-950">Nos banques partenaires</h2>
-            <button className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les banques <ArrowRight size={17} /></button>
+            <Link to="/finance/compte" className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les banques <ArrowRight size={17} /></Link>
           </div>
           <div className="grid gap-5 lg:grid-cols-5">
             {banks.map(([bank, logo, tag, perks], index) => (
               <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -15 }} className="finance-bank-card flex flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex min-h-12 items-center gap-3">
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
-                    <img src={logo} alt="" className="h-6 w-6 object-contain" />
+                    <BrandLogo src={logo} name={bank} className="h-6 w-6 object-contain" />
                   </span>
                   <h3 className="text-base font-black leading-tight text-slate-950">{bank}</h3>
                 </div>
@@ -590,7 +677,7 @@ function Finance() {
                 <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
                   {perks.map((perk) => <div key={perk} className="flex gap-2"><CheckCircle2 className="shrink-0 text-emerald-600" size={16} />{perk}</div>)}
                 </div>
-                <div className="mt-auto border-t border-blue-200 pt-4"><span className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</span></div>
+                <div className="mt-auto border-t border-blue-200 pt-4"><Link to="/finance/compte" className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</Link></div>
               </motion.article>
             ))}
           </div>
@@ -617,7 +704,7 @@ function Finance() {
             <div className="mt-2">1 EUR = 655.957 XOF</div>
             <div className="mt-2 text-xs text-emerald-600">Mis à jour : aujourd'hui, 10:30</div>
           </div>
-          <button className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white shadow-lg shadow-blue-900/20"><Send size={18} />Envoyer de l'argent</button>
+          <Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white shadow-lg shadow-blue-900/20"><Send size={18} />Envoyer de l'argent</Link>
         </section>
 
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -645,12 +732,12 @@ function Finance() {
           <button className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les solutions <ArrowRight size={17} /></button>
         </div>
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {financing.map(([Icon, title, text]) => (
+            {financing.map(([Icon, title, text]) => (
             <motion.article key={title} whileHover={{ y: -6 }} className="rounded-lg border border-slate-200 bg-white p-6">
               <div className="mb-5 grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={22} /></div>
               <h3 className="font-black text-slate-950">{title}</h3>
               <p className="mt-3 text-sm font-medium leading-6 text-slate-500">{text}</p>
-              <button className="mt-5 flex items-center gap-2 text-sm font-black text-blue-800">Découvrir <ArrowRight size={16} /></button>
+              <Link to="/finance/financement" className="mt-5 flex items-center gap-2 text-sm font-black text-blue-800">Découvrir <ArrowRight size={16} /></Link>
             </motion.article>
           ))}
         </div>
@@ -673,6 +760,198 @@ function Finance() {
   )
 }
 
+function FinanceProcess() {
+  const { process = 'compte' } = useParams()
+  const processes = {
+    compte: {
+      icon: Landmark,
+      title: 'Ouvrir un compte bancaire',
+      subtitle: 'Préparez votre dossier, choisissez une banque adaptée et lancez votre ouverture de compte étudiant.',
+      badge: 'Ouverture accompagnée',
+      steps: ['Profil étudiant', 'Téléphone & SIM', 'Documents', 'Banque', 'Validation'],
+      sidebar: ['Carte SIM active obligatoire', 'Passeport ou titre d’identité', 'Email personnel', 'Justificatif d’étude', 'Adresse ou hébergement'],
+    },
+    transfert: {
+      icon: CreditCard,
+      title: "Transfert d'argent international",
+      subtitle: 'Envoyez ou recevez de l’argent avec un parcours clair, sécurisé et adapté aux familles.',
+      badge: 'Transfert sécurisé',
+      steps: ['Montant', 'Pays', 'Bénéficiaire', 'Mode de réception', 'Validation'],
+      sidebar: ['Taux visible avant validation', 'Frais affichés en FCFA', 'Suivi du transfert', 'Reçu disponible'],
+    },
+    financement: {
+      icon: GraduationCap,
+      title: 'Solutions de financement',
+      subtitle: 'Explorez les prêts, bourses, garanties et plans de paiement pour financer votre projet d’études.',
+      badge: 'Analyse personnalisée',
+      steps: ['Besoin', 'Budget', 'Documents', 'Options', 'Plan conseillé'],
+      sidebar: ['Bourse d’études', 'Prêt étudiant', 'Garantie bancaire', 'Paiement échelonné'],
+    },
+    assurance: {
+      icon: ShieldCheck,
+      title: 'Assurance & Protection',
+      subtitle: 'Comparez les protections utiles pour votre visa, votre logement, votre santé et votre responsabilité civile.',
+      badge: 'Protection complète',
+      steps: ['Situation', 'Pays', 'Besoins', 'Offres', 'Souscription'],
+      sidebar: ['Assurance santé', 'Responsabilité civile', 'Habitation', 'Voyage & rapatriement'],
+    },
+  }
+  const config = processes[process] || processes.compte
+  const Icon = config.icon
+
+  return (
+    <div className="finance-process-page space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Banque & Finance <span className="mx-2">›</span> {config.title}</div>
+          <div className="mt-5 flex items-center gap-4">
+            <div className="grid h-14 w-14 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20"><Icon size={27} /></div>
+            <div>
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">{config.badge}</span>
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{config.title}</h1>
+            </div>
+          </div>
+          <p className="mt-4 max-w-3xl text-sm font-semibold leading-6 text-slate-600">{config.subtitle}</p>
+        </div>
+        <Link to="/finance" className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-black text-blue-800 shadow-sm">Retour finance</Link>
+      </div>
+
+      <section className="grid gap-4 lg:grid-cols-5">
+        {config.steps.map((step, index) => (
+          <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-blue-600 text-sm font-black text-white">{index + 1}</div>
+            <div className="mt-3 font-black text-slate-950">{step}</div>
+          </motion.div>
+        ))}
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
+        <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          {process === 'compte' && <BankAccountProcess />}
+          {process === 'transfert' && <MoneyTransferProcess />}
+          {process === 'financement' && <StudentFundingProcess />}
+          {process === 'assurance' && <InsuranceProcess />}
+        </motion.section>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">À prévoir</h2>
+            <div className="mt-5 space-y-3">
+              {config.sidebar.map((item) => <div key={item} className="flex gap-3 text-sm font-semibold leading-6 text-slate-600"><CheckCircle2 className="mt-1 shrink-0 text-emerald-600" size={16} />{item}</div>)}
+            </div>
+          </section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Besoin d’aide ?</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Un conseiller StudyWay peut vérifier votre dossier avant l’envoi.</p>
+            <Link to="/messages" className="mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-white font-black text-blue-800"><MessageCircle size={17} />Parler à un conseiller</Link>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function BankAccountProcess() {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Démarrer l’ouverture de compte</h2>
+      <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-5">
+        <h3 className="font-black text-blue-950">Carte SIM obligatoire</h3>
+        <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Pour ouvrir un compte bancaire en ligne, vous devez avoir un numéro de téléphone actif. La banque l’utilise pour vérifier votre identité, recevoir les codes de sécurité et finaliser l’ouverture du compte.</p>
+        <Link to="/esim" className="mt-4 inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 font-black text-white shadow-lg shadow-blue-600/20"><Smartphone size={18} />Acheter une carte SIM</Link>
+      </div>
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <FormInput label="Nom complet" placeholder="Votre nom tel qu’indiqué sur le passeport" />
+        <FormInput label="Email" placeholder="votre@email.com" />
+        <FormInput label="Téléphone" placeholder="+228 90 12 34 56" />
+        <FormSelect label="Pays de résidence actuel" placeholder="Sélectionner le pays" />
+        <FormSelect label="Banque souhaitée" placeholder="Nickel, BNP Paribas, Société Générale, N26..." />
+        <FormSelect label="Situation logement" placeholder="Adresse disponible, hébergé, en recherche..." />
+      </div>
+      <FinanceDocumentChecklist docs={['Passeport', 'Visa ou récépissé', 'Lettre d’admission', 'Justificatif de domicile ou hébergement', 'Numéro de téléphone actif']} />
+      <div className="mt-6 flex flex-wrap gap-4">
+        <button className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Soumettre ma demande <ArrowRight className="support-start-arrow" size={18} /></button>
+        <Link to="/esim" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-7 font-black text-blue-800"><Smartphone size={18} />Je n’ai pas encore de SIM</Link>
+      </div>
+    </div>
+  )
+}
+
+function MoneyTransferProcess() {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Préparer un transfert</h2>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        <FormInput label="Montant à envoyer" placeholder="350 000 FCFA" />
+        <FormSelect label="Devise d’arrivée" placeholder="XOF, EUR, CAD..." />
+        <FormSelect label="Pays du bénéficiaire" placeholder="Togo, France, Canada..." />
+        <FormInput label="Nom du bénéficiaire" placeholder="Nom complet" />
+        <FormSelect label="Mode de réception" placeholder="Compte bancaire, portefeuille mobile, retrait..." />
+        <FormInput label="Motif du transfert" placeholder="Loyer, frais universitaires, aide familiale..." />
+      </div>
+      <div className="mt-6 rounded-lg border border-slate-200 p-5">
+        <h3 className="font-black text-slate-950">Estimation claire</h3>
+        <div className="mt-4 grid gap-3 text-sm font-semibold text-slate-600 md:grid-cols-3">
+          <div className="rounded-lg bg-slate-50 p-4"><div>Frais estimés</div><b className="text-blue-700">À confirmer</b></div>
+          <div className="rounded-lg bg-slate-50 p-4"><div>Délai</div><b className="text-blue-700">Instantané à 48h</b></div>
+          <div className="rounded-lg bg-slate-50 p-4"><div>Reçu</div><b className="text-blue-700">Disponible</b></div>
+        </div>
+      </div>
+      <button className="support-start-button mt-6 flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Continuer <ArrowRight className="support-start-arrow" size={18} /></button>
+    </div>
+  )
+}
+
+function StudentFundingProcess() {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Découvrir les solutions de financement</h2>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        {[
+          ['Prêt étudiant', 'Analyse du montant nécessaire, durée, garant et capacité de remboursement.'],
+          ['Bourse d’études', 'Recherche de bourses selon pays, école, niveau et domaine d’études.'],
+          ['Garantie bancaire', 'Dossier pour visa, logement ou inscription universitaire.'],
+          ['Plan de paiement', 'Organisation des frais par échéances claires.'],
+        ].map(([title, text]) => <div key={title} className="rounded-lg border border-slate-200 p-5"><h3 className="font-black text-slate-950">{title}</h3><p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{text}</p></div>)}
+      </div>
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <FormSelect label="Besoin principal" placeholder="Frais scolaires, logement, visa, installation..." />
+        <FormInput label="Budget estimé" placeholder="1 500 000 FCFA" />
+        <FormSelect label="Pays d’étude" placeholder="France, Canada, Belgique..." />
+        <FormSelect label="Niveau d’études" placeholder="Licence, Master, Doctorat..." />
+      </div>
+      <button className="support-start-button mt-6 flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Obtenir mon plan de financement <ArrowRight className="support-start-arrow" size={18} /></button>
+    </div>
+  )
+}
+
+function InsuranceProcess() {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Choisir une protection</h2>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        <FormSelect label="Pays de destination" placeholder="France, Allemagne, Canada..." />
+        <FormSelect label="Type de protection" placeholder="Santé, habitation, voyage, responsabilité civile..." />
+        <FormInput label="Date d’arrivée" placeholder="Sélectionner une date" icon={CalendarDays} />
+        <FormSelect label="Durée souhaitée" placeholder="3 mois, 6 mois, 1 an..." />
+      </div>
+      <FinanceDocumentChecklist docs={['Passeport', 'Lettre d’admission', 'Adresse de logement si disponible', 'Date de départ', 'Contact d’urgence']} />
+      <button className="support-start-button mt-6 flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Comparer les offres <ArrowRight className="support-start-arrow" size={18} /></button>
+    </div>
+  )
+}
+
+function FinanceDocumentChecklist({ docs }) {
+  return (
+    <div className="mt-6">
+      <h3 className="font-black text-slate-950">Documents à préparer</h3>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {docs.map((doc) => <div key={doc} className="flex items-center gap-3 rounded-lg border border-slate-200 p-4 text-sm font-black text-slate-700"><FileText className="text-blue-700" size={18} />{doc}</div>)}
+      </div>
+    </div>
+  )
+}
+
 function Housing() {
   const housingImages = [
     'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
@@ -685,14 +964,14 @@ function Housing() {
     'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80',
   ]
   const homes = [
-    ['Studio cosy - Montparnasse', 'Paris 14e, France', '750 €', 'Studio', '20 m²', 'Meublé', 'Disponible dès le 15 juin', 'Coup de cœur'],
-    ['Appartement - Lyon Part-Dieu', 'Lyon, France', '680 €', 'T2', '35 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
-    ['Chambre - Résidence étudiante', 'Toulouse, France', '450 €', 'Chambre', '15 m²', 'Meublé', 'Disponible dès le 1er juillet', 'Vérifié'],
-    ['Studio - La Defense', 'Courbevoie, France', '800 €', 'Studio', '22 m²', 'Meublé', 'Disponible maintenant', 'Coup de cœur'],
-    ['T2 lumineux - Paris', 'Paris 11e, France', '720 €', 'T2', '32 m²', 'Équipé', 'Disponible bientôt', 'Vérifié'],
-    ['Colocation meublee', 'Lille, France', '520 €', 'Colocation', '18 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
-    ['Chambre calme - Centre', 'Bordeaux, France', '590 €', 'Chambre', '17 m²', 'Wi-Fi', 'Disponible maintenant', 'Vérifié'],
-    ['Studio moderne - Nantes', 'Nantes, France', '610 €', 'Studio', '24 m²', 'Meublé', 'Disponible en août', 'Vérifié'],
+    ['Studio cosy - Montparnasse', 'Paris 14e, France', '492 000 FCFA', 'Studio', '20 m²', 'Meublé', 'Disponible dès le 15 juin', 'Coup de cœur'],
+    ['Appartement - Lyon Part-Dieu', 'Lyon, France', '446 000 FCFA', 'T2', '35 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre - Résidence étudiante', 'Toulouse, France', '295 000 FCFA', 'Chambre', '15 m²', 'Meublé', 'Disponible dès le 1er juillet', 'Vérifié'],
+    ['Studio - La Defense', 'Courbevoie, France', '525 000 FCFA', 'Studio', '22 m²', 'Meublé', 'Disponible maintenant', 'Coup de cœur'],
+    ['T2 lumineux - Paris', 'Paris 11e, France', '472 000 FCFA', 'T2', '32 m²', 'Équipé', 'Disponible bientôt', 'Vérifié'],
+    ['Colocation meublee', 'Lille, France', '341 000 FCFA', 'Colocation', '18 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre calme - Centre', 'Bordeaux, France', '387 000 FCFA', 'Chambre', '17 m²', 'Wi-Fi', 'Disponible maintenant', 'Vérifié'],
+    ['Studio moderne - Nantes', 'Nantes, France', '400 000 FCFA', 'Studio', '24 m²', 'Meublé', 'Disponible en août', 'Vérifié'],
   ]
   const why = [
     [ShieldCheck, 'Logements vérifiés', 'Chaque logement est vérifié manuellement par notre équipe'],
@@ -720,7 +999,7 @@ function Housing() {
             <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[1.15fr_1.05fr_1fr_1fr_auto]">
               <HousingSearchItem icon={MapPin} label="Ville ou pays" value="Paris, France" />
               <HousingSearchItem label="Type de logement" value="Tous les types" select />
-              <HousingSearchItem label="Budget max." value="800 €" select />
+              <HousingSearchItem label="Budget max." value="525 000 FCFA" select />
               <HousingSearchItem label="Disponibilité" value="Dès maintenant" select />
               <button className="flex h-14 items-center justify-center gap-3 rounded-lg bg-[#082f7a] px-7 text-sm font-black text-white shadow-lg shadow-blue-900/20">
                 Rechercher <Search size={19} />
@@ -732,7 +1011,7 @@ function Housing() {
               <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_1fr_1fr]">
                 <div>
                   <div className="font-bold text-slate-900">Prix</div>
-                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-600"><span>0 €</span><span>1000+ €</span></div>
+                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-600"><span>0 FCFA</span><span>656 000+ FCFA</span></div>
                   <input type="range" defaultValue="78" className="mt-3 w-full accent-blue-800" />
                 </div>
                 <HousingChecks title="Type de logement" items={['Studio (342)', 'Appartement (523)', 'Chambre (689)', 'Colocation (215)']} compact />
@@ -748,8 +1027,8 @@ function Housing() {
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.08)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.08)_1px,transparent_1px)] bg-[size:42px_42px]" />
               <div className="absolute left-[43%] top-[43%] rounded-full bg-white px-4 py-2 text-xl font-black text-blue-950 shadow-lg">Paris</div>
               {[
-                ['650 €', 'left-[34%] top-[15%]'], ['700 €', 'right-[14%] top-[23%]'], ['910 €', 'left-[18%] top-[37%]'],
-                ['300 €', 'left-[49%] top-[55%]'], ['800 €', 'right-[9%] bottom-[18%]'], ['600 €', 'left-[7%] top-[48%]'],
+                ['426k', 'left-[34%] top-[15%]'], ['459k', 'right-[14%] top-[23%]'], ['597k', 'left-[18%] top-[37%]'],
+                ['197k', 'left-[49%] top-[55%]'], ['525k', 'right-[9%] bottom-[18%]'], ['394k', 'left-[7%] top-[48%]'],
               ].map(([price, pos]) => <span key={`${price}-${pos}`} className={`absolute ${pos} rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-md`}>{price}</span>)}
             </div>
             <button className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#082f7a] font-black text-white"><MapPin size={18} />Voir sur la carte</button>
@@ -1213,7 +1492,7 @@ function StudentGuideDetail() {
 }
 
 function Profile() {
-  return <div className="grid gap-6 xl:grid-cols-[1fr_420px]"><div className="space-y-6"><Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel><div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="2 450 €" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="2 100 €" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="350 €" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div><Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel></div><div className="space-y-5"><Panel title="Dernières activités"><List items={['Paiement loyer -550 €', 'Document ajouté - Attestation de scolarité', 'Paiement université -1 500 €']} /></Panel><Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel><div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div></div></div>
+  return <div className="grid gap-6 xl:grid-cols-[1fr_420px]"><div className="space-y-6"><Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel><div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="1 607 000 FCFA" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="1 378 000 FCFA" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="230 000 FCFA" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div><Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel></div><div className="space-y-5"><Panel title="Dernières activités"><List items={['Paiement loyer -361 000 FCFA', 'Document ajouté - Attestation de scolarité', 'Paiement université -984 000 FCFA']} /></Panel><Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel><div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div></div></div>
 }
 
 function SupportJourney() {
@@ -1345,7 +1624,7 @@ function StartSupport() {
           <WalletCards className="text-amber-600" size={22} />
           <div>
             <div className="text-xs font-bold text-slate-500">Mon portefeuille</div>
-            <div className="text-lg font-black text-emerald-600">1 250,00 €</div>
+            <div className="text-lg font-black text-emerald-600">820 000 FCFA</div>
           </div>
         </div>
       </div>
@@ -1498,7 +1777,7 @@ function PreferencesStep({ services, selectedServices, toggleService, docs, uplo
       <div>
         <h2 className="text-xl font-black text-slate-950">Préférences pratiques</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
-          <FormSelect label="Budget mensuel logement" placeholder="400 € - 700 €" />
+          <FormSelect label="Budget mensuel logement" placeholder="260 000 - 460 000 FCFA" />
           <FormSelect label="Besoin de financement" placeholder="À discuter avec un conseiller" />
           <FormSelect label="Disponibilité conseiller" placeholder="Après-midi ou soir" />
           <FormSelect label="Canal préféré" placeholder="Messages StudyWay" />
@@ -1532,7 +1811,7 @@ function ReviewStep({ selectedServices, uploadedDocs, docs }) {
           <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Suivi documents et visa</div>
           <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Messagerie prioritaire</div>
         </div>
-        <div className="mt-5 flex items-center justify-between rounded-lg bg-slate-50 px-5 py-4"><span className="font-black text-slate-950">Frais de lancement</span><span className="text-xl font-black text-blue-700">49 €</span></div>
+        <div className="mt-5 flex items-center justify-between rounded-lg bg-slate-50 px-5 py-4"><span className="font-black text-slate-950">Frais de lancement</span><span className="text-xl font-black text-blue-700">32 000 FCFA</span></div>
       </div>
     </div>
   )
@@ -1636,7 +1915,7 @@ function Visa() {
                         </div>
                         <ArrowRight className="mt-2 text-blue-700 transition group-hover:translate-x-1" size={19} />
                       </div>
-                      <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">{visa.badge}</span><span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">{visa.delay}</span><span className="rounded-full bg-violet-50 px-3 py-1 text-violet-700">À partir de {visa.cost} €</span></div>
+                      <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">{visa.badge}</span><span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">{visa.delay}</span><span className="rounded-full bg-violet-50 px-3 py-1 text-violet-700">Rendez-vous dès 30 000 FCFA</span></div>
                     </Link>
                   )
                 })}
@@ -1670,10 +1949,10 @@ function Visa() {
   const allDocuments = ['Passeport valide', ...selectedVisa.documents, 'Photo d’identité']
   const timelineItems = ['Dépôt de la demande', 'Traitement consulaire', 'Entretien si requis', 'Décision', 'Réception du visa']
   const costRows = [
-    ['Frais de visa', `${selectedVisa.cost - 99},00 ${currency}`],
-    ['Service StudyWay', '49,00 €'],
-    ['Assurance', '30,00 €'],
-    ['Total estimé', `${selectedVisa.cost},00 €`],
+    ['Frais consulaires', `À régler au centre en ${currency}`],
+    ['Prise de rendez-vous StudyWay', '30 000 FCFA'],
+    ['Agent StudyWay optionnel', '+30 000 FCFA'],
+    ['Premium Capago optionnel', '+19 000 FCFA'],
   ]
 
   return (
@@ -1690,6 +1969,7 @@ function Visa() {
                   <h1 className="mt-3 text-3xl font-black text-slate-950">{selectedVisa.title}</h1>
                   <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{selectedVisa.description}</p>
                   <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-lg bg-emerald-50 px-3 py-2 text-emerald-700">{selectedVisa.badge}</span><span className="rounded-lg bg-blue-50 px-3 py-2 text-blue-700">Délai moyen : {selectedVisa.delay}</span><span className="rounded-lg bg-violet-50 px-3 py-2 text-violet-700">{selectedVisa.success}</span></div>
+                  <Link to={`/visa/${country}/${type}/demande`} className="mt-5 inline-flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande <ArrowRight size={18} /></Link>
                 </div>
               </div>
               <div className={`visa-country-visual rounded-lg bg-gradient-to-br ${countryImageTone} p-2`}>
@@ -1731,7 +2011,7 @@ function Visa() {
               <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-xl font-black text-slate-950">Coûts associés</h2>
                 <div className="mt-5 divide-y divide-slate-100">{costRows.map(([label, value], index) => <div key={label} className={`flex justify-between gap-5 py-4 text-sm font-semibold ${index === costRows.length - 1 ? 'text-blue-800' : 'text-slate-600'}`}><span>{label}</span><b>{value}</b></div>)}</div>
-                <button className="mt-6 h-12 rounded-lg bg-blue-600 px-8 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande</button>
+                <Link to={`/visa/${country}/${type}/demande`} className="mt-6 inline-flex h-12 items-center rounded-lg bg-blue-600 px-8 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande</Link>
               </section>
             )}
             {activeVisaTab === 'Délai & traitement' && (
@@ -1770,20 +2050,250 @@ function Visa() {
   )
 }
 
+function OptionPriceBadge({ active, children }) {
+  return <span className={`shrink-0 rounded-lg px-4 py-2 text-sm font-black shadow-sm transition ${active ? 'bg-blue-600 text-white shadow-blue-600/20' : 'bg-blue-50 text-blue-700'}`}>{children}</span>
+}
+
+function AdditionalApplicantsFields({ applicants }) {
+  if (applicants <= 1) return null
+
+  return (
+    <div className="mt-8 space-y-5 border-t border-slate-100 pt-6">
+      <div>
+        <h3 className="text-lg font-black text-slate-950">Informations des autres demandeurs</h3>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Ajoutez les informations de chaque personne rattachée à cette demande : enfant, parent, conjoint, tuteur légal ou autre.</p>
+      </div>
+      {Array.from({ length: applicants - 1 }, (_, index) => (
+        <div key={index} className="rounded-lg border border-slate-200 bg-slate-50/40 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h4 className="font-black text-slate-950">Demandeur {index + 2}</h4>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">À compléter</span>
+          </div>
+          <div className="mt-4 grid gap-5 md:grid-cols-2">
+            <FormInput label="Nom complet" placeholder={`Nom du demandeur ${index + 2}`} />
+            <FormSelect label="Lien avec le demandeur principal" placeholder="Parent, enfant, conjoint, autre..." />
+            <FormInput label="Date de naissance" placeholder="Sélectionner une date" icon={CalendarDays} />
+            <FormSelect label="Type de demandeur" placeholder="Adulte, mineur, parent, tuteur légal..." />
+            <FormInput label="Numéro passeport" placeholder="Entrez le numéro" />
+            <FormInput label="Téléphone / email de contact" placeholder="Si différent du demandeur principal" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function VisaApplication() {
+  const { country = 'france', type = 'etudiant' } = useParams()
+  const [step, setStep] = useState(0)
+  const [serviceMode, setServiceMode] = useState('standard')
+  const [agentSupport, setAgentSupport] = useState('no')
+  const [applicants, setApplicants] = useState(1)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const countryNames = {
+    france: ['France', logos.france],
+    allemagne: ['Allemagne', logos.germany],
+    belgique: ['Belgique', logos.belgium],
+    suisse: ['Suisse', logos.swiss],
+    canada: ['Canada', logos.canada],
+  }
+  const [countryName, flag] = countryNames[country] || countryNames.france
+  const visaTitle = type === 'tourisme' ? 'Visa tourisme' : 'Visa étudiant'
+  const steps = ['Informations', 'Documents', 'Rendez-vous Capago', 'Paiement & validation']
+  const documents = type === 'tourisme'
+    ? ['Passeport valide', 'Réservation logement', 'Billet aller-retour', 'Preuve de ressources', 'Assurance voyage', 'Photo d’identité']
+    : ['Passeport valide', "Lettre d’admission", 'Preuve de ressources', 'Assurance santé', 'Justificatif logement', 'Photo d’identité']
+  const appointmentRequestFee = 30000
+  const agentFee = agentSupport === 'yes' ? 30000 : 0
+  const premiumFee = serviceMode === 'premium' ? 19000 : 0
+  const studywayTotal = appointmentRequestFee + agentFee + premiumFee
+  const formatCfa = (amount) => `${amount.toLocaleString('fr-FR')} FCFA`
+  const capagoServiceLabel = serviceMode === 'premium' ? `Premium Capago : ${formatCfa(premiumFee)}` : 'Service Standard Capago'
+
+  const nextStep = () => setStep((value) => Math.min(value + 1, steps.length - 1))
+  const previousStep = () => setStep((value) => Math.max(value - 1, 0))
+
+  if (submitted) {
+    return (
+      <div className="visa-application-page space-y-7">
+        <section className="rounded-lg border border-emerald-100 bg-white p-8 shadow-sm">
+          <div className="grid gap-7 lg:grid-cols-[1fr_340px]">
+            <div>
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
+              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre demande de visa est lancée</h1>
+              <p className="mt-3 max-w-3xl text-base font-semibold leading-7 text-slate-600">Votre dossier `SW-VISA-2026-0924` a été créé pour le {visaTitle.toLowerCase()} {countryName}. Notre équipe vérifie les informations et prépare la réservation du rendez-vous.</p>
+              <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-5">
+                <h2 className="font-black text-blue-950">Communication importante sur les créneaux Capago</h2>
+                <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">StudyWay ne dispose pas en temps réel des disponibilités Capago. Après réservation de votre rendez-vous, les créneaux disponibles vous seront envoyés clairement afin que vous puissiez confirmer le meilleur horaire.</p>
+              </div>
+              <div className="mt-7 flex flex-wrap gap-4">
+                <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white shadow-lg shadow-blue-600/20"><MessageCircle size={18} />Suivre avec un conseiller</Link>
+                <Link to={`/visa/${country}/${type}`} className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-6 font-black text-blue-800">Retour fiche visa</Link>
+              </div>
+            </div>
+            <aside className="rounded-lg bg-slate-50 p-6">
+              <h2 className="font-black text-slate-950">Résumé</h2>
+              <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between gap-4"><span>Pays</span><b className="text-slate-950">{countryName}</b></div>
+                <div className="flex justify-between gap-4"><span>Visa</span><b className="text-slate-950">{visaTitle}</b></div>
+                <div className="flex justify-between gap-4"><span>Service Capago</span><b className="text-slate-950">{serviceMode === 'premium' ? 'Premium optionnel' : 'Standard'}</b></div>
+                <div className="flex justify-between gap-4"><span>Agent StudyWay</span><b className="text-slate-950">{agentSupport === 'yes' ? `+${formatCfa(agentFee)}` : 'Non choisi'}</b></div>
+                <div className="flex justify-between gap-4"><span>Demandeurs</span><b className="text-slate-950">{applicants}</b></div>
+                <div className="flex justify-between gap-4 border-t border-slate-200 pt-4"><span>Prise de rendez-vous</span><b className="text-blue-700">{formatCfa(studywayTotal)}</b></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  return (
+    <div className="visa-application-page space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Visa & Immigration <span className="mx-2">›</span> Demande</div>
+          <div className="mt-4 flex items-center gap-4"><img src={flag} alt="" className="h-10 w-14 rounded-lg object-cover" /><h1 className="text-3xl font-black tracking-tight text-slate-950">Démarrer ma demande - {visaTitle}</h1></div>
+          <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Complétez votre dossier, choisissez le type d’accompagnement et préparez la réservation du rendez-vous Capago.</p>
+        </div>
+        <Link to={`/visa/${country}/${type}`} className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-black text-blue-800 shadow-sm">Retour fiche visa</Link>
+      </div>
+
+      <section className="grid gap-4 lg:grid-cols-4">
+        {steps.map((label, index) => <button key={label} type="button" onClick={() => setStep(index)} className={`flex items-center gap-3 rounded-lg p-4 text-left transition ${step === index ? 'bg-blue-50 text-blue-800 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50'}`}><span className={`grid h-9 w-9 place-items-center rounded-full text-sm font-black ${step === index ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span><span className="font-black">{label}</span></button>)}
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_330px]">
+        <motion.section key={step} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          {step === 0 && (
+            <div>
+              <h2 className="text-xl font-black text-slate-950">Informations du demandeur principal</h2>
+              <div className="mt-5 grid gap-5 md:grid-cols-2">
+                <FormInput label="Nom complet" placeholder="Christelle Komi" />
+                <FormInput label="Email" placeholder="christelle.komi@email.com" />
+                <FormInput label="Téléphone" placeholder="+228 90 12 34 56" />
+                <FormSelect label="Nationalité" placeholder="Sélectionner votre nationalité" />
+                <FormInput label="Numéro passeport" placeholder="Entrez le numéro" />
+                <FormInput label="Date d’expiration passeport" placeholder="Sélectionner une date" icon={CalendarDays} />
+              </div>
+              <AdditionalApplicantsFields applicants={applicants} />
+            </div>
+          )}
+          {step === 1 && (
+            <div>
+              <h2 className="text-xl font-black text-slate-950">Documents du dossier</h2>
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {documents.map((doc, index) => <div key={doc} className="flex items-center justify-between rounded-lg border border-slate-200 p-4"><span className="flex items-center gap-3 text-sm font-black text-slate-700"><FileText className="text-blue-700" size={18} />{doc}</span><span className={`rounded-full px-3 py-1 text-xs font-black ${index < 3 ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{index < 3 ? 'Ajouté' : 'À ajouter'}</span></div>)}
+              </div>
+              <button type="button" className="mt-5 flex h-12 items-center gap-3 rounded-lg border border-dashed border-blue-300 px-5 font-black text-blue-800 hover:bg-blue-50"><Upload size={18} />Importer un document</button>
+            </div>
+          )}
+          {step === 2 && (
+            <div className="space-y-7">
+              <div>
+                <h2 className="text-xl font-black text-slate-950">Rendez-vous Capago</h2>
+                <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 p-5">
+                  <h3 className="font-black text-blue-950">Information importante sur les créneaux</h3>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">En remplissant ce formulaire, vous soumettez une demande de rendez-vous. StudyWay ne dispose pas des disponibilités Capago en temps réel : après prise en compte de votre demande, les créneaux disponibles vous seront envoyés par email afin que vous puissiez confirmer votre rendez-vous.</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-black text-slate-950">Sélectionnez le niveau d’assistance Capago</h3>
+                <p className="mt-2 text-sm font-semibold text-slate-500">Ces options sont facultatives et se choisissent pendant le processus.</p>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {[['standard', 'Service Standard', 'Faire ma demande de visa en autonomie. Accès à une salle d’attente où vous serez appelé par numéro de ticket pour déposer votre dossier.', 'Inclus'], ['premium', 'Service Premium optionnel', 'Service VIP conçu pour une expérience fluide, rapide et confortable : accompagnement personnalisé, espace calme, collations, internet, photocopies et impressions gratuites.', `+${formatCfa(19000)}`]].map(([key, title, text, price]) => <button key={key} type="button" onClick={() => setServiceMode(key)} className={`rounded-lg border p-5 text-left transition ${serviceMode === key ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 hover:bg-slate-50'}`}><div className="flex items-center justify-between gap-3"><h4 className="font-black text-slate-950">{title}</h4><OptionPriceBadge active={serviceMode === key}>{price}</OptionPriceBadge></div><p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{text}</p></button>)}
+                </div>
+                <div className="mt-3 rounded-lg bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600">Tarifs Premium Capago : 19 000 FCFA, 9 500 FCFA pour les enfants de 6 à 12 ans, gratuit pour les enfants de moins de 6 ans.</div>
+              </div>
+              <div>
+                <h3 className="font-black text-slate-950">Accompagnement StudyWay au rendez-vous</h3>
+                <p className="mt-2 text-sm font-semibold text-slate-500">Optionnel : vous pouvez choisir d’être accompagné par un agent StudyWay ou de vous présenter seul.</p>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {[['no', 'Sans agent StudyWay', 'Vous vous présentez seul au rendez-vous avec les instructions StudyWay.', 'Inclus'], ['yes', 'Avec agent StudyWay', 'Un agent vous accompagne et vous aide à vous orienter le jour du rendez-vous.', `+${formatCfa(30000)}`]].map(([key, title, text, price]) => <button key={key} type="button" onClick={() => setAgentSupport(key)} className={`rounded-lg border p-5 text-left transition ${agentSupport === key ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 hover:bg-slate-50'}`}><div className="flex items-center justify-between gap-3"><h4 className="font-black text-slate-950">{title}</h4><OptionPriceBadge active={agentSupport === key}>{price}</OptionPriceBadge></div><p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{text}</p></button>)}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-black text-slate-950">Nombre de demandeurs</h3>
+                <div className="mt-4 flex w-fit items-center gap-4 rounded-lg border border-slate-200 p-3"><button type="button" onClick={() => setApplicants((value) => Math.max(1, value - 1))} className="grid h-9 w-9 place-items-center rounded-lg bg-slate-100 font-black">-</button><span className="w-10 text-center font-black">{applicants}</span><button type="button" onClick={() => setApplicants((value) => value + 1)} className="grid h-9 w-9 place-items-center rounded-lg bg-blue-600 font-black text-white">+</button></div>
+                {applicants >= 7 && <p className="mt-3 rounded-lg bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">Processus de groupe dédié : pour 7 demandeurs ou plus, nous vous recommandons de contacter StudyWay afin de bénéficier du processus dédié.</p>}
+                <AdditionalApplicantsFields applicants={applicants} />
+              </div>
+            </div>
+          )}
+          {step === 3 && (
+            <div>
+              <h2 className="text-xl font-black text-slate-950">Validation de la demande de rendez-vous</h2>
+              <div className="mt-5 divide-y divide-slate-100 rounded-lg border border-slate-200">
+                <div className="flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-600"><span>Prise de rendez-vous StudyWay</span><b>{formatCfa(appointmentRequestFee)}</b></div>
+                <div className="flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-600"><span>Agent StudyWay au rendez-vous</span><b>{agentSupport === 'yes' ? `+${formatCfa(agentFee)}` : 'Non choisi'}</b></div>
+                <div className="flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-600"><span>Service Capago sélectionné</span><b>{capagoServiceLabel}</b></div>
+                <div className="flex items-center justify-between px-5 py-4 text-sm font-semibold text-blue-800"><span>Total à régler</span><b>{formatCfa(studywayTotal)}</b></div>
+              </div>
+              <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-5">
+                <h3 className="font-black text-blue-950">Informations importantes</h3>
+                <div className="mt-3 space-y-3 text-sm font-semibold leading-6 text-blue-900">
+                  <p>En remplissant ce formulaire, vous soumettez une demande de rendez-vous. Un email de confirmation vous sera envoyé dès sa prise en compte.</p>
+                  <p>Lorsque votre créneau est attribué, vous recevez un email vous invitant à confirmer votre rendez-vous sous trois jours en réglant les frais de service en ligne par carte bancaire. Sans paiement dans ce délai, votre rendez-vous sera annulé automatiquement.</p>
+                  <p>Une fois le paiement effectué, un dernier email vous sera envoyé pour confirmer définitivement votre rendez-vous.</p>
+                </div>
+              </div>
+              <div className="mt-5 rounded-lg border border-slate-200 p-5">
+                <h3 className="font-black text-slate-950">Consulat Général de France à Lomé</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Vous êtes sur le point de remplir une demande de rendez-vous pour déposer un dossier auprès du Consulat de France à Lomé.</p>
+              </div>
+              <div className="mt-5 rounded-lg border border-amber-100 bg-amber-50 p-5">
+                <h3 className="font-black text-amber-900">Méfiez-vous des intermédiaires frauduleux</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-amber-800">Capago International est la société officielle mandatée par le gouvernement français pour recevoir les demandes de visa. Soyez prudent dans toute transaction avec des entreprises prétendant garantir l’obtention d’un visa.</p>
+              </div>
+              <div className="mt-5 rounded-lg border border-slate-200 p-5">
+                <h3 className="font-black text-slate-950">Enfants mineurs</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Lors du dépôt de la demande, les enfants mineurs doivent obligatoirement être accompagnés par l’un des parents ou le tuteur légal. Une décision du tribunal doit être présentée lors du rendez-vous en cas de tutelle.</p>
+              </div>
+              <label className="mt-5 flex items-start gap-3 rounded-lg border border-slate-200 p-4 text-sm font-semibold text-slate-700"><input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 accent-blue-700" />J’ai lu et j’accepte les Conditions générales de Capago et la Politique de Confidentialité.</label>
+            </div>
+          )}
+          <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
+            <button type="button" onClick={previousStep} className="h-11 rounded-lg border border-slate-200 px-6 font-black text-slate-600 hover:bg-slate-50">{step === 0 ? 'Annuler' : 'Retour'}</button>
+            <button type="button" disabled={step === steps.length - 1 && !acceptedTerms} onClick={step === steps.length - 1 ? () => setSubmitted(true) : nextStep} className="support-start-button flex h-11 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">{step === steps.length - 1 ? 'Soumettre la demande de rendez-vous' : 'Continuer'} <ArrowRight className="support-start-arrow" size={18} /></button>
+          </div>
+        </motion.section>
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">Résumé demande</h2>
+            <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
+              <div className="flex justify-between"><span>Pays</span><b>{countryName}</b></div>
+              <div className="flex justify-between"><span>Visa</span><b>{visaTitle}</b></div>
+              <div className="flex justify-between"><span>Assistance Capago</span><b>{serviceMode === 'premium' ? 'Premium optionnel' : 'Standard'}</b></div>
+              <div className="flex justify-between"><span>Agent StudyWay</span><b>{agentSupport === 'yes' ? `+${formatCfa(agentFee)}` : 'Non choisi'}</b></div>
+              <div className="flex justify-between"><span>Demandeurs</span><b>{applicants}</b></div>
+              <div className="flex justify-between border-t border-slate-100 pt-4 text-blue-800"><span>Total</span><b>{formatCfa(studywayTotal)}</b></div>
+            </div>
+          </section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Communication claire</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Les créneaux Capago vous seront envoyés après réservation du rendez-vous, car les disponibilités ne sont pas accessibles en temps réel.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
 function Transport() {
   const transportModes = [['Avion', Plane], ['Train', Train], ['Bus', Bus], ['Tram / Métro', Train], ['Chauffeur (Uber)', Car]]
   const flights = [
-    ['Air France', 'AF 753', logos.airFrance, '23:45', '6h 45m', 'Direct', '07:30', '450 €', 'text-emerald-600'],
-    ['Ethiopian Airlines', 'ET 920', logos.ethiopian, '15:20', '11h 15m', '1 escale (ADD)', '07:35', '385 €', 'text-amber-600'],
-    ['Turkish Airlines', 'TK 569', logos.turkish, '09:10', '9h 50m', '1 escale (IST)', '19:00', '420 €', 'text-amber-600'],
-    ['RwandAir', 'WB 704', logos.rwandair, '13:30', '8h 20m', '1 escale (KGL)', '21:50', '372 €', 'text-amber-600'],
+    ['Air France', 'AF 753', logos.airFrance, '23:45', '6h 45m', 'Direct', '07:30', '295 000 FCFA', 'text-emerald-600'],
+    ['Ethiopian Airlines', 'ET 920', logos.ethiopian, '15:20', '11h 15m', '1 escale (ADD)', '07:35', '252 000 FCFA', 'text-amber-600'],
+    ['Turkish Airlines', 'TK 569', logos.turkish, '09:10', '9h 50m', '1 escale (IST)', '19:00', '276 000 FCFA', 'text-amber-600'],
+    ['RwandAir', 'WB 704', logos.rwandair, '13:30', '8h 20m', '1 escale (KGL)', '21:50', '244 000 FCFA', 'text-amber-600'],
   ]
 
   return (
     <div className="transport-page space-y-7">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5">
         <div><h1 className="text-4xl font-black tracking-tight">Billets & Transport</h1><p className="mt-2 text-lg font-medium text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p></div>
-        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm"><div className="text-xs font-semibold text-slate-500">Mon portefeuille</div><div className="font-black text-emerald-600">1 250,00 €</div></div>
+        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm"><div className="text-xs font-semibold text-slate-500">Mon portefeuille</div><div className="font-black text-emerald-600">820 000 FCFA</div></div>
       </motion.div>
 
       <section className="flex flex-wrap gap-4 border-b border-slate-200 pb-6">
