@@ -10,7 +10,7 @@ import {
   Menu, X, Video, SlidersHorizontal,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import universityHero from './assets/university-student-hero.png'
 import supportHero from './assets/support-student-hero.png'
 import dashboardStudentHero from './assets/dashboard-african-student.png'
@@ -46,6 +46,7 @@ const logos = {
   canada: 'https://flagcdn.com/w40/ca.png',
   belgium: 'https://flagcdn.com/w40/be.png',
   germany: 'https://flagcdn.com/w40/de.png',
+  swiss: 'https://flagcdn.com/w40/ch.png',
   togo: 'https://flagcdn.com/w40/tg.png',
 }
 
@@ -303,8 +304,12 @@ function AnimatedRoutes() {
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
         <Route path="/universites" element={<Universities />} />
+        <Route path="/guides/:slug" element={<StudentGuideDetail />} />
+        <Route path="/guides" element={<StudentGuides />} />
         <Route path="/profil" element={<Profile />} />
+        <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
+        <Route path="/visa/:country/:type" element={<Visa />} />
         <Route path="/visa" element={<Visa />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/voyage" element={<Transport />} />
@@ -892,9 +897,9 @@ function Universities() {
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">Guide étudiant</h3>
             <div className="mt-4 space-y-4 text-sm font-semibold text-slate-600">
-              {['Comment choisir son université ?', "Préparer son dossier d'admission", 'Demande de visa étudiant'].map((item, index) => <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + index * 0.08 }} className="flex items-center gap-3" key={item}><FileText size={17} />{item}</motion.div>)}
+              {['Comment choisir son université ?', "Préparer son dossier d'admission", 'Demande de visa étudiant'].map((item, index) => <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + index * 0.08 }} key={item}><Link to="/guides" className="flex items-center gap-3 hover:text-blue-800"><FileText size={17} />{item}</Link></motion.div>)}
             </div>
-            <button className="mt-6 font-black text-blue-800">Voir tous les guides →</button>
+            <Link to="/guides" className="mt-6 inline-flex font-black text-blue-800">Voir tous les guides →</Link>
           </motion.section>
         </aside>
       </div>
@@ -983,6 +988,221 @@ function UniversityResultCard({ item, index }) {
   )
 }
 
+function StudentGuides() {
+  const [activeCategory, setActiveCategory] = useState('Orientation')
+  const guides = [
+    {
+      slug: 'choisir-universite',
+      title: 'Comment choisir son université ?',
+      category: 'Orientation',
+      time: '8 min',
+      icon: Building2,
+      color: 'bg-blue-50 text-blue-700',
+      intro: 'Comparez les programmes, la ville, le budget, la reconnaissance du diplôme et les opportunités après les études.',
+      steps: ['Définir votre objectif professionnel', 'Comparer les programmes et accréditations', 'Évaluer le coût total de la ville', 'Vérifier les prérequis et dates limites'],
+    },
+    {
+      slug: 'preparer-dossier-admission',
+      title: "Préparer son dossier d'admission",
+      category: 'Admission',
+      time: '12 min',
+      icon: ClipboardList,
+      color: 'bg-emerald-50 text-emerald-700',
+      intro: 'Organisez vos diplômes, relevés, CV, lettre de motivation et recommandations pour déposer un dossier clair.',
+      steps: ['Créer une checklist par université', 'Traduire et certifier les documents', 'Adapter la lettre de motivation', 'Relire et déposer avant la date limite'],
+    },
+    {
+      slug: 'demande-visa-etudiant',
+      title: 'Demande de visa étudiant',
+      category: 'Visa',
+      time: '10 min',
+      icon: Plane,
+      color: 'bg-violet-50 text-violet-700',
+      intro: 'Préparez les preuves financières, l’admission, le logement et l’assurance pour éviter les retards.',
+      steps: ['Vérifier le type de visa', 'Préparer les justificatifs financiers', 'Réserver le rendez-vous consulaire', 'Suivre la demande après dépôt'],
+    },
+    {
+      slug: 'trouver-logement-securise',
+      title: 'Trouver un logement sécurisé',
+      category: 'Installation',
+      time: '7 min',
+      icon: Home,
+      color: 'bg-amber-50 text-amber-700',
+      intro: 'Repérez les quartiers adaptés, évitez les arnaques et préparez votre dossier locatif.',
+      steps: ['Définir votre budget', 'Comparer résidence, studio et colocation', 'Vérifier le contrat', 'Préparer caution et assurance'],
+    },
+  ]
+  const categories = ['Orientation', 'Admission', 'Visa', 'Installation']
+  const filteredGuides = guides.filter((guide) => guide.category === activeCategory)
+  const checklist = ['Passeport valide', 'Diplôme et relevés', 'CV académique', 'Lettre de motivation', 'Preuve de ressources', 'Attestation de logement']
+
+  return (
+    <div className="guides-page space-y-7">
+      <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-end">
+          <div>
+            <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Guides étudiant</div>
+            <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-950">Guide étudiant</h1>
+            <p className="mt-3 max-w-3xl text-base font-semibold leading-7 text-slate-600">Des guides clairs pour choisir votre université, préparer votre admission, réussir votre visa et organiser votre installation.</p>
+          </div>
+          <label className="flex h-12 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-500">
+            <Search size={19} />
+            <input className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" placeholder="Rechercher un guide..." />
+          </label>
+        </div>
+      </section>
+
+      <section className="grid gap-5 md:grid-cols-4">
+        {categories.map((category) => <button type="button" key={category} onClick={() => setActiveCategory(category)} className={`h-12 rounded-lg font-black shadow-sm transition ${category === activeCategory ? 'bg-blue-600 text-white' : 'border border-slate-200 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-800'}`}>{category}</button>)}
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
+        <section className="grid gap-5 md:grid-cols-2">
+          {filteredGuides.map(({ slug, title, category, time, icon: Icon, color, intro, steps }, index) => (
+            <motion.article key={title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -6 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-start justify-between gap-4">
+                <div className={`grid h-12 w-12 place-items-center rounded-lg ${color}`}><Icon size={23} /></div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{time}</span>
+              </div>
+              <div className="mt-5 text-sm font-black text-blue-700">{category}</div>
+              <h2 className="mt-2 text-xl font-black text-slate-950">{title}</h2>
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{intro}</p>
+              <div className="mt-5 space-y-3">
+                {steps.map((step, stepIndex) => <div key={step} className="flex gap-3 text-sm font-semibold text-slate-600"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-blue-700">{stepIndex + 1}</span>{step}</div>)}
+              </div>
+              <Link to={`/guides/${slug}`} className="mt-6 flex items-center gap-2 font-black text-blue-800">Lire le guide <ArrowRight size={17} /></Link>
+            </motion.article>
+          ))}
+        </section>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-black text-slate-950">Checklist départ</h2>
+            <div className="mt-5 space-y-3">
+              {checklist.map((item, index) => <label key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-600"><input type="checkbox" defaultChecked={index < 3} className="h-4 w-4 rounded border-slate-300 accent-blue-700" />{item}</label>)}
+            </div>
+          </section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Besoin d’un avis personnalisé ?</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Un conseiller peut analyser votre projet et vous proposer une feuille de route.</p>
+            <Link to="/accompagnement/demarrer" className="mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Démarrer <ArrowRight size={17} /></Link>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function StudentGuideDetail() {
+  const { slug } = useParams()
+  const guides = {
+    'choisir-universite': {
+      title: 'Comment choisir son université ?',
+      category: 'Orientation',
+      icon: Building2,
+      color: 'bg-blue-50 text-blue-700',
+      intro: 'Choisir une université ne dépend pas seulement du classement. Il faut aligner votre projet, votre budget, les conditions d’admission et la ville où vous allez vivre.',
+      sections: [
+        ['Clarifier votre objectif', 'Commencez par votre objectif professionnel : métier visé, secteur, pays où vous souhaitez travailler, niveau de diplôme attendu.'],
+        ['Comparer les programmes', 'Regardez les matières, stages, alternance, langue d’enseignement, accréditations et partenariats entreprises.'],
+        ['Évaluer le budget réel', 'Ajoutez frais de scolarité, logement, transport, assurance, nourriture, visa et frais d’installation.'],
+        ['Vérifier les conditions d’admission', 'Notez les prérequis, niveau de langue, documents, dates limites et éventuels entretiens.'],
+      ],
+      checklist: ['Programme cohérent avec mon projet', 'Budget annuel estimé', 'Prérequis vérifiés', 'Ville et logement étudiés', 'Dates limites notées'],
+    },
+    'preparer-dossier-admission': {
+      title: "Préparer son dossier d'admission",
+      category: 'Admission',
+      icon: ClipboardList,
+      color: 'bg-emerald-50 text-emerald-700',
+      intro: 'Un bon dossier doit être clair, complet et adapté à chaque établissement. L’objectif est de rassurer l’université sur votre niveau, votre motivation et votre sérieux.',
+      sections: [
+        ['Créer une checklist par école', 'Chaque université peut demander des documents différents. Séparez vos listes pour éviter les oublis.'],
+        ['Préparer les documents officiels', 'Diplômes, relevés, attestations, passeport et traductions doivent être lisibles et cohérents.'],
+        ['Adapter votre motivation', 'La lettre doit expliquer pourquoi cette formation, cette université et ce projet ont du sens.'],
+        ['Relire avant dépôt', 'Vérifiez noms, dates, formats PDF, poids des fichiers et délais de soumission.'],
+      ],
+      checklist: ['Passeport', 'Diplômes', 'Relevés', 'CV', 'Lettre de motivation', 'Recommandations'],
+    },
+    'demande-visa-etudiant': {
+      title: 'Demande de visa étudiant',
+      category: 'Visa',
+      icon: Plane,
+      color: 'bg-violet-50 text-violet-700',
+      intro: 'La demande de visa demande de la rigueur. Le dossier doit prouver votre admission, vos ressources, votre logement et votre intention d’étudier sérieusement.',
+      sections: [
+        ['Identifier le bon visa', 'Vérifiez le visa adapté à votre pays, la durée de vos études et votre situation.'],
+        ['Rassembler les preuves', 'Admission, ressources, logement, assurance, passeport et photos doivent être prêts avant le rendez-vous.'],
+        ['Préparer le rendez-vous', 'Classez vos documents, imprimez les justificatifs et préparez des réponses simples.'],
+        ['Suivre le dossier', 'Gardez les reçus, numéros de dossier et messages officiels jusqu’à la décision.'],
+      ],
+      checklist: ['Admission', 'Passeport valide', 'Preuve de ressources', 'Logement', 'Assurance', 'Rendez-vous consulaire'],
+    },
+    'trouver-logement-securise': {
+      title: 'Trouver un logement sécurisé',
+      category: 'Installation',
+      icon: Home,
+      color: 'bg-amber-50 text-amber-700',
+      intro: 'Le logement doit être anticipé tôt. Un bon choix réduit le stress à l’arrivée et facilite souvent la demande de visa.',
+      sections: [
+        ['Définir le budget', 'Incluez loyer, charges, dépôt de garantie, assurance, transport et frais d’installation.'],
+        ['Choisir le type de logement', 'Résidence étudiante, studio ou colocation : comparez sécurité, distance et conditions.'],
+        ['Éviter les arnaques', 'Ne payez pas sans contrat clair, justificatif, adresse vérifiable et interlocuteur fiable.'],
+        ['Préparer le dossier', 'Préparez pièce d’identité, admission, garant, justificatifs financiers et assurance.'],
+      ],
+      checklist: ['Budget validé', 'Quartier vérifié', 'Contrat relu', 'Garant ou caution', 'Assurance logement'],
+    },
+  }
+  const guide = guides[slug] || guides['choisir-universite']
+  const Icon = guide.icon
+
+  return (
+    <div className="guide-detail-page space-y-7">
+      <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-3xl">
+            <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Guides étudiant <span className="mx-2">›</span> {guide.category}</div>
+            <div className={`mt-6 grid h-14 w-14 place-items-center rounded-lg ${guide.color}`}><Icon size={27} /></div>
+            <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-950">{guide.title}</h1>
+            <p className="mt-4 text-base font-semibold leading-7 text-slate-600">{guide.intro}</p>
+          </div>
+          <Link to="/guides" className="rounded-lg border border-slate-200 px-5 py-3 font-black text-blue-800 hover:bg-blue-50">Tous les guides</Link>
+        </div>
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
+        <section className="space-y-5">
+          {guide.sections.map(([title, text], index) => (
+            <motion.article key={title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex gap-4">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-600 font-black text-white">{index + 1}</span>
+                <div>
+                  <h2 className="text-xl font-black text-slate-950">{title}</h2>
+                  <p className="mt-2 text-sm font-semibold leading-7 text-slate-600">{text}</p>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </section>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-black text-slate-950">Checklist du guide</h2>
+            <div className="mt-5 space-y-3">
+              {guide.checklist.map((item, index) => <label key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-600"><input type="checkbox" defaultChecked={index < 2} className="h-4 w-4 rounded border-slate-300 accent-blue-700" />{item}</label>)}
+            </div>
+          </section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Besoin d’aide sur ce guide ?</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Un conseiller peut transformer ce guide en plan d’action personnalisé.</p>
+            <Link to="/accompagnement/demarrer" className="mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Démarrer mon accompagnement <ArrowRight size={17} /></Link>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
 function Profile() {
   return <div className="grid gap-6 xl:grid-cols-[1fr_420px]"><div className="space-y-6"><Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel><div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="2 450 €" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="2 100 €" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="350 €" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div><Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel></div><div className="space-y-5"><Panel title="Dernières activités"><List items={['Paiement loyer -550 €', 'Document ajouté - Attestation de scolarité', 'Paiement université -1 500 €']} /></Panel><Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel><div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div></div></div>
 }
@@ -1013,7 +1233,7 @@ function SupportJourney() {
           <h1 className="mt-8 text-6xl font-black leading-tight tracking-tight text-slate-950">Accompagnement<br />personnalisé</h1>
           <p className="mt-7 text-xl font-medium leading-9 text-slate-700">Nous vous accompagnons à chaque étape de votre projet d'études à l'étranger. De la préparation du dossier à votre installation, vous n'êtes jamais seul.</p>
           <div className="mt-9 flex flex-wrap gap-5">
-            <motion.button initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -5, scale: 1.02 }} className="support-start-button flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight className="support-start-arrow" size={19} /></motion.button>
+            <motion.div initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -5, scale: 1.02 }}><Link to="/accompagnement/demarrer" className="support-start-button flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight className="support-start-arrow" size={19} /></Link></motion.div>
             <motion.button initial={{ opacity: 0, x: 54, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.56, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800"><Video size={19} />Voir la vidéo</motion.button>
           </div>
         </motion.div>
@@ -1040,9 +1260,479 @@ function SupportJourney() {
   )
 }
 
+function StartSupport() {
+  const [step, setStep] = useState(0)
+  const [submitted, setSubmitted] = useState(false)
+  const [selectedServices, setSelectedServices] = useState(['Admission université', 'Visa étudiant', 'Logement'])
+  const [uploadedDocs, setUploadedDocs] = useState(['Passeport', "Dernier diplôme"])
+  const steps = [
+    ['Profil étudiant', 'Identité, contact et parcours'],
+    ['Projet d’études', 'Destination, rentrée et formation'],
+    ['Services & documents', 'Besoins, fichiers et rendez-vous'],
+    ['Validation', 'Résumé, paiement et lancement'],
+  ]
+  const journey = [
+    ['Conseil & Orientation', 'Nous analysons votre profil et vos objectifs.'],
+    ['Préparation du dossier', 'Nous rassemblons et vérifions tous vos documents.'],
+    ['Logement & réservation', 'Nous vous aidons à trouver un logement sécurisé.'],
+    ['Demande de visa', 'Nous soumettons votre dossier et assurons le suivi.'],
+    ['Départ & installation', "Nous vous accompagnons jusqu'à votre arrivée."],
+  ]
+  const services = ['Admission université', 'Visa étudiant', 'Logement', 'Assurance', 'Compte bancaire', 'Billets & arrivée']
+  const docs = ['Passeport', "Dernier diplôme", 'Relevés de notes', 'CV', 'Lettre de motivation', 'Preuve de ressources']
+  const progress = Math.round(((step + 1) / steps.length) * 100)
+
+  const nextStep = () => setStep((value) => Math.min(value + 1, steps.length - 1))
+  const previousStep = () => setStep((value) => Math.max(value - 1, 0))
+  const toggleService = (service) => setSelectedServices((items) => items.includes(service) ? items.filter((item) => item !== service) : [...items, service])
+  const toggleDoc = (doc) => setUploadedDocs((items) => items.includes(doc) ? items.filter((item) => item !== doc) : [...items, doc])
+
+  if (submitted) {
+    return (
+      <div className="start-support-page space-y-7">
+        <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
+          <div className="grid gap-8 p-8 xl:grid-cols-[1fr_360px]">
+            <div>
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
+              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre accompagnement est lancé</h1>
+              <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-slate-600">Votre dossier `SW-AC-2026-0148` a été créé. Un conseiller va vérifier vos informations et vous contacter pour finaliser votre feuille de route.</p>
+              <div className="mt-7 grid gap-4 md:grid-cols-3">
+                {[
+                  ['Aujourd’hui', 'Dossier créé'],
+                  ['Sous 24h', 'Analyse conseiller'],
+                  ['Prochaine étape', 'Rendez-vous orientation'],
+                ].map(([label, value]) => <div key={label} className="rounded-lg border border-slate-200 p-5"><div className="text-sm font-bold text-slate-500">{label}</div><div className="mt-2 font-black text-slate-950">{value}</div></div>)}
+              </div>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white shadow-lg shadow-blue-600/20"><MessageCircle size={18} />Ouvrir la conversation</Link>
+                <Link to="/accompagnement" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-6 font-black text-blue-800">Retour accompagnement</Link>
+              </div>
+            </div>
+            <aside className="rounded-lg bg-slate-50 p-6">
+              <h2 className="font-black text-slate-950">Résumé du dossier</h2>
+              <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between gap-4"><span>Pack choisi</span><b className="text-slate-950">Essentiel Plus</b></div>
+                <div className="flex justify-between gap-4"><span>Services</span><b className="text-slate-950">{selectedServices.length}</b></div>
+                <div className="flex justify-between gap-4"><span>Documents</span><b className="text-slate-950">{uploadedDocs.length}/{docs.length}</b></div>
+                <div className="flex justify-between gap-4"><span>Statut</span><b className="text-emerald-600">En analyse</b></div>
+              </div>
+            </aside>
+          </div>
+        </motion.section>
+      </div>
+    )
+  }
+
+  return (
+    <div className="start-support-page space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Accompagnement <span className="mx-2">›</span> Démarrer mon accompagnement</div>
+          <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Démarrer mon accompagnement</h1>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Remplissez les informations ci-dessous pour commencer votre accompagnement personnalisé. Vous pourrez compléter les détails manquants avec votre conseiller.</p>
+          <div className="mt-5 h-2 max-w-xl rounded-full bg-slate-100"><motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-2 rounded-full bg-blue-600" /></div>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-3 shadow-sm">
+          <WalletCards className="text-amber-600" size={22} />
+          <div>
+            <div className="text-xs font-bold text-slate-500">Mon portefeuille</div>
+            <div className="text-lg font-black text-emerald-600">1 250,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <section>
+        <div className="grid gap-4 lg:grid-cols-4">
+          {steps.map(([title], index) => (
+            <button key={title} type="button" onClick={() => setStep(index)} className={`flex items-center gap-3 rounded-lg px-3 py-3 text-left transition ${index === step ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-black ${index === step ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span>
+              <span className="min-w-0">
+                <span className="block text-sm font-black">{title}</span>
+                <span className="mt-1 block text-xs font-semibold text-slate-400">{steps[index][1]}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_330px]">
+        <motion.section key={step} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          {step === 0 && <PersonalInfoStep />}
+          {step === 1 && <ProjectInfoStep />}
+          {step === 2 && <PreferencesStep services={services} selectedServices={selectedServices} toggleService={toggleService} docs={docs} uploadedDocs={uploadedDocs} toggleDoc={toggleDoc} />}
+          {step === 3 && <ReviewStep selectedServices={selectedServices} uploadedDocs={uploadedDocs} docs={docs} />}
+          <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
+            <button type="button" onClick={previousStep} className="h-11 rounded-lg border border-slate-200 px-6 font-black text-slate-600 hover:bg-slate-50">{step === 0 ? 'Annuler' : 'Retour'}</button>
+            <button type="button" onClick={step === steps.length - 1 ? () => setSubmitted(true) : nextStep} className="support-start-button flex h-11 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">{step === steps.length - 1 ? 'Valider et lancer' : 'Continuer'} <ArrowRight className="support-start-arrow" size={18} /></button>
+          </div>
+        </motion.section>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Votre accompagnement</h2>
+            <div className="mt-6 space-y-0">
+              {journey.map(([title, text], index) => (
+                <div key={title} className="grid grid-cols-[34px_1fr] gap-4 pb-5 last:pb-0">
+                  <div className="relative">
+                    {index < journey.length - 1 && <span className="absolute left-1/2 top-9 h-full w-px -translate-x-1/2 bg-slate-200" />}
+                    <span className={`relative z-10 grid h-8 w-8 place-items-center rounded-full text-sm font-black ${index <= Math.min(step + 1, journey.length - 1) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-950">{title}</h3>
+                    <p className="mt-1 text-sm font-medium leading-6 text-slate-500">{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="relative overflow-hidden rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <div className="max-w-[190px]">
+              <h2 className="font-black text-blue-950">Besoin d'aide ?</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-blue-900">Discutez avec un conseiller pour toute question sur votre accompagnement.</p>
+              <Link to="/messages" className="mt-5 flex h-11 w-fit items-center gap-3 rounded-lg bg-white px-5 text-sm font-black text-blue-800 shadow-sm"><MessageCircle size={18} />Parler à un conseiller</Link>
+            </div>
+            <UserRound className="absolute -bottom-5 right-4 text-blue-200" size={120} />
+          </section>
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex gap-4">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-800"><Lock size={20} /></div>
+              <div><h2 className="font-black text-slate-950">Sécurité & confidentialité</h2><p className="mt-2 text-sm font-medium leading-6 text-slate-500">Vos informations sont 100% sécurisées et ne seront jamais partagées.</p></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function PersonalInfoStep() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Informations personnelles</h2>
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <FormInput label="Prénom(s)" placeholder="Christelle" />
+          <FormRadio label="Genre" options={['Homme', 'Femme']} />
+          <FormInput label="Nom" placeholder="Komi" />
+          <FormSelect label="État civil" placeholder="Sélectionner votre état civil" />
+          <FormInput label="Date de naissance" placeholder="Sélectionner une date" icon={CalendarDays} />
+          <FormSelect label="Pièce d'identité" placeholder="Sélectionner le type" />
+          <FormSelect label="Nationalité" placeholder="Sélectionner votre nationalité" />
+          <FormInput label="Numéro de pièce d'identité" placeholder="Entrez le numéro" />
+          <FormSelect label="Pays de résidence actuel" placeholder="Sélectionner votre pays" />
+          <FormTextarea label="Adresse actuelle" placeholder="Entrez votre adresse complète" />
+          <FormInput label="Téléphone" placeholder="+228    90 12 34 56" />
+          <FormInput label="Email" placeholder="christelle.komi@email.com" />
+        </div>
+      </div>
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Informations académiques</h2>
+        <div className="mt-5 grid gap-5 md:grid-cols-3">
+          <FormSelect label="Niveau d'études actuel" placeholder="Sélectionner votre niveau" />
+          <FormInput label="Dernier diplôme obtenu" placeholder="Entrez votre dernier diplôme" />
+          <FormInput label="Filière / Domaine d'études" placeholder="Entrez votre filière" />
+          <FormInput label="Établissement actuel" placeholder="Entrez le nom de votre établissement" />
+        </div>
+      </div>
+      <section className="rounded-lg border border-blue-100 bg-blue-50 p-5">
+        <div className="flex gap-4"><Info className="shrink-0 text-blue-700" size={22} /><p className="text-sm font-semibold leading-6 text-blue-950">Ces informations servent à préparer votre dossier étudiant, vos candidatures et les démarches administratives. Vous pourrez les modifier avec votre conseiller.</p></div>
+      </section>
+    </div>
+  )
+}
+
+function ProjectInfoStep() {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Informations sur le projet</h2>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        <FormSelect label="Pays souhaité" placeholder="France, Canada, Belgique..." />
+        <FormSelect label="Rentrée visée" placeholder="Septembre 2026" />
+        <FormInput label="Formation recherchée" placeholder="Licence, Master, BTS..." />
+        <FormInput label="Ville préférée" placeholder="Paris, Lyon, Montréal..." />
+        <FormTextarea label="Objectif du projet" placeholder="Décrivez votre projet d'études et vos attentes." />
+        <FormTextarea label="Situation actuelle" placeholder="Expliquez où vous en êtes dans vos démarches." />
+      </div>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        {[
+          [GraduationCap, 'Admission', 'Choix des formations et constitution du dossier'],
+          [ShieldCheck, 'Visa', 'Préparation des justificatifs et suivi consulaire'],
+          [Home, 'Installation', 'Logement, assurance, banque et arrivée'],
+        ].map(([Icon, title, text]) => <div key={title} className="rounded-lg border border-slate-200 p-5"><div className="grid h-11 w-11 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={22} /></div><h3 className="mt-4 font-black">{title}</h3><p className="mt-2 text-sm font-medium leading-6 text-slate-500">{text}</p></div>)}
+      </div>
+    </div>
+  )
+}
+
+function PreferencesStep({ services, selectedServices, toggleService, docs, uploadedDocs, toggleDoc }) {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Services à activer</h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {services.map((service) => {
+            const selected = selectedServices.includes(service)
+            return <button key={service} type="button" onClick={() => toggleService(service)} className={`flex items-center gap-3 rounded-lg border p-4 text-left transition ${selected ? 'border-blue-500 bg-blue-50 text-blue-800 shadow-sm' : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'}`}><span className={`grid h-6 w-6 place-items-center rounded-full ${selected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>{selected && <CheckCircle2 size={15} />}</span><span className="font-black">{service}</span></button>
+          })}
+        </div>
+      </div>
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Documents disponibles</h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {docs.map((doc) => {
+            const uploaded = uploadedDocs.includes(doc)
+            return <button key={doc} type="button" onClick={() => toggleDoc(doc)} className={`flex items-center justify-between rounded-lg border p-4 text-left transition ${uploaded ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-200 hover:bg-slate-50'}`}><span className="flex items-center gap-3"><FileText size={18} /><span className="font-black">{doc}</span></span><span className={`rounded-full px-3 py-1 text-xs font-black ${uploaded ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{uploaded ? 'Ajouté' : 'À ajouter'}</span></button>
+          })}
+        </div>
+        <button type="button" className="mt-5 flex h-12 items-center gap-3 rounded-lg border border-dashed border-blue-300 px-5 font-black text-blue-800 hover:bg-blue-50"><Upload size={18} />Importer un nouveau document</button>
+      </div>
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Préférences pratiques</h2>
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <FormSelect label="Budget mensuel logement" placeholder="400 € - 700 €" />
+          <FormSelect label="Besoin de financement" placeholder="À discuter avec un conseiller" />
+          <FormSelect label="Disponibilité conseiller" placeholder="Après-midi ou soir" />
+          <FormSelect label="Canal préféré" placeholder="Messages StudyWay" />
+          <FormTextarea label="Notes pour le conseiller" placeholder="Ajoutez toute information utile." />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ReviewStep({ selectedServices, uploadedDocs, docs }) {
+  return (
+    <div>
+      <h2 className="text-xl font-black text-slate-950">Vérification & validation</h2>
+      <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-5">
+        <h3 className="font-black text-blue-950">Votre demande est prête à être envoyée</h3>
+        <p className="mt-2 text-sm font-medium leading-6 text-blue-900">Après validation, un conseiller StudyWay analysera vos informations et vous contactera pour compléter votre dossier.</p>
+      </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        {[
+          ['Services activés', `${selectedServices.length} services`, MessageCircle],
+          ['Documents reçus', `${uploadedDocs.length}/${docs.length} documents`, FileText],
+          ['Rendez-vous', 'Créneau à confirmer', CalendarDays],
+        ].map(([item, value, Icon], index) => <div key={item} className="rounded-lg border border-slate-200 p-5"><div className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-white"><Icon size={19} /></div><h3 className="mt-4 font-black">{item}</h3><p className="mt-2 text-sm font-bold text-slate-500">{value}</p><p className="mt-2 text-sm font-medium text-slate-500">Inclus dans votre accompagnement personnalisé.</p></div>)}
+      </div>
+      <div className="mt-6 rounded-lg border border-slate-200 p-5">
+        <h3 className="font-black text-slate-950">Pack recommandé : Essentiel Plus</h3>
+        <div className="mt-4 grid gap-3 text-sm font-semibold text-slate-600 md:grid-cols-2">
+          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Conseiller dédié</div>
+          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Plan d'action personnalisé</div>
+          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Suivi documents et visa</div>
+          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Messagerie prioritaire</div>
+        </div>
+        <div className="mt-5 flex items-center justify-between rounded-lg bg-slate-50 px-5 py-4"><span className="font-black text-slate-950">Frais de lancement</span><span className="text-xl font-black text-blue-700">49 €</span></div>
+      </div>
+    </div>
+  )
+}
+
+function FormInput({ label, placeholder, icon: Icon }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<span className="mt-2 flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50"><input className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder={placeholder} />{Icon && <Icon size={17} />}</span></label>
+}
+
+function FormSelect({ label, placeholder }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<span className="mt-2 flex h-11 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">{placeholder}<ChevronDown size={17} /></span></label>
+}
+
+function FormTextarea({ label, placeholder }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<textarea className="mt-2 min-h-24 w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder={placeholder} /></label>
+}
+
+function FormRadio({ label, options }) {
+  return <div className="block text-sm font-black text-slate-700">{label}<div className="mt-3 flex h-11 items-center gap-7">{options.map((option, index) => <label key={option} className="flex items-center gap-2 font-semibold text-slate-700"><span className={`grid h-4 w-4 place-items-center rounded-full border ${index === 0 ? 'border-blue-600' : 'border-slate-300'}`}>{index === 0 && <span className="h-2 w-2 rounded-full bg-blue-600" />}</span>{option}</label>)}</div></div>
+}
+
 function Visa() {
-  const steps = ['Préparation dossier', 'Soumission', 'Rendez-vous', 'Entretien', 'Décision', 'Visa délivré']
-  return <div className="grid gap-6 xl:grid-cols-[1fr_380px]"><div className="space-y-6"><section className="grid gap-4 md:grid-cols-4">{[['France court séjour', logos.france], ['France long séjour', logos.france], ['Canada court séjour', logos.canada], ['Canada long séjour', logos.canada]].map(([x, flag]) => <div className="rounded-lg border bg-white p-5"><img src={flag} alt="" className="h-7 w-10 rounded object-cover" /><h3 className="mt-3 font-black">{x}</h3><p className="mt-2 text-sm text-slate-500">Sélectionnez ce visa pour commencer votre dossier.</p></div>)}</section><PageTitle title="Mon dossier de visa France" subtitle="Études en France - Campus France" /><Panel title="Progression"><ProcessLine steps={steps} activeIndex={2} icons={[FileText, Upload, CalendarDays, UserRound, ClipboardList, ShieldCheck]} /></Panel><Panel title="Informations du rendez-vous"><div className="grid gap-4 md:grid-cols-4">{['05 juin 2024', '09:30', 'TLScontact Paris', 'Visa étudiant (VLS-TS)'].map((x) => <div className="font-black" key={x}>{x}</div>)}</div></Panel><Panel title="Étapes de mon dossier"><VerticalTimeline items={['Dossier créé - 12 mai 2024', 'Dossier soumis à Campus France - 20 mai 2024', 'Rendez-vous pris - 28 mai 2024', 'Entretien - À venir', 'Décision - En attente', 'Visa délivré - En attente']} activeIndex={2} /></Panel></div><div className="space-y-5"><Panel title="Mon agent"><div className="flex items-center gap-4"><img src={avatars.koffi} alt="Koffi Adjo" className="h-16 w-16 rounded-full object-cover" /><div><div className="font-black">Koffi Adjo</div><div className="text-slate-500">Agent visa</div></div></div><List items={['+228 90 12 34 56', 'Discuter sur WhatsApp', 'Envoyer un message']} /></Panel><Panel title="Documents requis"><List items={['Passeport - Valide', "Lettre d'admission - Valide", 'Preuve de ressources - Valide', 'Assurance voyage - Valide', 'Relevés bancaires - Manquant', 'Certificat de scolarité - Manquant']} /></Panel></div></div>
+  const { country, type } = useParams()
+  const countries = [
+    ['france', 'France', logos.france, 'Paris', 'EUR'],
+    ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR'],
+    ['belgique', 'Belgique', logos.belgium, 'Bruxelles', 'EUR'],
+    ['suisse', 'Suisse', logos.swiss, 'Berne', 'CHF'],
+    ['canada', 'Canada', logos.canada, 'Ottawa', 'CAD'],
+  ]
+  const visaTypes = [
+    {
+      type: 'etudiant',
+      title: 'Visa étudiant',
+      icon: GraduationCap,
+      description: 'Pour études supérieures, formations, échanges universitaires et rentrée académique.',
+      badge: 'Le plus demandé',
+      delay: '4 à 8 semaines',
+      success: 'Taux de succès élevé',
+      objective: 'Études',
+      validity: 'Durée des études',
+      cost: 198,
+      documents: ["Lettre d'admission", 'Preuve de ressources financières', 'Assurance voyage / santé', 'Justificatif de logement'],
+      eligibility: ['Être admis dans un établissement reconnu', 'Avoir des ressources financières suffisantes', 'Avoir un passeport valide', 'Fournir tous les documents requis'],
+    },
+    {
+      type: 'tourisme',
+      title: 'Visa tourisme',
+      icon: Plane,
+      description: 'Pour visiter un pays, participer à un court séjour, voir la famille ou découvrir une destination.',
+      badge: 'Court séjour',
+      delay: '2 à 6 semaines',
+      success: 'Dossier simplifié',
+      objective: 'Tourisme',
+      validity: '30 à 90 jours',
+      cost: 129,
+      documents: ['Réservation hôtel ou attestation accueil', 'Billet aller-retour', 'Preuve de ressources', 'Assurance voyage'],
+      eligibility: ['Présenter un motif de séjour clair', 'Prouver les moyens financiers', 'Avoir une assurance voyage', 'Garantir le retour au pays de résidence'],
+    },
+  ]
+  const selectedCountry = countries.find(([slug]) => slug === country) || countries[0]
+  const selectedVisa = visaTypes.find((visa) => visa.type === type)
+
+  if (!country || !type || !selectedVisa) {
+    return (
+      <div className="visa-page space-y-7">
+        <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Visa & Immigration</div>
+              <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-950">Visa & Immigration</h1>
+              <p className="mt-3 max-w-3xl text-base font-semibold leading-7 text-slate-600">Choisissez un pays, puis sélectionnez le visa étudiant ou tourisme adapté à votre projet. Chaque fiche détaille documents, coûts, délais et étapes.</p>
+            </div>
+            <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white shadow-lg shadow-blue-600/20"><MessageCircle size={18} />Parler à un conseiller</Link>
+          </div>
+        </section>
+
+        <section className="grid gap-5">
+          {countries.map(([slug, name, flag, capital, currency], countryIndex) => (
+            <motion.article key={slug} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: countryIndex * 0.05 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-5">
+                <div className="flex items-center gap-4">
+                  <img src={flag} alt="" className="h-12 w-16 rounded-lg object-cover shadow-sm" />
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-950">{name}</h2>
+                    <p className="mt-1 text-sm font-semibold text-slate-500">Ambassade : {capital} · Devise : {currency}</p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">2 types de visa</span>
+              </div>
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {visaTypes.map((visa) => {
+                  const Icon = visa.icon
+                  return (
+                    <Link key={visa.type} to={`/visa/${slug}/${visa.type}`} className="group rounded-lg border border-slate-200 p-5 transition hover:-translate-y-1 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-lg hover:shadow-blue-100">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex gap-4">
+                          <div className="grid h-12 w-12 place-items-center rounded-lg bg-blue-50 text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white"><Icon size={24} /></div>
+                          <div><h3 className="text-lg font-black text-slate-950">{visa.title}</h3><p className="mt-1 text-sm font-semibold leading-6 text-slate-500">{visa.description}</p></div>
+                        </div>
+                        <ArrowRight className="mt-2 text-blue-700 transition group-hover:translate-x-1" size={19} />
+                      </div>
+                      <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">{visa.badge}</span><span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">{visa.delay}</span><span className="rounded-full bg-violet-50 px-3 py-1 text-violet-700">À partir de {visa.cost} €</span></div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </motion.article>
+          ))}
+        </section>
+      </div>
+    )
+  }
+
+  const [, countryName, flag, capital, currency] = selectedCountry
+  const Icon = selectedVisa.icon
+  const keyInfo = [
+    ['Type de visa', selectedVisa.type === 'etudiant' ? 'Visa de long séjour' : 'Visa court séjour'],
+    ['Objectif', selectedVisa.objective],
+    ['Entrées', selectedVisa.type === 'etudiant' ? 'Multiples' : 'Simple ou multiples'],
+    ['Renouvelable', selectedVisa.type === 'etudiant' ? 'Oui' : 'Selon le pays'],
+    ['Durée de validité', selectedVisa.validity],
+    ['Durée de traitement', selectedVisa.delay],
+    ['Entretien', selectedVisa.type === 'etudiant' ? 'Oui' : 'Si requis'],
+    ['Pays concerné', countryName],
+  ]
+  const progress = [
+    ['Choisissez le type de visa', 'Sélectionnez le visa adapté à votre situation.'],
+    ['Préparez vos documents', 'Consultez la liste des documents requis.'],
+    ['Remplissez le formulaire', 'Remplissez votre demande en ligne.'],
+    ['Prenez rendez-vous', 'Réservez un rendez-vous au centre de visa.'],
+    ['Suivez votre dossier', 'Suivez l’état d’avancement en temps réel.'],
+  ]
+
+  return (
+    <div className="visa-page space-y-6">
+      <Link to="/visa" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour à la liste des visas</Link>
+      <div className="grid gap-6 xl:grid-cols-[1fr_330px]">
+        <div className="space-y-6">
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="grid gap-6 p-6 lg:grid-cols-[1fr_320px] lg:items-center">
+              <div className="flex gap-5">
+                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={34} /></div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-3"><img src={flag} alt="" className="h-7 w-10 rounded object-cover" /><span className="font-black text-slate-500">{countryName}</span></div>
+                  <h1 className="mt-3 text-3xl font-black text-slate-950">{selectedVisa.title}</h1>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{selectedVisa.description}</p>
+                  <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-lg bg-emerald-50 px-3 py-2 text-emerald-700">{selectedVisa.badge}</span><span className="rounded-lg bg-blue-50 px-3 py-2 text-blue-700">Délai moyen : {selectedVisa.delay}</span><span className="rounded-lg bg-violet-50 px-3 py-2 text-violet-700">{selectedVisa.success}</span></div>
+                </div>
+              </div>
+              <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80" alt="" className="h-36 w-full rounded-lg object-cover" />
+            </div>
+            <div className="grid border-t border-slate-100 text-sm font-black text-slate-600 md:grid-cols-6">
+              {['Aperçu', 'Documents requis', 'Étapes', 'Coûts', 'Délai & traitement', 'FAQ'].map((tab, index) => <button key={tab} className={`h-14 border-b-2 ${index === 0 ? 'border-blue-600 text-blue-700' : 'border-transparent hover:text-blue-700'}`}>{tab}</button>)}
+            </div>
+          </section>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-black text-slate-950">Description du visa</h2>
+              <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">Le {selectedVisa.title.toLowerCase()} pour {countryName} accompagne les voyageurs dans la constitution d’un dossier clair, complet et adapté aux exigences du pays.</p>
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <h3 className="font-black text-slate-950">Conditions d’éligibilité</h3>
+                <div className="mt-4 space-y-3">{selectedVisa.eligibility.map((item) => <div key={item} className="flex gap-3 text-sm font-semibold text-slate-600"><CheckCircle2 className="shrink-0 text-emerald-600" size={17} />{item}</div>)}</div>
+              </div>
+            </section>
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-black text-slate-950">Informations clés</h2>
+              <div className="mt-5 divide-y divide-slate-100">{keyInfo.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-5 py-3 text-sm"><span className="font-bold text-slate-600">{label}</span><b className="text-right text-slate-950">{value}</b></div>)}</div>
+            </section>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-slate-950">Documents requis</h2>
+              <div className="mt-5 space-y-3">{['Passeport valide', ...selectedVisa.documents, 'Photo d’identité'].map((doc, index) => <div key={doc} className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-600"><span className="flex items-center gap-2"><FileText size={16} className="text-blue-700" />{doc}</span><span className={`rounded-full px-2 py-1 text-xs font-black ${index < 4 ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>{index < 4 ? 'Requis' : 'Optionnel'}</span></div>)}</div>
+            </section>
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-slate-950">Coûts associés</h2>
+              <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between"><span>Frais de visa</span><b>{selectedVisa.cost - 99},00 {currency}</b></div>
+                <div className="flex justify-between"><span>Service StudyWay</span><b>49,00 €</b></div>
+                <div className="flex justify-between"><span>Assurance</span><b>30,00 €</b></div>
+                <div className="flex justify-between border-t border-slate-100 pt-3 text-blue-800"><span>Total estimé</span><b>{selectedVisa.cost},00 €</b></div>
+              </div>
+              <button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20">Démarrer ma demande</button>
+            </section>
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-slate-950">Délai & traitement</h2>
+              <div className="mt-5 space-y-4">{['Dépôt de la demande', 'Traitement consulaire', 'Entretien si requis', 'Décision', 'Réception du visa'].map((item, index) => <div key={item} className="flex gap-3 text-sm font-semibold text-slate-600"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-blue-700">{index + 1}</span>{item}</div>)}</div>
+            </section>
+          </div>
+        </div>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Votre progression</h2>
+            <div className="mt-6 space-y-0">{progress.map(([title, text], index) => <div key={title} className="grid grid-cols-[34px_1fr] gap-4 pb-5 last:pb-0"><div className="relative">{index < progress.length - 1 && <span className="absolute left-1/2 top-9 h-full w-px -translate-x-1/2 bg-slate-200" />}<span className={`relative z-10 grid h-8 w-8 place-items-center rounded-full text-sm font-black ${index === 0 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span></div><div><h3 className="text-sm font-black text-slate-950">{title}</h3><p className="mt-1 text-sm font-medium leading-6 text-slate-500">{text}</p></div></div>)}</div>
+          </section>
+          <section className="relative overflow-hidden rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Besoin d’aide ?</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Nos conseillers sont disponibles pour vous accompagner à chaque étape.</p>
+            <Link to="/messages" className="mt-5 flex h-11 w-fit items-center gap-3 rounded-lg bg-white px-5 text-sm font-black text-blue-800 shadow-sm"><MessageCircle size={18} />Parler à un conseiller</Link>
+            <UserRound className="absolute -bottom-5 right-4 text-blue-200" size={110} />
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
 }
 
 function Transport() {
