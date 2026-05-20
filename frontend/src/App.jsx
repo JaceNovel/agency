@@ -380,7 +380,12 @@ function Dashboard() {
     ['Compte Étudiant', 'Gratuit', 'Ouverture 100% en ligne', 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=700&q=80', logos.societeGenerale],
     ['Assurance Santé', '120 €/an', 'Couverture complète', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=700&q=80', logos.orange],
   ]
-  const partnerLogos = [logos.campusFrance, logos.parisSaclay, logos.edhec, logos.escp, logos.societeGenerale, logos.bnp, logos.bpifrance]
+  const partnerLogos = [
+    ['/image.png', 'Partenaire'],
+    ['/image copy.png', 'Ecobank'],
+    ['/image copy 3.png', 'Wise'],
+    ['/image copy 2.png', 'Ecobank'],
+  ]
 
   useEffect(() => {
     const timer = window.setInterval(() => setActiveSlide((slide) => (slide + 1) % heroSlides.length), 5000)
@@ -444,9 +449,11 @@ function Dashboard() {
         </aside>
       </div>
 
-      <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-8 shadow-sm lg:-mr-8">
+      <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm lg:-mr-8">
         <h2 className="mb-7 text-2xl font-black">Ils nous font confiance</h2>
-        <div className="grid items-center gap-8 md:grid-cols-7">{partnerLogos.map((src) => <img key={src} src={src} alt="Partenaire StudyWay" className="mx-auto max-h-14 max-w-40 object-contain" />)}</div>
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-10 gap-y-6">
+          {partnerLogos.map(([src, name]) => <img key={src} src={src} alt={name} className="max-h-14 w-auto max-w-[190px] object-contain" />)}
+        </div>
       </section>
     </div>
   )
