@@ -26,6 +26,11 @@ class ParcoursupFormationController extends Controller
         return ParcoursupFormationResource::collection($this->formations->search($request));
     }
 
+    public function stats(): JsonResponse
+    {
+        return response()->json(['data' => $this->formations->stats()]);
+    }
+
     public function show(Request $request, string $id): ParcoursupFormationResource
     {
         $formation = $this->formations->find($id);

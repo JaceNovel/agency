@@ -45,6 +45,18 @@ class ParcoursupFormationRepository
         });
     }
 
+    public function stats(): array
+    {
+        return Cache::remember('parcoursup:stats', now()->addMinutes(30), function () {
+            return [
+                'formations' => ParcoursupFormation::query()->count(),
+                'regions' => ParcoursupFormation::query()->whereNotNull('region')->distinct('region')->count('region'),
+                'domains' => ParcoursupFormation::query()->whereNotNull('specialization')->distinct('specialization')->count('specialization'),
+                'establishments' => ParcoursupFormation::query()->whereNotNull('university_name')->distinct('university_name')->count('university_name'),
+            ];
+        });
+    }
+
     public function upsert(array $rows): void
     {
         ParcoursupFormation::query()->upsert(

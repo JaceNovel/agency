@@ -18,6 +18,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function (): void {
     });
 
     Route::prefix('parcoursup')->group(function (): void {
+        Route::get('stats', [ParcoursupFormationController::class, 'stats']);
         Route::get('formations', [ParcoursupFormationController::class, 'index']);
         Route::get('search', [ParcoursupFormationController::class, 'search']);
         Route::get('formations/{id}', [ParcoursupFormationController::class, 'show']);

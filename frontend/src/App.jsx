@@ -1141,6 +1141,12 @@ function Universities() {
     staleTime: 1000 * 60 * 5,
     retry: 1,
   })
+  const { data: statsData } = useQuery({
+    queryKey: ['parcoursup-stats'],
+    queryFn: () => fetchJson('/api/v1/parcoursup/stats'),
+    staleTime: 1000 * 60 * 30,
+    retry: 1,
+  })
   useEffect(() => {
     setPerPage(12)
   }, [debouncedFilters])
@@ -1148,11 +1154,12 @@ function Universities() {
   const formations = isFallback ? parcoursupFallbackFormations : data.data
   const totalResults = data?.meta?.total ?? formations.length
   const canShowMore = !isFallback && formations.length < totalResults
+  const realStats = statsData?.data ?? {}
   const stats = [
-    [Landmark, '23k+', 'Formations Parcoursup'],
-    [Globe2, '18', 'Régions françaises'],
-    [GraduationCap, 'Toutes', 'Filières couvertes'],
-    [Users, 'Orientation', 'Sans dépôt de vœux'],
+    [Landmark, formatCompactNumber(realStats.formations ?? totalResults), 'Formations importées'],
+    [Globe2, formatCompactNumber(realStats.regions), 'Régions référencées'],
+    [GraduationCap, formatCompactNumber(realStats.domains), 'Domaines recensés'],
+    [Building2, formatCompactNumber(realStats.establishments), 'Établissements'],
   ]
   const domains = ['Informatique', 'Droit', 'Santé', 'Commerce', 'Ingénierie', 'Arts']
 
@@ -1279,25 +1286,39 @@ function UniversityInput({ label, value, placeholder, onChange }) {
 function UniversityResultCard({ formation, index }) {
   const [favorite, setFavorite] = useState(false)
   const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'À vérifier'
+  const type = formation.formation_type ?? 'Parcoursup'
+  const domain = formation.specialization ?? 'Domaine à vérifier'
+  const city = formation.city ?? 'France'
 
   return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -6 }} className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(37,99,235,.18),transparent_9rem)]" />
-        <span className="absolute left-3 top-3 flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-800"><img src={logos.france} alt="" className="h-4 w-6 rounded object-cover" />{formation.country ?? 'France'}</span>
-        <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white shadow-md ${favorite ? 'is-favorite text-rose-600' : 'text-slate-800'}`}><Heart size={19} fill={favorite ? 'currentColor' : 'none'} /></button>
-        <div className="absolute bottom-4 left-4 grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20"><GraduationCap size={25} /></div>
-      </div>
-      <div className="p-5">
-        <h3 className="line-clamp-2 min-h-12 font-black leading-tight text-slate-950">{formation.formation_name}</h3>
-        <p className="mt-2 text-sm font-semibold text-slate-500">{formation.university_name}</p>
-        <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600"><MapPin size={15} />{formation.city ?? 'France'}{formation.region ? `, ${formation.region}` : ''}</div>
-        <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs font-black">
-          <div className="rounded-lg bg-blue-50 p-3 text-blue-800"><div>{rate}</div><span className="font-semibold text-blue-500">admission</span></div>
-          <div className="rounded-lg bg-slate-50 p-3 text-slate-700"><div>{formation.duration ?? '—'}</div><span className="font-semibold text-slate-500">durée</span></div>
-          <div className="rounded-lg bg-emerald-50 p-3 text-emerald-700"><div>{formation.capacity ?? '—'}</div><span className="font-semibold text-emerald-500">places</span></div>
+    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/70">
+      <div className="relative min-h-[110px] border-b border-slate-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eef6ff_54%,#e9fdf9_100%)] p-5">
+        <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-full bg-blue-100/70" />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm"><img src={logos.france} alt="" className="h-4 w-6 rounded object-cover" />{formation.country ?? 'France'}</span>
+            <span className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-black text-white">{type}</span>
+          </div>
+          <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white shadow-md transition group-hover:scale-105 ${favorite ? 'is-favorite text-rose-600' : 'text-slate-700'}`}><Heart size={19} fill={favorite ? 'currentColor' : 'none'} /></button>
         </div>
-        <Link to={`/universites/${formation.id ?? formation.formation_id}`} className="support-start-button mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Voir détails <ArrowRight className="support-start-arrow" size={17} /></Link>
+        <div className="relative mt-5 flex items-center gap-3">
+          <div className="grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20"><GraduationCap size={24} /></div>
+          <div className="min-w-0">
+            <div className="line-clamp-1 text-sm font-black text-blue-900">{domain}</div>
+            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-slate-500"><MapPin size={13} />{city}</div>
+          </div>
+        </div>
+      </div>
+      <div className="flex min-h-[285px] flex-col p-5">
+        <h3 className="line-clamp-3 min-h-[66px] font-black leading-snug text-slate-950">{formation.formation_name}</h3>
+        <p className="mt-3 line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-slate-500">{formation.university_name ?? 'Établissement français'}</p>
+        <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600"><Building2 size={15} />{formation.region ?? 'Région non communiquée'}</div>
+        <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs font-black">
+          <div className="rounded-lg bg-blue-50 p-3 text-blue-800"><div className="text-sm">{rate}</div><span className="font-semibold text-blue-500">admission</span></div>
+          <div className="rounded-lg bg-slate-50 p-3 text-slate-700"><div className="text-sm">{formation.duration ?? '—'}</div><span className="font-semibold text-slate-500">durée</span></div>
+          <div className="rounded-lg bg-emerald-50 p-3 text-emerald-700"><div className="text-sm">{formation.capacity ?? '—'}</div><span className="font-semibold text-emerald-500">places</span></div>
+        </div>
+        <Link to={`/universites/${formation.id ?? formation.formation_id}`} className="support-start-button mt-auto flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Voir détails <ArrowRight className="support-start-arrow" size={17} /></Link>
       </div>
     </motion.article>
   )
@@ -1479,6 +1500,19 @@ async function fetchJson(path) {
   }
 
   return response.json()
+}
+
+function formatCompactNumber(value) {
+  const number = Number(value ?? 0)
+
+  if (!number) {
+    return '0'
+  }
+
+  return new Intl.NumberFormat('fr-FR', {
+    notation: number >= 10000 ? 'compact' : 'standard',
+    maximumFractionDigits: 1,
+  }).format(number)
 }
 
 const parcoursupFallbackFormations = [
