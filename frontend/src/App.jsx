@@ -1294,6 +1294,24 @@ function UniversityFormationDetail() {
   })
   const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
   const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'Non communiqué'
+  const capacity = formation.capacity ?? 'Non communiqué'
+  const duration = formation.duration ?? 'Selon formation'
+  const formationType = formation.formation_type ?? 'Formation Parcoursup'
+  const specialization = formation.specialization ?? 'Domaine à vérifier'
+  const location = [formation.city, formation.region, formation.country ?? 'France'].filter(Boolean).join(', ')
+  const dossierItems = [
+    "Relevés de notes et derniers bulletins",
+    "Passeport ou pièce d’identité",
+    "Projet de formation motivé",
+    "CV étudiant et expériences",
+    "Attestations de langue si demandées",
+  ]
+  const supportSteps = [
+    ['1', 'Analyse du profil', 'Vérification de la cohérence entre votre parcours, vos notes et cette formation.'],
+    ['2', 'Préparation du dossier', 'Organisation des documents, du projet motivé et des pièces à traduire.'],
+    ['3', 'Plan admission', 'Comparaison des chances d’accès et proposition de formations alternatives.'],
+    ['4', 'Départ étudiant', 'Visa, logement, assurance, banque et installation après admission.'],
+  ]
 
   return (
     <div className="space-y-7">
@@ -1306,39 +1324,117 @@ function UniversityFormationDetail() {
             <p className="mt-4 text-base font-semibold leading-7 text-slate-600">{formation.description}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/accompagnement/demarrer" className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Commencer mon accompagnement <ArrowRight className="support-start-arrow" size={18} /></Link>
-              {formation.website && <a href={formation.website} target="_blank" rel="noreferrer" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-7 font-black text-blue-800">Site officiel</a>}
+              <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-7 font-black text-blue-800">Parler à un conseiller</Link>
             </div>
           </div>
           <div className="rounded-lg bg-slate-50 p-5">
             <h2 className="font-black text-slate-950">Statistiques</h2>
             <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
               <div className="flex justify-between"><span>Taux admission</span><b className="text-blue-700">{rate}</b></div>
-              <div className="flex justify-between"><span>Capacité</span><b>{formation.capacity ?? 'À vérifier'}</b></div>
-              <div className="flex justify-between"><span>Durée</span><b>{formation.duration ?? 'Selon formation'}</b></div>
+              <div className="flex justify-between"><span>Capacité</span><b>{capacity}</b></div>
+              <div className="flex justify-between"><span>Durée</span><b>{duration}</b></div>
               <div className="flex justify-between"><span>Coûts estimés</span><b>{formation.tuition ? `${formation.tuition} FCFA` : 'À vérifier'}</b></div>
             </div>
           </div>
         </div>
       </section>
+
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <UniversityDetailMetric icon={GraduationCap} label="Type de formation" value={formationType} />
+        <UniversityDetailMetric icon={Languages} label="Domaine" value={specialization} />
+        <UniversityDetailMetric icon={CalendarDays} label="Durée estimée" value={duration} />
+        <UniversityDetailMetric icon={Users} label="Places indicatives" value={String(capacity)} />
+      </section>
+
       <div className="grid gap-7 lg:grid-cols-[1fr_360px]">
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-slate-950">Université & localisation</h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <InfoLine label="Université" value={formation.university_name ?? 'Établissement français'} />
-            <InfoLine label="Ville" value={formation.city ?? 'France'} />
-            <InfoLine label="Région" value={formation.region ?? 'Non communiqué'} />
-            <InfoLine label="Pays" value={formation.country ?? 'France'} />
-          </div>
-          <div className="relative mt-6 h-64 overflow-hidden rounded-lg bg-blue-50">
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.09)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.09)_1px,transparent_1px)] bg-[size:44px_44px]" />
-            <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30"><MapPin size={30} /></div>
-            <div className="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-3 text-sm font-black text-slate-950 shadow">{formation.city ?? 'Localisation'}{formation.latitude ? ` · ${formation.latitude}, ${formation.longitude}` : ''}</div>
-          </div>
-        </section>
-        <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
-          <h2 className="font-black text-blue-950">Important</h2>
-          <p className="mt-3 text-sm font-semibold leading-6 text-blue-900">StudyWay utilise les données publiques Parcoursup pour l’orientation uniquement. Le module ne crée pas de compte Parcoursup, ne dépose pas de candidature et n’automatise aucun vœu officiel.</p>
-        </section>
+        <div className="space-y-7">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Informations complètes</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <InfoLine label="Université" value={formation.university_name ?? 'Établissement français'} />
+              <InfoLine label="Formation" value={formation.formation_name} />
+              <InfoLine label="Type" value={formationType} />
+              <InfoLine label="Domaine" value={specialization} />
+              <InfoLine label="Ville" value={formation.city ?? 'France'} />
+              <InfoLine label="Région" value={formation.region ?? 'Non communiqué'} />
+              <InfoLine label="Pays" value={formation.country ?? 'France'} />
+              <InfoLine label="Référence Parcoursup" value={formation.formation_id ?? 'Non communiqué'} />
+            </div>
+            {formation.website && (
+              <div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-600">
+                Source publique Parcoursup enregistrée dans StudyWay. La consultation se fait ici, sans quitter la plateforme.
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Admission & dossier</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <div className="rounded-lg bg-blue-50 p-4"><div className="text-sm font-bold text-blue-600">Taux indicatif</div><div className="mt-2 text-2xl font-black text-blue-900">{rate}</div></div>
+              <div className="rounded-lg bg-emerald-50 p-4"><div className="text-sm font-bold text-emerald-600">Capacité</div><div className="mt-2 text-2xl font-black text-emerald-900">{capacity}</div></div>
+              <div className="rounded-lg bg-slate-50 p-4"><div className="text-sm font-bold text-slate-500">Durée</div><div className="mt-2 text-2xl font-black text-slate-900">{duration}</div></div>
+            </div>
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
+              {dossierItems.map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white p-3 text-sm font-bold text-slate-700">
+                  <CheckCircle2 className="text-emerald-500" size={18} />{item}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Université & localisation</h2>
+            <p className="mt-2 text-sm font-semibold text-slate-500">{location}</p>
+            <div className="relative mt-6 h-64 overflow-hidden rounded-lg bg-blue-50">
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.09)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.09)_1px,transparent_1px)] bg-[size:44px_44px]" />
+              <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30"><MapPin size={30} /></div>
+              <div className="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-3 text-sm font-black text-slate-950 shadow">{formation.city ?? 'Localisation'}{formation.latitude ? ` · ${formation.latitude}, ${formation.longitude}` : ''}</div>
+            </div>
+          </section>
+        </div>
+
+        <div className="space-y-6">
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Accompagnement StudyWay</h2>
+            <div className="mt-5 space-y-4">
+              {supportSteps.map(([step, title, text]) => (
+                <div key={step} className="flex gap-3">
+                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-blue-600 text-sm font-black text-white">{step}</div>
+                  <div><div className="font-black text-blue-950">{title}</div><p className="mt-1 text-sm font-semibold leading-6 text-blue-900">{text}</p></div>
+                </div>
+              ))}
+            </div>
+            <Link to="/accompagnement/demarrer" className="support-start-button mt-6 flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-600 font-black text-white">Démarrer avec cette formation <ArrowRight className="support-start-arrow" size={18} /></Link>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">Coûts à prévoir</h2>
+            <div className="mt-4 space-y-3 text-sm font-semibold text-slate-600">
+              <div className="flex justify-between"><span>Frais StudyWay</span><b>Selon formule</b></div>
+              <div className="flex justify-between"><span>Frais universitaires</span><b>{formation.tuition ? `${formation.tuition} FCFA` : 'À confirmer'}</b></div>
+              <div className="flex justify-between"><span>Traductions / légalisation</span><b>Si nécessaire</b></div>
+              <div className="flex justify-between"><span>Visa, logement, assurance</span><b>Après admission</b></div>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Important</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-blue-900">StudyWay utilise les données publiques Parcoursup pour l’orientation uniquement. Le module ne crée pas de compte Parcoursup, ne dépose pas de candidature et n’automatise aucun vœu officiel.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function UniversityDetailMetric({ icon: Icon, label, value }) {
+  return (
+    <div className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-700"><Icon size={22} /></div>
+      <div>
+        <div className="text-sm font-bold text-slate-500">{label}</div>
+        <div className="mt-1 line-clamp-2 font-black text-slate-950">{value}</div>
       </div>
     </div>
   )
