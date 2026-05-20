@@ -1289,23 +1289,34 @@ function UniversityResultCard({ formation, index }) {
   const type = formation.formation_type ?? 'Parcoursup'
   const domain = formation.specialization ?? 'Domaine à vérifier'
   const city = formation.city ?? 'France'
+  const universityImage = getUniversityCardImage(formation)
 
   return (
     <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/70">
-      <div className="relative min-h-[110px] border-b border-slate-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eef6ff_54%,#e9fdf9_100%)] p-5">
-        <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-full bg-blue-100/70" />
+      <div className="relative min-h-[168px] overflow-hidden border-b border-slate-100 bg-slate-100 p-5">
+        <img
+          src={universityImage}
+          alt=""
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.onerror = null
+            event.currentTarget.src = universityHero
+          }}
+          className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,45,.12)_0%,rgba(8,20,45,.18)_45%,rgba(8,20,45,.66)_100%)]" />
         <div className="relative flex items-start justify-between gap-3">
           <div className="flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm"><img src={logos.france} alt="" className="h-4 w-6 rounded object-cover" />{formation.country ?? 'France'}</span>
-            <span className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-black text-white">{type}</span>
+            <span className="rounded-full bg-blue-600/95 px-3 py-1.5 text-xs font-black text-white shadow-sm">{type}</span>
           </div>
           <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white shadow-md transition group-hover:scale-105 ${favorite ? 'is-favorite text-rose-600' : 'text-slate-700'}`}><Heart size={19} fill={favorite ? 'currentColor' : 'none'} /></button>
         </div>
-        <div className="relative mt-5 flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20"><GraduationCap size={24} /></div>
+        <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-blue-700 shadow-lg shadow-slate-900/20"><GraduationCap size={24} /></div>
           <div className="min-w-0">
-            <div className="line-clamp-1 text-sm font-black text-blue-900">{domain}</div>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-slate-500"><MapPin size={13} />{city}</div>
+            <div className="line-clamp-1 text-sm font-black text-white">{domain}</div>
+            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-white/85"><MapPin size={13} />{city}</div>
           </div>
         </div>
       </div>
@@ -1513,6 +1524,26 @@ function formatCompactNumber(value) {
     notation: number >= 10000 ? 'compact' : 'standard',
     maximumFractionDigits: 1,
   }).format(number)
+}
+
+const universityCardImages = [
+  universityHero,
+  'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1560440021-33f9b867899d?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1576495199011-eb94736d05d6?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?auto=format&fit=crop&w=900&q=80',
+  parisPackBackground,
+]
+
+function getUniversityCardImage(formation) {
+  const key = `${formation.university_name ?? ''}-${formation.city ?? ''}-${formation.formation_id ?? formation.id ?? ''}`
+  const hash = Array.from(key).reduce((total, character) => total + character.charCodeAt(0), 0)
+
+  return universityCardImages[hash % universityCardImages.length]
 }
 
 const parcoursupFallbackFormations = [
