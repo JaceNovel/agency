@@ -7,7 +7,7 @@ import {
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
-  Menu, X, Video, SlidersHorizontal,
+  X, Video, SlidersHorizontal,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
@@ -257,9 +257,11 @@ function Shell() {
       <div>
         <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
           <div>
-            <button type="button" onClick={() => setOpen(true)} className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-300 shadow-sm shadow-slate-00 transition hover:bg-slate-400/80" aria-label="Ouvrir la navigation">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-700 text-slate-100 shadow-sm">
-                <Menu size={24} />
+            <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg transition hover:bg-slate-200" aria-label="Ouvrir la navigation">
+              <span className="flex flex-col gap-1.5">
+                <span className="block h-0.5 w-7 rounded-full bg-black" />
+                <span className="block h-0.5 w-7 rounded-full bg-black" />
+                <span className="block h-0.5 w-7 rounded-full bg-black" />
               </span>
             </button>
           </div>
@@ -1548,11 +1550,11 @@ function FormRadio({ label, options }) {
 function Visa() {
   const { country, type } = useParams()
   const countries = [
-    ['france', 'France', logos.france, 'Paris', 'EUR'],
-    ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR'],
-    ['belgique', 'Belgique', logos.belgium, 'Bruxelles', 'EUR'],
-    ['suisse', 'Suisse', logos.swiss, 'Berne', 'CHF'],
-    ['canada', 'Canada', logos.canada, 'Ottawa', 'CAD'],
+    ['france', 'France', logos.france, 'Paris', 'EUR', '/visa-france-travel.png', 'Passeport, avion et ambiance France', 'from-blue-50 to-white', 'object-cover'],
+    ['allemagne', 'Allemagne', logos.germany, 'Berlin', 'EUR', '/visa-germany-travel.png', 'Passeport, avion et ambiance Allemagne', 'from-amber-50 to-red-50', 'object-cover'],
+    ['belgique', 'Belgique', logos.belgium, 'Bruxelles', 'EUR', '/visa-belgium-travel.png', 'Passeport, avion et ambiance Belgique', 'from-yellow-50 to-slate-50', 'object-cover'],
+    ['suisse', 'Suisse', logos.swiss, 'Berne', 'CHF', '/visa-switzerland-travel.png', 'Passeport, avion et ambiance Suisse', 'from-red-50 to-sky-50', 'object-cover'],
+    ['canada', 'Canada', logos.canada, 'Ottawa', 'CAD', '/visa-canada-travel.png', 'Passeport, avion et ambiance Canada', 'from-red-50 to-blue-50', 'object-cover'],
   ]
   const visaTypes = [
     {
@@ -1638,7 +1640,7 @@ function Visa() {
     )
   }
 
-  const [, countryName, flag, capital, currency] = selectedCountry
+  const [, countryName, flag, capital, currency, countryImage, countryImageAlt, countryImageTone, countryImageFit] = selectedCountry
   const Icon = selectedVisa.icon
   const keyInfo = [
     ['Type de visa', selectedVisa.type === 'etudiant' ? 'Visa de long séjour' : 'Visa court séjour'],
@@ -1674,7 +1676,9 @@ function Visa() {
                   <div className="mt-5 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-lg bg-emerald-50 px-3 py-2 text-emerald-700">{selectedVisa.badge}</span><span className="rounded-lg bg-blue-50 px-3 py-2 text-blue-700">Délai moyen : {selectedVisa.delay}</span><span className="rounded-lg bg-violet-50 px-3 py-2 text-violet-700">{selectedVisa.success}</span></div>
                 </div>
               </div>
-              <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80" alt="" className="h-36 w-full rounded-lg object-cover" />
+              <div className={`visa-country-visual rounded-lg bg-gradient-to-br ${countryImageTone} p-2`}>
+                <img src={countryImage} alt={countryImageAlt} className={`h-40 w-full rounded-lg shadow-sm ${countryImageFit}`} />
+              </div>
             </div>
             <div className="grid border-t border-slate-100 text-sm font-black text-slate-600 md:grid-cols-6">
               {['Aperçu', 'Documents requis', 'Étapes', 'Coûts', 'Délai & traitement', 'FAQ'].map((tab, index) => <button key={tab} className={`h-14 border-b-2 ${index === 0 ? 'border-blue-600 text-blue-700' : 'border-transparent hover:text-blue-700'}`}>{tab}</button>)}
