@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import {
   ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
@@ -307,6 +307,7 @@ function AnimatedRoutes() {
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
         <Route path="/universites" element={<Universities />} />
+        <Route path="/universites/:id" element={<UniversityFormationDetail />} />
         <Route path="/guides/:slug" element={<StudentGuideDetail />} />
         <Route path="/guides" element={<StudentGuides />} />
         <Route path="/profil" element={<Profile />} />
@@ -1129,26 +1130,25 @@ function HousingChecks({ title, items, compact = false }) {
 }
 
 function Universities() {
-  const universities = [
-    ['Sorbonne Université', 'Paris, France', 'France', logos.france, logos.sorbonne, 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80', '#63', '120 Programmes', 'Français, Anglais'],
-    ['Université de Montreal', 'Montreal, Canada', 'Canada', logos.canada, logos.montreal, 'https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=900&q=80', '#111', '80 Programmes', 'Français, Anglais'],
-    ['Technische Universitat Munchen', 'Munich, Allemagne', 'Allemagne', logos.germany, logos.tum, 'https://images.unsplash.com/photo-1587330979470-3016b6702d89?auto=format&fit=crop&w=900&q=80', '#52', '100 Programmes', 'Allemand, Anglais'],
-    ['Université catholique de Louvain', 'Louvain-la-Neuve, Belgique', 'Belgique', logos.belgium, logos.uclouvain, 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=900&q=80', '#120', '60 Programmes', 'Français, Anglais'],
-  ]
+  const [filters, setFilters] = useState({ q: '', city: '', specialization: '', formation_type: '', admission_rate: '' })
+  const debouncedFilters = useDebouncedValue(filters, 380)
+  const params = new URLSearchParams(Object.entries(debouncedFilters).filter(([, value]) => value))
+  params.set('per_page', '12')
+  const { data, isLoading } = useQuery({
+    queryKey: ['parcoursup-formations', debouncedFilters],
+    queryFn: () => fetchJson(`/api/v1/parcoursup/search?${params.toString()}`),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  })
+  const isFallback = !data?.data?.length
+  const formations = isFallback ? parcoursupFallbackFormations : data.data
   const stats = [
-    [Landmark, '1200+', 'Universités partenaires'],
-    [Globe2, '50+', 'Pays couverts'],
-    [GraduationCap, '8000+', 'Programmes disponibles'],
-    [Users, '25k+', 'Étudiants accompagnés'],
+    [Landmark, '23k+', 'Formations Parcoursup'],
+    [Globe2, '18', 'Régions françaises'],
+    [GraduationCap, 'Toutes', 'Filières couvertes'],
+    [Users, 'Orientation', 'Sans dépôt de vœux'],
   ]
-  const domains = [
-    ['Informatique', FileText, 'text-violet-600'],
-    ['Business', Landmark, 'text-emerald-600'],
-    ['Ingénierie', Settings, 'text-blue-600'],
-    ['Santé', Heart, 'text-rose-600'],
-    ['Sciences sociales', ShieldCheck, 'text-purple-600'],
-    ['Arts & Design', Star, 'text-amber-600'],
-  ]
+  const domains = ['Informatique', 'Droit', 'Santé', 'Commerce', 'Ingénierie', 'Arts']
 
   return (
     <div className="university-page -mx-5 space-y-8 lg:-mx-8">
@@ -1158,8 +1158,8 @@ function Universities() {
           <div className="absolute inset-0 rounded-lg bg-[linear-gradient(90deg,rgba(244,248,255,.92)_0%,rgba(244,248,255,.72)_38%,rgba(244,248,255,.08)_70%,rgba(244,248,255,0)_100%)]" />
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Universités</div>
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 mt-8 max-w-[600px]">
-            <h1 className="university-title text-4xl font-black leading-tight tracking-tight text-slate-950 xl:text-5xl">Trouvez l'université<br />qui vous correspond</h1>
-            <p className="mt-6 max-w-md text-lg font-medium leading-8 text-slate-600 xl:text-xl">Découvrez des milliers d'universités partenaires dans le monde et trouvez la formation idéale pour atteindre vos objectifs.</p>
+            <h1 className="university-title text-4xl font-black leading-tight tracking-tight text-slate-950 xl:text-5xl">Explorez les formations<br />Parcoursup</h1>
+            <p className="mt-6 max-w-md text-lg font-medium leading-8 text-slate-600 xl:text-xl">Recherchez les formations officielles, comparez les statistiques et préparez votre orientation avec StudyWay.</p>
           </motion.div>
           <div className="absolute right-8 top-14 hidden w-56 rounded-lg bg-white/95 p-5 shadow-xl shadow-blue-100 2xl:block">
             <div className="flex items-center gap-4"><Landmark className="text-blue-800" /><div><div className="text-xl font-black">+ 1200</div><div className="text-sm font-semibold text-slate-500">Universités partenaires</div></div></div>
@@ -1194,19 +1194,19 @@ function Universities() {
 
       <div className="space-y-7 px-5 lg:px-8">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
+              <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
             <label>
-              <span className="text-sm font-black text-slate-950">Que voulez-vous étudier ?</span>
-              <span className="mt-3 flex h-12 items-center gap-3 rounded-lg border border-slate-200 px-4 text-slate-400"><Search size={18} /><input className="w-full border-none bg-transparent text-sm font-semibold text-slate-700 outline-none" placeholder="Ex: Informatique, Business..." /></span>
+              <span className="text-sm font-black text-slate-950">Formation, université, ville</span>
+              <span className="mt-3 flex h-12 items-center gap-3 rounded-lg border border-slate-200 px-4 text-slate-400"><Search size={18} /><input value={filters.q} onChange={(event) => setFilters((current) => ({ ...current, q: event.target.value }))} className="w-full border-none bg-transparent text-sm font-semibold text-slate-700 outline-none" placeholder="Ex: Informatique, Sorbonne, Lyon..." /></span>
             </label>
-            <UniversitySelect label="Niveau d'études" value="Licence" />
-            <UniversitySelect label="Pays" value="Tous les pays" />
-            <UniversitySelect label="Langue d'enseignement" value="Toutes les langues" />
-            <button className="mt-7 flex h-12 items-center justify-center gap-3 rounded-lg bg-[#082f7a] px-7 font-black text-white">Rechercher <Search size={18} /></button>
+            <UniversityInput label="Ville" value={filters.city} placeholder="Paris" onChange={(value) => setFilters((current) => ({ ...current, city: value }))} />
+            <UniversityInput label="Domaine" value={filters.specialization} placeholder="Informatique" onChange={(value) => setFilters((current) => ({ ...current, specialization: value }))} />
+            <UniversityInput label="Type" value={filters.formation_type} placeholder="Licence, BTS, BUT..." onChange={(value) => setFilters((current) => ({ ...current, formation_type: value }))} />
+            <button onClick={() => setFilters({ q: '', city: '', specialization: '', formation_type: '', admission_rate: '' })} className="mt-7 flex h-12 items-center justify-center gap-3 rounded-lg bg-[#082f7a] px-7 font-black text-white">Réinitialiser <Search size={18} /></button>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm font-semibold text-slate-500">
             Recherches populaires :
-            {['Informatique', 'Management', 'Ingénierie', 'Santé', 'Design', 'Droit'].map((item) => <span className="rounded-lg bg-blue-50 px-4 py-2 font-bold text-blue-900" key={item}>{item}</span>)}
+            {domains.map((item) => <button onClick={() => setFilters((current) => ({ ...current, specialization: item }))} className="rounded-lg bg-blue-50 px-4 py-2 font-bold text-blue-900" key={item}>{item}</button>)}
           </div>
         </section>
 
@@ -1221,11 +1221,16 @@ function Universities() {
 
         <section>
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-2xl font-black text-slate-950">Universités recommandées</h2>
-            <button className="font-black text-blue-800">Voir toutes les universités →</button>
+            <h2 className="text-2xl font-black text-slate-950">Formations disponibles</h2>
+            <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${data?.meta?.total ?? formations.length} résultats`}</span>
           </div>
+          {isFallback && (
+            <div className="mb-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
+              Données de démonstration affichées. Pour voir les milliers de formations officielles, lancez la synchronisation backend avec <span className="font-black">php artisan parcoursup:sync</span>.
+            </div>
+          )}
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {universities.map((item, index) => <UniversityResultCard key={item[0]} item={item} index={index} />)}
+            {formations.map((formation, index) => <UniversityResultCard key={formation.id ?? formation.formation_id} formation={formation} index={index} />)}
           </div>
         </section>
 
@@ -1235,7 +1240,7 @@ function Universities() {
             <button className="font-black text-blue-800">Voir tous les domaines →</button>
           </div>
           <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-6">
-            {domains.map(([label, Icon, tone]) => <div key={label} className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 font-black shadow-sm"><Icon className={tone} size={23} />{label}</div>)}
+            {domains.map((label) => <button onClick={() => setFilters((current) => ({ ...current, specialization: label }))} key={label} className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 font-black shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"><GraduationCap className="text-blue-700" size={23} />{label}</button>)}
           </div>
         </section>
       </div>
@@ -1243,38 +1248,290 @@ function Universities() {
   )
 }
 
-function UniversitySelect({ label, value }) {
+function UniversityInput({ label, value, placeholder, onChange }) {
   return (
     <label>
       <span className="whitespace-nowrap text-sm font-black text-slate-950">{label}</span>
-      <span className="mt-3 flex h-12 items-center justify-between rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700">{value}<ChevronDown size={17} /></span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-3 flex h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder={placeholder} />
     </label>
   )
 }
 
-function UniversityResultCard({ item, index }) {
-  const [title, place, country, flag, logo, image, rank, programs, languages] = item
+function UniversityResultCard({ formation, index }) {
   const [favorite, setFavorite] = useState(false)
+  const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'À vérifier'
 
   return (
     <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -6 }} className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="relative h-36 overflow-hidden">
-        <img src={image} alt={title} className="h-full w-full object-cover" />
-        <span className="absolute left-3 top-3 flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-800"><img src={flag} alt="" className="h-4 w-6 rounded object-cover" />{country}</span>
+      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(37,99,235,.18),transparent_9rem)]" />
+        <span className="absolute left-3 top-3 flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-800"><img src={logos.france} alt="" className="h-4 w-6 rounded object-cover" />{formation.country ?? 'France'}</span>
         <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white shadow-md ${favorite ? 'is-favorite text-rose-600' : 'text-slate-800'}`}><Heart size={19} fill={favorite ? 'currentColor' : 'none'} /></button>
+        <div className="absolute bottom-4 left-4 grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20"><GraduationCap size={25} /></div>
       </div>
       <div className="p-5">
-        <div className="flex items-center gap-4">
-          <img src={logo} alt="" className="h-12 w-12 rounded-lg border border-slate-200 object-contain p-1" />
-          <div><h3 className="font-black text-slate-950">{title}</h3><p className="text-sm font-medium text-slate-500">{place}</p></div>
+        <h3 className="line-clamp-2 min-h-12 font-black leading-tight text-slate-950">{formation.formation_name}</h3>
+        <p className="mt-2 text-sm font-semibold text-slate-500">{formation.university_name}</p>
+        <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-600"><MapPin size={15} />{formation.city ?? 'France'}{formation.region ? `, ${formation.region}` : ''}</div>
+        <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs font-black">
+          <div className="rounded-lg bg-blue-50 p-3 text-blue-800"><div>{rate}</div><span className="font-semibold text-blue-500">admission</span></div>
+          <div className="rounded-lg bg-slate-50 p-3 text-slate-700"><div>{formation.duration ?? '—'}</div><span className="font-semibold text-slate-500">durée</span></div>
+          <div className="rounded-lg bg-emerald-50 p-3 text-emerald-700"><div>{formation.capacity ?? '—'}</div><span className="font-semibold text-emerald-500">places</span></div>
         </div>
-        <div className="mt-5 text-sm font-semibold text-slate-600"><MapPin size={15} className="mr-2 inline" />Publique</div>
-        <div className="mt-3 text-sm font-bold text-slate-700">QS World Ranking : {rank}</div>
-        <div className="mt-5 flex justify-between border-t border-slate-100 pt-4 text-xs font-semibold text-slate-500"><span>{programs}</span><span>{languages}</span></div>
+        <Link to={`/universites/${formation.id ?? formation.formation_id}`} className="support-start-button mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Voir détails <ArrowRight className="support-start-arrow" size={17} /></Link>
       </div>
     </motion.article>
   )
 }
+
+function UniversityFormationDetail() {
+  const { id } = useParams()
+  const { data } = useQuery({
+    queryKey: ['parcoursup-formation', id],
+    queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
+    staleTime: 1000 * 60 * 10,
+    retry: 1,
+  })
+  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
+  const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'Non communiqué'
+
+  return (
+    <div className="space-y-7">
+      <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="grid gap-6 p-7 lg:grid-cols-[1fr_330px]">
+          <div>
+            <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">{formation.specialization ?? formation.formation_type ?? 'Parcoursup'}</span>
+            <h1 className="mt-5 text-4xl font-black leading-tight text-slate-950">{formation.formation_name}</h1>
+            <p className="mt-4 text-base font-semibold leading-7 text-slate-600">{formation.description}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/accompagnement/demarrer" className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Commencer mon accompagnement <ArrowRight className="support-start-arrow" size={18} /></Link>
+              {formation.website && <a href={formation.website} target="_blank" rel="noreferrer" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-7 font-black text-blue-800">Site officiel</a>}
+            </div>
+          </div>
+          <div className="rounded-lg bg-slate-50 p-5">
+            <h2 className="font-black text-slate-950">Statistiques</h2>
+            <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
+              <div className="flex justify-between"><span>Taux admission</span><b className="text-blue-700">{rate}</b></div>
+              <div className="flex justify-between"><span>Capacité</span><b>{formation.capacity ?? 'À vérifier'}</b></div>
+              <div className="flex justify-between"><span>Durée</span><b>{formation.duration ?? 'Selon formation'}</b></div>
+              <div className="flex justify-between"><span>Coûts estimés</span><b>{formation.tuition ? `${formation.tuition} FCFA` : 'À vérifier'}</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="grid gap-7 lg:grid-cols-[1fr_360px]">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black text-slate-950">Université & localisation</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <InfoLine label="Université" value={formation.university_name ?? 'Établissement français'} />
+            <InfoLine label="Ville" value={formation.city ?? 'France'} />
+            <InfoLine label="Région" value={formation.region ?? 'Non communiqué'} />
+            <InfoLine label="Pays" value={formation.country ?? 'France'} />
+          </div>
+          <div className="relative mt-6 h-64 overflow-hidden rounded-lg bg-blue-50">
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.09)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.09)_1px,transparent_1px)] bg-[size:44px_44px]" />
+            <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30"><MapPin size={30} /></div>
+            <div className="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-3 text-sm font-black text-slate-950 shadow">{formation.city ?? 'Localisation'}{formation.latitude ? ` · ${formation.latitude}, ${formation.longitude}` : ''}</div>
+          </div>
+        </section>
+        <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+          <h2 className="font-black text-blue-950">Important</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-blue-900">StudyWay utilise les données publiques Parcoursup pour l’orientation uniquement. Le module ne crée pas de compte Parcoursup, ne dépose pas de candidature et n’automatise aucun vœu officiel.</p>
+        </section>
+      </div>
+    </div>
+  )
+}
+
+function useDebouncedValue(value, delay = 350) {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedValue(value), delay)
+    return () => window.clearTimeout(timer)
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+async function fetchJson(path) {
+  const response = await fetch(path)
+
+  if (!response.ok) {
+    throw new Error('API unavailable')
+  }
+
+  return response.json()
+}
+
+const parcoursupFallbackFormations = [
+  {
+    id: 'demo-licence-info',
+    formation_id: 'demo-licence-info',
+    formation_name: 'Licence Informatique',
+    university_name: 'Université Paris Cité',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Informatique',
+    duration: '3 ans',
+    admission_rate: 62,
+    capacity: 180,
+    description: 'Formation universitaire en informatique pour construire des bases solides en algorithmique, développement, bases de données et mathématiques.',
+  },
+  {
+    id: 'demo-but-gea',
+    formation_id: 'demo-but-gea',
+    formation_name: 'BUT Gestion des entreprises et administrations',
+    university_name: 'IUT de Lyon',
+    city: 'Lyon',
+    region: 'Auvergne-Rhône-Alpes',
+    country: 'France',
+    formation_type: 'BUT',
+    specialization: 'Gestion',
+    duration: '3 ans',
+    admission_rate: 48,
+    capacity: 120,
+    description: 'Parcours professionnalisant pour préparer les étudiants à la gestion, la comptabilité, le management et l’administration.',
+  },
+  {
+    id: 'demo-bts-commerce',
+    formation_id: 'demo-bts-commerce',
+    formation_name: 'BTS Commerce international',
+    university_name: 'Lycée Jean Lurçat',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Commerce',
+    duration: '2 ans',
+    admission_rate: 55,
+    capacity: 35,
+    description: 'Formation courte orientée import-export, négociation internationale, logistique et relation client à l’étranger.',
+  },
+  {
+    id: 'demo-cpge-mpsi',
+    formation_id: 'demo-cpge-mpsi',
+    formation_name: 'CPGE MPSI',
+    university_name: 'Lycée Louis-le-Grand',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'CPGE',
+    specialization: 'Mathématiques',
+    duration: '2 ans',
+    admission_rate: 28,
+    capacity: 48,
+    description: 'Classe préparatoire scientifique exigeante pour préparer les concours d’écoles d’ingénieurs.',
+  },
+  {
+    id: 'demo-licence-droit',
+    formation_id: 'demo-licence-droit',
+    formation_name: 'Licence Droit',
+    university_name: 'Université de Bordeaux',
+    city: 'Bordeaux',
+    region: 'Nouvelle-Aquitaine',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Droit',
+    duration: '3 ans',
+    admission_rate: 70,
+    capacity: 420,
+    description: 'Formation générale en droit privé, droit public, méthodologie juridique et institutions.',
+  },
+  {
+    id: 'demo-pass-sante',
+    formation_id: 'demo-pass-sante',
+    formation_name: 'PASS Santé',
+    university_name: 'Université de Montpellier',
+    city: 'Montpellier',
+    region: 'Occitanie',
+    country: 'France',
+    formation_type: 'PASS',
+    specialization: 'Santé',
+    duration: '1 an',
+    admission_rate: 34,
+    capacity: 620,
+    description: 'Parcours d’accès spécifique santé pour préparer médecine, pharmacie, odontologie, maïeutique ou kinésithérapie.',
+  },
+  {
+    id: 'demo-but-info',
+    formation_id: 'demo-but-info',
+    formation_name: 'BUT Informatique',
+    university_name: 'IUT de Lille',
+    city: 'Lille',
+    region: 'Hauts-de-France',
+    country: 'France',
+    formation_type: 'BUT',
+    specialization: 'Informatique',
+    duration: '3 ans',
+    admission_rate: 44,
+    capacity: 104,
+    description: 'Formation professionnalisante en développement logiciel, systèmes, bases de données et gestion de projet.',
+  },
+  {
+    id: 'demo-licence-eco',
+    formation_id: 'demo-licence-eco',
+    formation_name: 'Licence Économie et gestion',
+    university_name: 'Université Toulouse Capitole',
+    city: 'Toulouse',
+    region: 'Occitanie',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Économie',
+    duration: '3 ans',
+    admission_rate: 66,
+    capacity: 300,
+    description: 'Parcours universitaire pour acquérir les bases en économie, gestion, statistiques et analyse financière.',
+  },
+  {
+    id: 'demo-bts-compta',
+    formation_id: 'demo-bts-compta',
+    formation_name: 'BTS Comptabilité et gestion',
+    university_name: 'Lycée La Martinière Duchère',
+    city: 'Lyon',
+    region: 'Auvergne-Rhône-Alpes',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Comptabilité',
+    duration: '2 ans',
+    admission_rate: 58,
+    capacity: 32,
+    description: 'Formation courte orientée comptabilité, fiscalité, gestion financière et outils professionnels.',
+  },
+  {
+    id: 'demo-licence-arts',
+    formation_id: 'demo-licence-arts',
+    formation_name: 'Licence Arts plastiques',
+    university_name: 'Université Rennes 2',
+    city: 'Rennes',
+    region: 'Bretagne',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Arts',
+    duration: '3 ans',
+    admission_rate: 61,
+    capacity: 95,
+    description: 'Formation en création artistique, histoire de l’art, pratiques plastiques et culture visuelle.',
+  },
+  {
+    id: 'demo-bts-electro',
+    formation_id: 'demo-bts-electro',
+    formation_name: 'BTS Électrotechnique',
+    university_name: 'Lycée Diderot',
+    city: 'Marseille',
+    region: 'Provence-Alpes-Côte d’Azur',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Ingénierie',
+    duration: '2 ans',
+    admission_rate: 52,
+    capacity: 30,
+    description: 'Formation technique en énergie électrique, automatismes, maintenance et installations industrielles.',
+  },
+]
 
 function StudentGuides() {
   const [activeCategory, setActiveCategory] = useState('Orientation')

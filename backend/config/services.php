@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'parcoursup' => [
+        'records_url' => env('PARCOURSUP_RECORDS_URL', 'https://data.education.gouv.fr/api/v2/catalog/datasets/fr-esr-parcoursup/records'),
+        'exports_json_url' => env('PARCOURSUP_EXPORTS_JSON_URL', 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-parcoursup/exports/json'),
+    ],
+
 ];
