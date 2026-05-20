@@ -1226,7 +1226,7 @@ function Universities() {
           </div>
           {isFallback && (
             <div className="mb-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
-              Données de démonstration affichées. Pour voir les milliers de formations officielles, lancez la synchronisation backend avec <span className="font-black">php artisan parcoursup:sync</span>.
+              Données de démonstration affichées : démarrez l’API Laravel pour charger les milliers de formations officielles.
             </div>
           )}
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -1356,7 +1356,8 @@ function useDebouncedValue(value, delay = 350) {
 }
 
 async function fetchJson(path) {
-  const response = await fetch(path)
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
+  const response = await fetch(`${apiBaseUrl}${path}`)
 
   if (!response.ok) {
     throw new Error('API unavailable')
