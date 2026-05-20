@@ -610,11 +610,11 @@ function Finance() {
     [Users, 'Rapide', 'Ouverture en 24-48h'],
   ]
   const banks = [
-    ['BNP Paribas', logos.bnp, 'Populaire', ['Carte bancaire internationale', 'Application mobile', 'Découvert autorisé']],
-    ['Société Générale', logos.societeGenerale, 'Partenaire', ['Offres étudiants exclusives', 'Assurance incluse', 'Retraits sans frais zone SEPA']],
-    ['Crédit Mutuel', logos.creditMutuel, 'Recommandé', ['Carte Mastercard/Visa', 'Conseiller dédié', 'Solutions épargne']],
-    ['N26', logos.n26, 'Digital', ['Ouverture rapide en 8 min', 'Carte virtuelle incluse', "Zéro frais à l'étranger"]],
-    ['Revolut', logos.revolut, 'Flexible', ['Multi-devises', 'Transferts instantanés', "Contrôle total depuis l'app"]],
+    ['BNP Paribas', '/finance-bnp.png', 'Populaire', ['Carte bancaire internationale', 'Application mobile', 'Découvert autorisé']],
+    ['Société Générale', '/finance-societe-generale.jpeg', 'Partenaire', ['Offres étudiants exclusives', 'Assurance incluse', 'Retraits sans frais zone SEPA']],
+    ['Crédit Mutuel', '/finance-credit-mutuel.png', 'Recommandé', ['Carte Mastercard/Visa', 'Conseiller dédié', 'Solutions épargne']],
+    ['N26', '/finance-n26.png', 'Digital', ['Ouverture rapide en 8 min', 'Carte virtuelle incluse', "Zéro frais à l'étranger"]],
+    ['Revolut', '/finance-revolut.png', 'Flexible', ['Multi-devises', 'Transferts instantanés', "Contrôle total depuis l'app"]],
   ]
   const financing = [
     [Landmark, 'Prêt étudiant', 'Financez vos études avec des taux avantageux et des conditions adaptées.'],
@@ -668,8 +668,8 @@ function Finance() {
             {banks.map(([bank, logo, tag, perks], index) => (
               <motion.article key={bank} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -15 }} className="finance-bank-card flex flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex min-h-12 items-center gap-3">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
-                    <BrandLogo src={logo} name={bank} className="h-6 w-6 object-contain" />
+                  <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg bg-white ring-1 ring-blue-100">
+                    <BrandLogo src={logo} name={bank} className="finance-bank-logo h-full w-full object-contain p-2" />
                   </span>
                   <h3 className="text-base font-black leading-tight text-slate-950">{bank}</h3>
                 </div>

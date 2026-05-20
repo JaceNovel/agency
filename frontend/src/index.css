@@ -379,8 +379,12 @@ main textarea:focus {
     0 24px 52px rgba(37, 99, 235, 0.14);
 }
 
-.finance-bank-card img {
+.finance-bank-card img:not(.finance-bank-logo) {
   filter: invert(30%) sepia(92%) saturate(2543%) hue-rotate(214deg) brightness(92%) contrast(96%);
+}
+
+.finance-bank-logo {
+  filter: none;
 }
 
 .finance-student-badge {
