@@ -66,8 +66,8 @@ const navItems = [
   { label: 'Finance & Banque', icon: CreditCard, to: '/finance' },
   { label: 'Billets & Transport', icon: Plane, to: '/transport' },
   { label: 'Accompagnement', icon: UserRound, to: '/accompagnement' },
+  { label: 'Messages', icon: MessageCircle, to: '/messages', badge: 3 },
   { label: 'eSIM & Forfait', icon: Smartphone, to: '/esim' },
-  { label: 'Support client', icon: MessageCircle, to: '/messages', badge: 5 },
 ]
 
 function App() {
@@ -368,12 +368,12 @@ function Dashboard() {
     ['Traduction & Documents', FileText, 'Traduction certifiée, apostille'], ['Visa & Immigration', Plane, 'Dossier complet, suivi et assistance'], ['Logement Étudiant', Home, 'Résidences, studios, colocations'], ['Paiement Frais Universitaires', CreditCard, 'Payez vos frais en sécurité'], ['Billets & Transport', Plane, 'Vols, trains, transferts'], ['Banque & Financement', Landmark, 'Compte étudiant, AVI, prêts'],
   ]
   const serviceTones = [
-    'from-blue-50 via-white to-sky-50 text-blue-700',
-    'from-indigo-50 via-white to-blue-50 text-indigo-700',
-    'from-emerald-50 via-white to-cyan-50 text-emerald-700',
-    'from-amber-50 via-white to-orange-50 text-amber-700',
-    'from-slate-50 via-white to-blue-50 text-blue-700',
-    'from-violet-50 via-white to-indigo-50 text-violet-700',
+    'bg-blue-600 text-white',
+    'bg-blue-600 text-white',
+    'bg-blue-600 text-white',
+    'bg-blue-600 text-white',
+    'bg-blue-600 text-white',
+    'bg-blue-600 text-white',
   ]
   const offers = [
     ['Résidence Paris 15', '450 €/mois', 'Paris, France', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80', logos.parisSaclay],
@@ -420,12 +420,10 @@ function Dashboard() {
           <h2 className="mb-4 text-xl font-black">Nos services principaux</h2>
           <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
             {services.map(([label, Icon, sub], index) => (
-              <motion.div initial={{ opacity: 0, y: 18, rotateX: -8 }} animate={{ opacity: 1, y: 0, rotateX: 0 }} transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className={`service-3d-card ${index < 4 ? 'service-featured-card' : ''} relative overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-br ${serviceTones[index]} p-5 text-center shadow-sm`} key={label}>
-                <div className="service-card-glow" />
-                <div className="service-card-icon mx-auto grid h-16 w-16 place-items-center rounded-full bg-white text-current shadow-lg shadow-blue-950/5"><Icon size={28} /></div>
-                <div className="relative z-10 mt-4 font-black text-slate-950">{label}</div>
-                <p className="relative z-10 mt-2 text-sm leading-6 text-slate-500">{sub}</p>
-                {index < 4 && <div className="relative z-10 mt-4 text-xs font-black uppercase tracking-wide text-current">Démarrer →</div>}
+              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.015 }} className="service-3d-card group relative rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm" key={label}>
+                <div className={`service-card-icon mx-auto grid h-14 w-14 place-items-center rounded-full ${serviceTones[index]}`}><Icon size={25} /></div>
+                <div className="mt-4 min-h-[44px] font-black leading-tight text-slate-950">{label}</div>
+                <p className="mt-2 min-h-[44px] text-sm font-medium leading-5 text-slate-500">{sub}</p>
               </motion.div>
             ))}
           </div>
@@ -1022,7 +1020,7 @@ function SupportJourney() {
           <h1 className="mt-8 text-6xl font-black leading-tight tracking-tight text-slate-950">Accompagnement<br />personnalisé</h1>
           <p className="mt-7 text-xl font-medium leading-9 text-slate-700">Nous vous accompagnons à chaque étape de votre projet d'études à l'étranger. De la préparation du dossier à votre installation, vous n'êtes jamais seul.</p>
           <div className="mt-9 flex flex-wrap gap-5">
-            <motion.button initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight size={19} /></motion.button>
+            <motion.button initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -5, scale: 1.02 }} className="support-start-button flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight className="support-start-arrow" size={19} /></motion.button>
             <motion.button initial={{ opacity: 0, x: 54, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.56, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800"><Video size={19} />Voir la vidéo</motion.button>
           </div>
         </motion.div>
@@ -1034,8 +1032,8 @@ function SupportJourney() {
       <div className="grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <div className="space-y-7">
           <div><h2 className="text-3xl font-black text-slate-950">Nos étapes d'accompagnement</h2><p className="mt-2 text-lg font-medium text-slate-500">Un parcours clair et complet pour réussir votre départ.</p></div>
-          <section className="grid gap-6 md:grid-cols-5">
-            {steps.map(([Icon, title, text], index) => <motion.div initial={{ opacity: 0, y: 22, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} whileHover={{ y: -10 }} transition={{ delay: 0.12 + index * 0.055, duration: 0.36, ease: [0.22, 1, 0.36, 1] }} key={title} className="support-step-card relative rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm"><div className="absolute -top-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-blue-800 font-black text-white">{index + 1}</div><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={28} /></div><h3 className="mt-5 font-black text-slate-950">{title}</h3><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p></motion.div>)}
+          <section className="support-steps-track relative grid gap-6 md:grid-cols-5">
+            {steps.map(([Icon, title, text], index) => <motion.div initial={{ opacity: 0, y: 22, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} whileHover={{ y: -10 }} transition={{ delay: 0.12 + index * 0.055, duration: 0.36, ease: [0.22, 1, 0.36, 1] }} key={title} className="support-step-card relative rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">{index < steps.length - 1 && <span className="support-step-connector" />}<div className="absolute -top-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-blue-800 font-black text-white">{index + 1}</div><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={28} /></div><h3 className="mt-5 font-black text-slate-950">{title}</h3><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p></motion.div>)}
           </section>
           <section className="flex gap-5 rounded-lg border border-blue-100 bg-blue-50 p-6"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-blue-800"><ShieldCheck size={26} /></div><div><h3 className="font-black text-blue-950">Important</h3><p className="mt-2 leading-7 text-blue-950">Nous accompagnons nos étudiants dans toutes les démarches administratives. Cependant, la décision finale d'octroi du visa appartient exclusivement aux autorités consulaires.</p></div></section>
         </div>
@@ -1209,7 +1207,7 @@ function Esim() {
           <button type="button" onClick={() => planScroller.current?.scrollBy({ left: -360, behavior: 'smooth' })} className="absolute left-4 top-1/2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-800 shadow-lg shadow-slate-200" aria-label="Forfaits précédents"><ChevronDown className="rotate-90" /></button>
           <button type="button" onClick={() => planScroller.current?.scrollBy({ left: 360, behavior: 'smooth' })} className="absolute right-4 top-1/2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-800 shadow-lg shadow-slate-200" aria-label="Forfaits suivants"><ChevronDown className="-rotate-90" /></button>
           <div ref={planScroller} className="esim-plan-rail flex gap-5 overflow-x-auto scroll-smooth px-10 pb-3">
-            {plans.map((plan, index) => <EsimPlan key={`${plan[0]}-${plan[1]}`} plan={plan} featured={index === 2} index={index} />)}
+            {plans.map((plan, index) => <EsimPlan key={`${plan[0]}-${plan[1]}`} plan={plan} index={index} />)}
           </div>
         </section>
 
@@ -1262,15 +1260,15 @@ function Esim() {
   )
 }
 
-function EsimPlan({ plan, featured = false, index }) {
+function EsimPlan({ plan, index }) {
   const [region, data, duration, price, flag] = plan
   return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -8, scale: 1.012 }} className={`relative min-w-[280px] rounded-lg border bg-white p-5 shadow-sm ${featured ? 'border-blue-600 ring-2 ring-blue-100' : 'border-slate-200'}`}>
+    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -8, scale: 1.012 }} className="group relative min-w-[280px] rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-blue-600 hover:ring-2 hover:ring-blue-100">
       <div className="flex items-center gap-3"><img src={flag} alt="" className="h-8 w-8 rounded-full" /><span className="font-black">{region}</span></div>
       <div className="mt-4 text-2xl font-black">{data}</div>
       <div className="mt-4 space-y-2 text-sm font-medium text-slate-500"><div>{duration}</div><div>Appels illimités</div><div>SMS illimités</div></div>
       <div className="mt-5 text-lg font-black">{price}</div>
-      <button className={`mt-4 h-11 w-full rounded-lg font-black ${featured ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-800'}`}>Choisir</button>
+      <button className="mt-4 h-11 w-full rounded-lg bg-blue-50 font-black text-blue-800 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">Choisir</button>
     </motion.article>
   )
 }
@@ -1398,6 +1396,7 @@ function Messages() {
   const [draft, setDraft] = useState('')
   const [attachment, setAttachment] = useState(null)
   const [emojiOpen, setEmojiOpen] = useState(false)
+  const messagesListRef = useRef(null)
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
   const activeThread = threads.find((thread) => thread.id === activeThreadId) || threads[0]
@@ -1413,7 +1412,16 @@ function Messages() {
   const groupCount = threads.filter((thread) => thread.group).length
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    const frame = requestAnimationFrame(() => {
+      const list = messagesListRef.current
+      if (list) {
+        list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' })
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      }
+    })
+
+    return () => cancelAnimationFrame(frame)
   }, [activeThreadId, activeThread.messages.length])
 
   const selectThread = (threadId) => {
@@ -1453,9 +1461,10 @@ function Messages() {
   }
 
   return (
-    <div className="messages-page flex min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 p-0">
-      <div className="messaging-shell grid h-full min-h-0 w-full flex-1 overflow-hidden bg-white xl:grid-cols-[430px_1fr]">
-        <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
+    <div className="messages-page service-client-page min-h-screen bg-slate-50">
+      <div className="-mx-6 -mb-6 -mt-6 lg:-mx-8 lg:-mb-8 lg:-mt-8">
+        <section className="messaging-shell grid h-[calc(100vh-5rem)] min-h-[780px] overflow-hidden border-y border-slate-200 bg-white shadow-sm xl:grid-cols-[430px_1fr]">
+          <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
           <div className="grid shrink-0 grid-cols-3 gap-3 border-b border-slate-100 p-5">
             {[
               ['all', 'Toutes', threads.length],
@@ -1511,7 +1520,7 @@ function Messages() {
             </div>
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 lg:px-16">
+          <div ref={messagesListRef} className="messages-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 lg:px-20">
             <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd'hui</div>
             <div className="space-y-7">
               {activeThread.messages.map((message, index) => (
@@ -1523,7 +1532,7 @@ function Messages() {
                   className={`flex items-end gap-4 ${message.side === 'right' ? 'justify-end' : 'justify-start'}`}
                 >
                   {message.side === 'left' && <ThreadAvatar thread={activeThread} compact />}
-                  <div className={`message-bubble relative max-w-[560px] whitespace-pre-line rounded-lg px-6 py-5 text-[15px] font-semibold leading-7 ${message.side === 'right' ? 'message-out bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'message-in border border-slate-200 bg-slate-50 text-slate-950 shadow-sm'}`}>
+                  <div className={`message-bubble relative max-w-[720px] whitespace-pre-line rounded-lg px-8 py-6 text-base font-semibold leading-8 ${message.side === 'right' ? 'message-out bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'message-in border border-slate-200 bg-slate-50 text-slate-950 shadow-sm'}`}>
                     {message.text}
                     {message.attachment && (
                       <div className={`mt-4 overflow-hidden rounded-lg border ${message.side === 'right' ? 'border-white/25 bg-white/10' : 'border-slate-200 bg-white'}`}>
@@ -1552,13 +1561,13 @@ function Messages() {
           </div>
 
           <form
-            className="grid shrink-0 grid-cols-[1fr_56px] gap-4 border-t border-slate-100 p-6"
+            className="grid shrink-0 grid-cols-[1fr_64px] gap-4 border-t border-slate-100 p-6"
             onSubmit={(event) => {
               event.preventDefault()
               sendMessage()
             }}
           >
-            <div className="relative flex min-h-14 items-center gap-4 rounded-lg border border-slate-200 bg-white px-5 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
+            <div className="relative flex min-h-16 items-center gap-4 rounded-lg border border-slate-200 bg-white px-6 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
               <input ref={fileInputRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" className="hidden" onChange={handleAttachment} />
               <button type="button" onClick={() => fileInputRef.current?.click()} className="text-slate-500 hover:text-blue-700" aria-label="Joindre une image, un PDF ou un document">
                 <Paperclip size={23} />
@@ -1571,7 +1580,7 @@ function Messages() {
                     <button type="button" onClick={() => setAttachment(null)} className="text-blue-500 hover:text-blue-900" aria-label="Retirer la pièce jointe"><X size={14} /></button>
                   </div>
                 )}
-                <input value={draft} onChange={(event) => setDraft(event.target.value)} className="w-full min-w-0 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder="Écrire un message..." />
+                <input value={draft} onChange={(event) => setDraft(event.target.value)} className="w-full min-w-0 border-none bg-transparent text-base font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder="Écrire un message..." />
               </div>
               <button type="button" onClick={() => setEmojiOpen((value) => !value)} className="text-slate-500 hover:text-blue-700" aria-label="Ajouter un emoji">
                 <Smile size={23} />
@@ -1584,11 +1593,12 @@ function Messages() {
                 </div>
               )}
             </div>
-            <button type="submit" className="grid h-14 w-14 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700" aria-label="Envoyer le message">
+            <button type="submit" className="grid h-16 w-16 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700" aria-label="Envoyer le message">
               <Send size={24} />
             </button>
           </form>
         </motion.section>
+        </section>
       </div>
     </div>
   )
