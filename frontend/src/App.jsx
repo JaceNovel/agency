@@ -67,6 +67,7 @@ const navItems = [
   { label: 'Billets & Transport', icon: Plane, to: '/transport' },
   { label: 'Accompagnement', icon: UserRound, to: '/accompagnement' },
   { label: 'eSIM & Forfait', icon: Smartphone, to: '/esim' },
+  { label: 'Support client', icon: MessageCircle, to: '/messages', badge: 5 },
 ]
 
 function App() {
@@ -243,29 +244,29 @@ function Shell() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       {open && <button type="button" className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px]" aria-label="Fermer la navigation" onClick={() => setOpen(false)} />}
-      <aside className={`sidebar-panel fixed inset-y-0 left-0 z-50 w-72 overflow-hidden rounded-r-2xl bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 ${open ? 'is-open' : ''}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 overflow-hidden rounded-r-2xl bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 transition ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-full min-h-0 flex-col p-6">
           <div className="flex items-center justify-between">
             <Logo />
             <button type="button" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-lg text-blue-100 hover:bg-white/10" aria-label="Fermer la navigation"><X size={22} /></button>
           </div>
           <nav className="sidebar-nav mt-10 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">{navItems.map(({ label, icon: Icon, to, badge }) => <NavLink key={label} to={to} onClick={() => setOpen(false)} className={({ isActive }) => `flex h-12 items-center gap-3 rounded-lg px-4 text-sm font-bold transition ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}><Icon size={21} /><span className="flex-1">{label}</span>{badge && <span className="grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}</NavLink>)}</nav>
-          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><Link to="/messages" onClick={() => setOpen(false)} className="mt-4 flex h-11 w-full items-center justify-center rounded-lg bg-blue-600 text-sm font-bold">Contacter le support</Link></div>
+          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><button className="mt-4 h-11 w-full rounded-lg bg-blue-600 text-sm font-bold">Contacter le support</button></div>
         </div>
       </aside>
       <div>
         <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
-          <div className="-ml-2 lg:-ml-3">
-            <button type="button" onClick={() => setOpen(true)} className="flex h-16 items-center gap-4 rounded-2xl bg-[#061b47] px-4 pr-4 shadow-lg shadow-blue-950/20 transition hover:bg-[#082f7a]" aria-label="Ouvrir la navigation">
+          <div>
+            <button type="button" onClick={() => setOpen(true)} className="flex h-14 items-center gap-3 rounded-2xl bg-slate-300 px-3 pr-3 shadow-sm shadow-slate-00 transition hover:bg-slate-400/80" aria-label="Ouvrir la navigation">
               <div className="grid h-11 w-11 place-items-center rounded-lg bg-white text-blue-700 shadow-md shadow-slate-200">
                 <img src={logos.studyway} alt="StudyWay" className="h-7 w-7" />
               </div>
               <div className="hidden leading-tight sm:block">
-                <div className="text-2xl font-black tracking-tight text-white">Study<span className="text-blue-400">Way</span></div>
-                <div className="text-[11px] font-semibold text-blue-100">Votre avenir, notre mission</div>
+                <div className="text-2xl font-black tracking-tight text-blue-950">Study<span className="text-blue-600">Way</span></div>
+                <div className="text-[11px] font-semibold text-slate-500">Votre avenir, notre mission</div>
               </div>
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/12 text-blue-50 shadow-sm">
-                <ArrowRight size={24} />
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-700 text-slate-100 shadow-sm">
+                <Menu size={24} />
               </span>
             </button>
           </div>
@@ -391,13 +392,13 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page space-y-7">
-      <div className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0 space-y-7">
+      <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
+        <div className="space-y-7">
         <section className="dashboard-hero relative min-h-[360px] overflow-hidden rounded-lg text-white shadow-sm">
           {heroSlides.map((item, index) => (
             <img key={item.title} src={item.image} alt="" className={`absolute inset-0 h-full w-full object-cover transition duration-1000 ${activeSlide === index ? 'scale-100 opacity-100' : 'scale-105 opacity-0'}`} />
           ))}
-          <div className={`absolute inset-0 bg-gradient-to-r ${activeSlide === 0 ? slide.tone : 'from-slate-950/55 via-slate-950/18 to-transparent'}`} />
+          <div className={`absolute inset-0 bg-gradient-to-r ${slide.tone}`} />
           <motion.div key={slide.title} initial={{ opacity: 0, filter: 'blur(6px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="relative z-10 max-w-2xl p-10 xl:p-12">
             <h1 className="overflow-hidden text-5xl font-black leading-tight tracking-tight">
               <motion.span key={`${slide.title}-lead`} initial={{ y: -48, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }} className="block">
@@ -441,7 +442,7 @@ function Dashboard() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d'examen</span><button className="font-black text-blue-700">Voir détails</button></div></section>
           <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black">Ajouter de l'argent</button></section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>{['Uploader un document', 'Réserver un logement', 'Prendre rendez-vous', 'Demander une AVI', 'Ouvrir un compte bancaire'].map((item) => <div key={item} className="flex items-center gap-3 py-3 text-sm font-semibold text-slate-600"><FileText size={17} />{item}</div>)}</section>
-          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-white px-5 font-black text-blue-950 shadow-lg shadow-blue-950/20">Parrainer maintenant <ArrowRight size={18} /></button></section>
+          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-white/15 px-5 font-black">Parrainer maintenant <ArrowRight size={18} /></button></section>
         </aside>
       </div>
 
@@ -766,9 +767,9 @@ function Housing() {
         </section>
       </div>
 
-        <section className="-mb-5 rounded-t-2xl bg-[#061b47] px-5 py-12 text-white lg:-mb-8 lg:px-8">
+        <section className="-mb-5 rounded-t-2xl bg-slate-500 px-5 py-12 text-white lg:-mb-8 lg:px-8">
           <h2 className="mb-7 text-center text-2xl font-black">Pourquoi choisir nos logements ?</h2>
-          <div className="grid gap-5 rounded-lg bg-[#082f7a] p-6 md:grid-cols-4">
+          <div className="grid gap-5 rounded-lg bg-slate-600 p-6 md:grid-cols-4">
             {why.map(([Icon, title, text], index) => (
               <motion.div key={title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="flex gap-4">
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/15 text-white"><Icon size={24} /></div>
@@ -870,7 +871,7 @@ function Universities() {
       <div className="relative grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <section className="university-hero relative min-h-[430px] overflow-visible rounded-lg bg-[#f4f8ff] p-8 md:p-10">
           <img src={universityHero} alt="Étudiante avec cahier" className="university-hero-image absolute inset-y-0 right-0 h-full w-full rounded-lg object-cover" />
-          <div className="absolute inset-0 rounded-lg bg-transparent" />
+          <div className="absolute inset-0 rounded-lg bg-[linear-gradient(90deg,rgba(244,248,255,.92)_0%,rgba(244,248,255,.72)_38%,rgba(244,248,255,.08)_70%,rgba(244,248,255,0)_100%)]" />
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Universités</div>
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 mt-8 max-w-[600px]">
             <h1 className="university-title text-4xl font-black leading-tight tracking-tight text-slate-950 xl:text-5xl">Trouvez l'université<br />qui vous correspond</h1>
@@ -1061,17 +1062,16 @@ function Transport() {
     ['Turkish Airlines', 'TK 569', logos.turkish, '09:10', '9h 50m', '1 escale (IST)', '19:00', '420 €', 'text-amber-600'],
     ['RwandAir', 'WB 704', logos.rwandair, '13:30', '8h 20m', '1 escale (KGL)', '21:50', '372 €', 'text-amber-600'],
   ]
-  const transportEase = [0.16, 1, 0.3, 1]
 
   return (
     <div className="transport-page space-y-7">
-      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.48, ease: transportEase }} className="flex flex-wrap items-center justify-between gap-5">
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5">
         <div><h1 className="text-4xl font-black tracking-tight">Billets & Transport</h1><p className="mt-2 text-lg font-medium text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p></div>
         <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm"><div className="text-xs font-semibold text-slate-500">Mon portefeuille</div><div className="font-black text-emerald-600">1 250,00 €</div></div>
       </motion.div>
 
       <section className="flex flex-wrap gap-4 border-b border-slate-200 pb-6">
-        {transportModes.map(([label, Icon], index) => <motion.button initial={{ opacity: 0, y: 16, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.1 + index * 0.06, duration: 0.44, ease: transportEase }} whileHover={{ y: -2, transition: { duration: 0.18 } }} key={label} className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${index === 0 ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}><Icon size={22} />{label}</motion.button>)}
+        {transportModes.map(([label, Icon], index) => <motion.button initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + index * 0.055, duration: 0.26, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} key={label} className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${index === 0 ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}><Icon size={22} />{label}</motion.button>)}
       </section>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
@@ -1104,7 +1104,7 @@ function Transport() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Réservation sécurisée</h2><div className="mt-5 space-y-3">{['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}</div></section>
         </aside>
 
-        <motion.section initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ duration: 0.52, ease: transportEase }} className="transport-arrival-pack relative overflow-hidden rounded-lg border border-blue-100 bg-[#f3f7ff] px-6 py-5 text-blue-950 shadow-sm xl:col-span-2">
+        <motion.section initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="transport-arrival-pack relative overflow-hidden rounded-lg border border-blue-100 bg-[#f3f7ff] px-6 py-5 text-blue-950 shadow-sm xl:col-span-2">
           <img src={parisPackBackground} alt="" className="arrival-pack-bg absolute inset-0 h-full w-full object-contain" />
           <div className="relative z-10 grid gap-5 lg:grid-cols-[300px_auto_1fr_auto] lg:items-center">
             <div>
@@ -1115,7 +1115,7 @@ function Transport() {
             <div className="arrival-pack-icons flex flex-wrap items-center gap-3 text-blue-950 lg:justify-self-start">
               {[[Plane, 'Vol'], [Train, 'Train'], [Smartphone, 'eSIM'], [Car, 'Chauffeur'], [Home, 'Logement']].map(([Icon, label], index) => (
                 <div className="flex items-center gap-3" key={label}>
-                  <motion.span initial={{ opacity: 0, y: 10, scale: 0.96 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.055, duration: 0.34, ease: transportEase }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-white text-blue-900 shadow-sm" title={label}>
+                  <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.045, duration: 0.24 }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-white text-blue-900 shadow-sm" title={label}>
                     <Icon size={21} />
                   </motion.span>
                   {index < 4 && <span className="text-lg font-black text-slate-400">+</span>}
@@ -1138,7 +1138,7 @@ function TravelField({ label, value, sub, icon: Icon }) {
 function FlightRow({ flight, index }) {
   const [name, code, logo, départ, duration, stop, arrival, price, tone] = flight
   return (
-    <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.055, duration: 0.42, ease: [0.16, 1, 0.3, 1] }} whileHover={{ backgroundColor: 'rgba(248, 250, 252, 0.86)' }} className="grid items-center gap-5 p-6 lg:grid-cols-[1.3fr_0.8fr_1fr_0.8fr_0.8fr_auto]">
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="grid items-center gap-5 p-6 lg:grid-cols-[1.3fr_0.8fr_1fr_0.8fr_0.8fr_auto]">
       <div className="flex items-center gap-4"><img src={logo} alt={name} className="h-16 w-16 rounded-lg border border-slate-100 object-contain p-2" /><div><div className="font-black">{name}</div><div className="text-sm text-slate-500">{code}</div></div></div>
       <div><div className="text-2xl font-black">{départ}</div><div className="font-bold">LFW</div><div className="text-sm text-slate-500">Lomé</div></div>
       <div className="text-center"><div className="font-bold">{duration}</div><div className={`mt-2 text-sm font-bold ${tone}`}>{stop}</div></div>
@@ -1453,54 +1453,9 @@ function Messages() {
   }
 
   return (
-    <div className="messages-page service-client-page min-h-screen bg-slate-50">
-      <section className="service-client-hero relative overflow-hidden rounded-lg bg-[#061b47] p-8 text-white shadow-sm">
-        <div className="relative z-10 grid gap-8 xl:grid-cols-[1fr_440px] xl:items-center">
-          <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-blue-950 shadow-lg shadow-blue-950/10"><MessageCircle size={17} />Centre d'assistance StudyWay</div>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight xl:text-5xl">Une équipe disponible pour sécuriser chaque étape de votre parcours</h1>
-            <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-blue-50">Chat direct, suivi de dossier, appels, documents et urgences voyage : tout votre support client est réuni dans un espace clair et rapide.</p>
-            <div className="mt-7 flex flex-wrap gap-4">
-              <button className="flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white shadow-lg shadow-blue-950/20"><MessageCircle size={19} />Démarrer un chat</button>
-              <button className="flex h-12 items-center gap-3 rounded-lg bg-white px-6 font-black text-blue-950"><Phone size={19} />Planifier un appel</button>
-            </div>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              [CheckCircle2, '98%', 'Satisfaction étudiants'],
-              [MessageCircle, '< 5 min', 'Temps de réponse moyen'],
-              [ShieldCheck, '24h/7j', 'Assistance prioritaire'],
-              [FileText, '12', 'Dossiers suivis'],
-            ].map(([Icon, value, label]) => (
-              <div key={label} className="rounded-lg border border-white/20 bg-white p-5 text-blue-950 shadow-lg shadow-blue-950/10">
-                <Icon className="text-blue-700" size={24} />
-                <div className="mt-4 text-2xl font-black">{value}</div>
-                <div className="mt-1 text-sm font-semibold text-slate-600">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-5 lg:grid-cols-4">
-        {[
-          [MessageCircle, 'Chat instantané', 'Échangez avec un conseiller StudyWay.', 'Ouvrir le chat'],
-          [Phone, 'Appel conseiller', 'Programmez un appel pour vos démarches.', 'Réserver'],
-          [FileText, 'Suivi de dossier', 'Documents, visa, logement et paiements.', 'Voir le suivi'],
-          [ShieldCheck, 'Urgence voyage', 'Aide rapide en cas de départ imminent.', 'Signaler'],
-        ].map(([Icon, title, text, action]) => (
-          <article key={title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="grid h-12 w-12 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={23} /></div>
-            <h2 className="mt-4 font-black text-blue-950">{title}</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{text}</p>
-            <button className="mt-4 text-sm font-black text-blue-700">{action} →</button>
-          </article>
-        ))}
-      </section>
-
-      <div className="-mx-6 lg:-mx-8">
-        <section className="messaging-shell grid min-h-[720px] overflow-hidden border-y border-slate-200 bg-white shadow-sm xl:grid-cols-[430px_1fr]">
-          <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
+    <div className="messages-page flex min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 p-0">
+      <div className="messaging-shell grid h-full min-h-0 w-full flex-1 overflow-hidden bg-white xl:grid-cols-[430px_1fr]">
+        <aside className="flex min-h-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
           <div className="grid shrink-0 grid-cols-3 gap-3 border-b border-slate-100 p-5">
             {[
               ['all', 'Toutes', threads.length],
@@ -1538,7 +1493,7 @@ function Messages() {
           </div>
         </aside>
 
-          <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-col overflow-hidden bg-white">
+        <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-col overflow-hidden bg-white">
           <header className="flex h-24 shrink-0 items-center justify-between border-b border-slate-200 px-7">
             <div className="flex items-center gap-4">
               <ThreadAvatar thread={activeThread} large />
@@ -1633,8 +1588,7 @@ function Messages() {
               <Send size={24} />
             </button>
           </form>
-          </motion.section>
-        </section>
+        </motion.section>
       </div>
     </div>
   )
