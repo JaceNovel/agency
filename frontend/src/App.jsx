@@ -1808,9 +1808,63 @@ function Transport() {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Mon voyage</h2><div className="mt-5 border-l-2 border-blue-100 pl-5"><div className="font-black text-blue-800">Aller</div><div className="text-sm text-slate-500">25 juin 2025</div><div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4"><div><div className="text-xl font-black">23:45</div><div className="font-bold">LFW</div><div className="text-sm text-slate-500">Lomé</div></div><div className="text-center text-sm font-bold text-emerald-600">6h 45m<br />Direct</div><div className="text-right"><div className="text-xl font-black">07:30</div><div className="font-bold">CDG</div><div className="text-sm text-slate-500">Paris</div></div></div><div className="mt-6 flex items-center gap-3"><UserRound size={18} /><div><b>Passager</b><div className="text-sm text-slate-500">1 Adulte</div></div></div></div><button className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white">Continuer vers la réservation</button></section>
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Transport sur place</h2><p className="mt-1 text-sm text-slate-500">Réservez votre trajet à l'arrivée</p>{[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport"], [Train, 'Tram / Métro', 'Déplacements en ville'], [Bus, 'Bus', 'Lignes régulières'], [Car, 'Chauffeur (Uber)', 'Trajet privé avec chauffeur']].map(([Icon, title, sub]) => <div className="mt-5 flex items-center justify-between" key={title}><div className="flex items-center gap-4"><Icon size={21} /><div><b>{title}</b><div className="text-sm text-slate-500">{sub}</div></div></div><ChevronDown className="-rotate-90" size={17} /></div>)}</section>
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Réservation sécurisée</h2><div className="mt-5 space-y-3">{['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}</div></section>
+          <section className="transport-side-card transport-trip-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-xl font-black">Mon voyage</h2>
+              <span className="transport-card-visual grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-700"><Plane size={34} /></span>
+            </div>
+            <div className="mt-5 grid grid-cols-[22px_1fr] gap-4">
+              <div className="relative pt-1">
+                <Plane className="relative z-10 rounded-full bg-white text-blue-700" size={18} />
+                <span className="absolute left-[8px] top-7 h-28 w-px bg-blue-100" />
+                <span className="absolute left-[5px] top-[94px] h-2.5 w-2.5 rounded-full bg-blue-700 ring-4 ring-blue-50" />
+              </div>
+              <div>
+                <div className="font-black">Aller</div>
+                <div className="text-sm font-semibold text-slate-500">25 juin 2025</div>
+                <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+                  <div><div className="text-xl font-black">23:45</div><div className="font-bold">LFW</div><div className="text-sm text-slate-500">Lomé</div></div>
+                  <div className="text-center text-sm font-bold"><span className="block text-slate-500">6h 45m</span><span className="text-emerald-600">Direct</span></div>
+                  <div className="text-right"><div className="text-xl font-black">07:30</div><div className="font-bold">CDG</div><div className="text-sm text-slate-500">Paris</div></div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+              <UserRound className="text-slate-600" size={21} />
+              <div><b>Passager</b><div className="text-sm text-slate-500">1 Adulte</div></div>
+            </div>
+            <button className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white">Continuer vers la réservation</button>
+          </section>
+          <section className="transport-side-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black">Transport sur place</h2>
+            <p className="mt-1 text-sm font-semibold text-slate-500">Réservez votre trajet à l'arrivée</p>
+            <div className="mt-5 divide-y divide-slate-100">
+              {[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport", 'text-blue-700 bg-blue-50'], [Train, 'Tram / Métro', 'Déplacements en ville', 'text-indigo-700 bg-indigo-50'], [Bus, 'Bus', 'Lignes régulières', 'text-emerald-700 bg-emerald-50'], [Car, 'Chauffeur (Uber)', 'Trajet privé avec chauffeur', 'text-slate-900 bg-slate-100']].map(([Icon, title, sub, tone]) => (
+                <button className="group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
+                  <span className="flex min-w-0 items-center gap-4">
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}><Icon size={21} /></span>
+                    <span className="min-w-0"><b>{title}</b><span className="mt-1 block text-sm font-semibold text-slate-500">{sub}</span></span>
+                  </span>
+                  <ChevronDown className="-rotate-90 text-slate-400 transition group-hover:text-blue-700" size={18} />
+                </button>
+              ))}
+            </div>
+          </section>
+          <section className="transport-side-card transport-secure-card relative overflow-hidden rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
+            <div className="relative z-10 grid grid-cols-[1fr_auto] gap-4">
+              <div>
+                <h2 className="text-xl font-black">Réservation sécurisée</h2>
+                <div className="mt-5 space-y-3">
+                  {['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}
+                </div>
+              </div>
+              <div className="secure-visual relative hidden h-36 w-28 sm:block">
+                <div className="absolute right-0 top-4 grid h-24 w-24 place-items-center rounded-[28px] bg-blue-700 text-white shadow-lg shadow-blue-700/25"><Lock size={34} /></div>
+                <ShieldCheck className="absolute right-7 top-0 text-blue-900" size={34} />
+                <CreditCard className="absolute bottom-0 left-0 rounded-2xl bg-white p-2 text-blue-700 shadow-md" size={46} />
+              </div>
+            </div>
+          </section>
         </aside>
 
         <motion.section initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="transport-arrival-pack relative overflow-hidden rounded-lg border border-blue-100 bg-[#f3f7ff] px-6 py-5 text-blue-950 shadow-sm xl:col-span-2">
@@ -1824,7 +1878,7 @@ function Transport() {
             <div className="arrival-pack-icons flex flex-wrap items-center gap-3 text-blue-950 lg:justify-self-start">
               {[[Plane, 'Vol'], [Train, 'Train'], [Smartphone, 'eSIM'], [Car, 'Chauffeur'], [Home, 'Logement']].map(([Icon, label], index) => (
                 <div className="flex items-center gap-3" key={label}>
-                  <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.045, duration: 0.24 }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-white text-blue-900 shadow-sm" title={label}>
+                  <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.045, duration: 0.24 }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-blue-700 text-white shadow-sm" title={label}>
                     <Icon size={21} />
                   </motion.span>
                   {index < 4 && <span className="text-lg font-black text-slate-400">+</span>}
