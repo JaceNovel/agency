@@ -17,6 +17,9 @@ import dashboardStudentHero from './assets/dashboard-african-student.png'
 import esimPhoneHero from './assets/esim-phone-hero.png'
 import financeHero from './assets/finance-student-hero.png'
 import parisPackBackground from './assets/paris-pack-background.png'
+import transportTicketHero from './assets/transport-ticket-hero.png'
+import housingStudentHero from './assets/housing-student-hero.png'
+import housingHotelHero from './assets/housing-hotel-hero.png'
 
 const queryClient = new QueryClient()
 
@@ -1310,48 +1313,71 @@ function Housing() {
 
   if (!housingMode) {
     return (
-      <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
+      <div className="housing-page housing-landing -mx-5 space-y-8 lg:-mx-8">
         <div className="px-5 lg:px-8">
-          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="grid min-h-[520px] lg:grid-cols-[0.92fr_1.08fr]">
-              <div className="relative flex flex-col justify-between bg-[#061b47] p-8 text-white lg:p-10">
+          <section className="housing-landing-shell overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="grid min-h-[520px] lg:grid-cols-[1.38fr_0.62fr]">
+              <div className="housing-landing-hero relative grid gap-8 bg-[#061b47] p-8 text-white lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:p-10">
                 <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(37,99,235,.48),transparent_45%),linear-gradient(180deg,#061b47,#082f7a)]" />
-                <div className="relative">
-                  <span className="inline-flex rounded-full bg-white/12 px-4 py-2 text-xs font-black uppercase tracking-wide ring-1 ring-white/15">Séjour & installation</span>
-                  <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight lg:text-5xl">Choisissez votre solution d’hébergement</h1>
-                  <p className="mt-4 max-w-lg text-base font-medium leading-7 text-blue-50/90">StudyWay vous accompagne pour réserver une adresse fiable, que ce soit pour une installation étudiante ou un séjour hôtelier à l’arrivée.</p>
-                </div>
-                <div className="relative mt-10 grid gap-4 text-sm font-bold sm:grid-cols-3">
-                  {[[ShieldCheck, 'Vérifié'], [CreditCard, 'Paiement sécurisé'], [MessageCircle, 'Conseiller dédié']].map(([Icon, label]) => (
-                    <div key={label} className="flex items-center gap-3 rounded-lg bg-white/10 p-4 ring-1 ring-white/10"><Icon size={20} />{label}</div>
-                  ))}
-                </div>
-              </div>
-              <div className="grid gap-5 p-6 lg:p-8">
-                <button type="button" onClick={() => setHousingMode('student')} className="group grid min-h-[220px] gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200 md:grid-cols-[180px_1fr_auto]">
-                  <img src={housingImages[0]} alt="Logement étudiant" className="h-44 w-full rounded-lg object-cover md:h-full" />
+                <div className="housing-hero-copy relative z-10 flex min-h-full flex-col justify-between">
                   <div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-800"><Home size={25} /></div>
-                    <h2 className="mt-5 text-2xl font-black text-slate-950">Logements étudiants</h2>
+                    <motion.span initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-xs font-black tracking-wide ring-1 ring-white/15">
+                      <Home size={14} /> Logement étudiant
+                    </motion.span>
+                    <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mt-7 max-w-xl text-4xl font-black tracking-tight lg:text-5xl">Choisissez votre solution d’hébergement</motion.h1>
+                    <p className="mt-5 max-w-xl text-base font-medium leading-7 text-blue-50/90">StudyWay vous accompagne pour réserver une adresse fiable, que ce soit pour une installation étudiante ou un séjour hôtelier à l’arrivée.</p>
+                  </div>
+                  <div className="mt-10 grid gap-4 text-xs font-black sm:grid-cols-3">
+                    {[
+                      [ShieldCheck, 'Logements vérifiés', 'Qualité garantie'],
+                      [MessageCircle, 'Accompagnement', 'À chaque étape'],
+                      [Lock, 'Paiement sécurisé', '100% sécurisé'],
+                    ].map(([Icon, label, text], index) => (
+                      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 + index * 0.06 }} key={label} className="housing-hero-proof flex items-center gap-3 rounded-lg bg-white/10 p-4 ring-1 ring-white/10">
+                        <Icon size={20} />
+                        <span><strong className="block text-white">{label}</strong><span className="font-bold text-blue-50/78">{text}</span></span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                <motion.div initial={{ opacity: 0, x: 26, scale: 0.97 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.14, duration: 0.54, ease: [0.16, 1, 0.3, 1] }} className="housing-hero-photo-stage">
+                  <img src={housingStudentHero} alt="Studio étudiant moderne" className="housing-hero-slide housing-hero-slide-student" />
+                  <img src={housingHotelHero} alt="Chambre d'hôtel moderne" className="housing-hero-slide housing-hero-slide-hotel" />
+                  <div className="housing-hero-rating-card">
+                    <span className="text-amber-400">★</span>
+                    <strong>4.8/5</strong>
+                    <small>+1200 avis positif</small>
+                  </div>
+                  <div className="housing-hero-social-card">
+                    <span className="housing-avatar-stack"><i /> <i /> <i /></span>
+                    <strong>+1200 étudiants</strong>
+                    <small>logés avec succès</small>
+                  </div>
+                </motion.div>
+              </div>
+              <div className="housing-choice-panel grid gap-5 p-6 lg:p-8">
+                <motion.button initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 }} type="button" onClick={() => setHousingMode('student')} className="housing-choice-card group grid min-h-[236px] grid-cols-[auto_1fr_auto] items-start gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-800"><Home size={25} /></span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-950">Logements étudiants</h2>
                     <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Résidences, studios, chambres et colocations pour une installation durable près du campus.</p>
                     <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
                       {['Bail étudiant', 'Dossier accompagné', 'Quartiers vérifiés'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
                     </div>
                   </div>
                   <span className="self-center rounded-lg bg-blue-700 p-3 text-white"><ArrowRight size={20} /></span>
-                </button>
-                <button type="button" onClick={() => setHousingMode('hotel')} className="group grid min-h-[220px] gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200 md:grid-cols-[180px_1fr_auto]">
-                  <img src={hotelImages[0]} alt="Hôtel" className="h-44 w-full rounded-lg object-cover md:h-full" />
+                </motion.button>
+                <motion.button initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} type="button" onClick={() => setHousingMode('hotel')} className="housing-choice-card group grid min-h-[236px] grid-cols-[auto_1fr_auto] items-start gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700"><Building2 size={25} /></span>
                   <div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700"><Building2 size={25} /></div>
-                    <h2 className="mt-5 text-2xl font-black text-slate-950">Hôtels</h2>
+                    <h2 className="text-2xl font-black text-slate-950">Hôtels</h2>
                     <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Hôtels disponibles pour arrivée, rendez-vous visa, séjour court ou transition avant le logement final.</p>
                     <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
                       {['Réservation rapide', 'Avantages inclus', 'Détails transparents'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
                     </div>
                   </div>
                   <span className="self-center rounded-lg bg-emerald-600 p-3 text-white"><ArrowRight size={20} /></span>
-                </button>
+                </motion.button>
               </div>
             </div>
           </section>
@@ -1359,25 +1385,24 @@ function Housing() {
       </div>
     )
   }
-
   return (
     <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
       <div className="px-5 lg:px-8">
-        <div className="flex flex-wrap items-start justify-between gap-5">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="housing-results-hero flex flex-wrap items-start justify-between gap-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:p-7">
           <div>
-            <button type="button" onClick={() => setHousingMode(null)} className="mb-4 text-sm font-black text-blue-800">Changer de catégorie</button>
+            <button type="button" onClick={() => setHousingMode(null)} className="housing-back-button mb-4 inline-flex items-center gap-2 text-sm font-black text-blue-800"><ArrowRight className="rotate-180" size={16} />Changer de catégorie</button>
             <h1 className="typewriter-title text-4xl font-black tracking-tight text-slate-950">{housingMode === 'hotel' ? 'Réserver un hôtel' : 'Trouvez votre logement étudiant'}</h1>
             <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l'Europe."}</p>
           </div>
-          <button className="flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
+          <button className="housing-advisor-button flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
             <MessageCircle size={20} />
             Parler à un conseiller
           </button>
-        </div>
+        </motion.div>
 
         <div className="mt-8 grid items-start gap-8 xl:grid-cols-[1fr_360px]">
           <div className="space-y-6">
-            <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[1.15fr_1.05fr_1fr_1fr_auto]">
+            <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-lg md:grid-cols-[1.15fr_1.05fr_1fr_1fr_auto] housing-search-surface">
               <HousingSearchItem icon={MapPin} label="Ville ou pays" value={housingMode === 'hotel' ? 'Paris, France' : 'Paris, France'} />
               <HousingSearchItem label={housingMode === 'hotel' ? 'Type d’hôtel' : 'Type de logement'} value={housingMode === 'hotel' ? 'Tous les hôtels' : 'Tous les types'} select />
               <HousingSearchItem label="Budget max." value={housingMode === 'hotel' ? '150 000 FCFA' : '605 000 FCFA'} select />
@@ -1387,7 +1412,7 @@ function Housing() {
               </button>
             </motion.section>
 
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <section className="housing-filter-panel rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-lg font-black text-slate-950">Affiner les résultats</h2>
               <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_1fr_1fr]">
                 <div>
@@ -1401,10 +1426,10 @@ function Housing() {
             </section>
           </div>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <section className="housing-map-card rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels proches' : 'Rechercher sur la carte'}</h3>
             <p className="mt-2 text-sm font-medium text-slate-500">{housingMode === 'hotel' ? 'Comparer les quartiers et accès' : 'Voir les logements autour de vous'}</p>
-            <div className="relative mt-5 h-36 overflow-hidden rounded-lg bg-blue-50">
+            <div className="housing-map-preview relative mt-5 h-36 overflow-hidden rounded-lg bg-blue-50">
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.08)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.08)_1px,transparent_1px)] bg-[size:42px_42px]" />
               <div className="absolute left-[43%] top-[43%] rounded-full bg-white px-4 py-2 text-xl font-black text-blue-950 shadow-lg">Paris</div>
               {(housingMode === 'hotel'
@@ -1418,7 +1443,7 @@ function Housing() {
       </div>
 
       <div className="px-5 lg:px-8">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="housing-listing-section rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-xl font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels disponibles' : 'Logements disponibles'} <span className="font-bold text-slate-400">({housingMode === 'hotel' ? hotelResults.length : '1,248'})</span></h2>
             <label className="flex items-center gap-3 text-sm font-bold text-slate-600">
@@ -1479,7 +1504,7 @@ function Housing() {
 
 function HousingSearchItem({ icon: Icon, label, value, select = false }) {
   return (
-    <div className="flex min-h-14 items-center gap-4 border-slate-100 md:border-r md:pr-5">
+    <div className="housing-search-item flex min-h-14 items-center gap-4 border-slate-100 md:border-r md:pr-5">
       {Icon && <Icon size={22} className="text-blue-900" />}
       <div className="min-w-0 flex-1">
         <div className="text-xs font-bold text-slate-500">{label}</div>
@@ -1498,13 +1523,14 @@ function HousingCard({ home, image, index }) {
   const [favorite, setFavorite] = useState(false)
 
   return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -6 }} className="housing-card overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.045 }} whileHover={{ y: -6 }} className="housing-card group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg transition-transform transform-gpu hover:-translate-y-2 hover:shadow-2xl">
       <div className="relative h-48 overflow-hidden">
-        <img src={image} alt={title} className="h-full w-full object-cover" />
-        <span className={`absolute left-3 top-3 rounded-lg px-3 py-1 text-xs font-black text-white shadow-sm ${isFavorite ? 'bg-blue-800' : 'bg-emerald-500'}`}>
+        <img src={image} alt={title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div className="absolute inset-0 housing-image-overlay bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-60 transition-opacity" />
+        <span className={`housing-badge absolute left-4 top-4 text-xs font-black text-white px-3 py-1 rounded-full shadow-md ${isFavorite ? 'bg-blue-600' : 'bg-emerald-500'}`}>
           {isFavorite ? '♡ Coup de cœur' : '♡ Vérifié'}
         </span>
-        <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white shadow-md ${favorite ? 'is-favorite text-rose-600' : 'text-slate-800'}`} aria-label="Ajouter aux favoris">
+        <button type="button" onClick={() => setFavorite((value) => !value)} className={`favorite-button absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 backdrop-blur shadow-sm ${favorite ? 'is-favorite text-rose-600' : 'text-slate-800'}`} aria-label="Ajouter aux favoris">
           <Heart size={19} fill={favorite ? 'currentColor' : 'none'} />
         </button>
       </div>
@@ -1530,12 +1556,13 @@ function HotelCard({ hotel, image, index, active, onSelect }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.045 }}
       whileHover={{ y: -5 }}
-      className={`housing-card overflow-hidden rounded-lg border bg-white shadow-sm ${active ? 'border-blue-400 ring-4 ring-blue-50' : 'border-slate-200'}`}
+      className={`housing-card group overflow-hidden rounded-2xl border bg-white shadow-lg transition-transform transform hover:-translate-y-1 ${active ? 'border-blue-400 ring-4 ring-blue-50' : 'border-slate-100'}`}
     >
       <div className="relative h-52 overflow-hidden">
-        <img src={image} alt={hotel.name} className="h-full w-full object-cover" />
-        <span className="absolute left-3 top-3 rounded-lg bg-white px-3 py-1 text-xs font-black text-blue-950 shadow-sm">{hotel.category}</span>
-        <span className="absolute right-3 top-3 flex items-center gap-1 rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-sm"><Star size={13} fill="currentColor" />{hotel.rating}</span>
+        <img src={image} alt={hotel.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/24 to-transparent opacity-0 group-hover:opacity-60 transition-opacity" />
+        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-black text-blue-950 shadow-md">{hotel.category}</span>
+        <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-md"><Star size={13} fill="currentColor" />{hotel.rating}</span>
       </div>
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
@@ -1575,10 +1602,11 @@ function HotelEmptyState({ title, text }) {
 
 function HotelDetails({ hotel, image }) {
   return (
-    <aside className="sticky top-6 h-fit overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <aside className="sticky top-6 h-fit overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg">
       <div className="relative h-48 overflow-hidden">
         <img src={image} alt={hotel.name} className="h-full w-full object-cover" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-5 text-white">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent p-5 text-white" />
+        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
           <div className="flex items-center gap-2 text-sm font-black"><Star size={16} fill="currentColor" />{hotel.rating} · {hotel.category}</div>
           <h3 className="mt-1 text-xl font-black">{hotel.name}</h3>
         </div>
@@ -1607,8 +1635,8 @@ function HotelDetails({ hotel, image }) {
           <div><span className="font-semibold text-slate-500">Chambre</span><b className="mt-1 block text-slate-950">{hotel.room}</b></div>
           <div><span className="font-semibold text-slate-500">Accès</span><b className="mt-1 block text-slate-950">{hotel.distance}</b></div>
         </div>
-        <button type="button" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20">Réserver cet hôtel <ArrowRight size={18} /></button>
-        <button type="button" className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><MessageCircle size={18} />Demander conseil</button>
+        <button type="button" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-blue-700 font-black text-white shadow-xl transition hover:scale-[1.01]">Réserver cet hôtel <ArrowRight size={18} /></button>
+        <button type="button" className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 font-black text-blue-800"> <MessageCircle size={18} />Demander conseil</button>
       </div>
     </aside>
   )
@@ -3990,21 +4018,23 @@ function Transport() {
           </motion.div>
         </div>
       )}
-      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5 border-b border-slate-100 pb-5">
+      <motion.div initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }} className="transport-hero-banner flex flex-wrap items-center justify-between gap-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:p-7">
+        <img src={transportTicketHero} alt="" aria-hidden="true" className="transport-hero-bg-image" />
         <div className="flex items-start gap-4">
-          <button type="button" className="mt-1 grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700"><ArrowLeft size={20} /></button>
+          <button type="button" className="transport-back-button mt-1 grid h-11 w-11 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700"><ArrowLeft size={20} /></button>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">Billets & Transport</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p>
+            <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-blue-800">Voyage étudiant</span>
+            <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950">Billets & Transport</h1>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p>
           </div>
         </div>
-        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm">
+        <div className="transport-wallet-card ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm">
           <div className="text-xs font-semibold text-slate-500">Mon portefeuille</div>
           <div className="font-black text-emerald-600">1 250,00 €</div>
         </div>
       </motion.div>
 
-      <section className="flex flex-wrap gap-4">
+      <section className="transport-mode-strip flex flex-wrap gap-4 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
         {transportModes.map(([key, label, Icon], index) => (
           <motion.button
             type="button"
@@ -4014,7 +4044,7 @@ function Transport() {
             whileHover={{ y: -3 }}
             onClick={() => switchTransportMode(key)}
             key={key}
-            className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${activeMode === key ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}
+            className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${activeMode === key ? 'is-active border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}
           >
             <Icon size={22} />{label}
           </motion.button>
@@ -4023,23 +4053,23 @@ function Transport() {
 
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
         <div className="space-y-7">
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <section className="transport-search-panel rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div className="grid gap-4 lg:grid-cols-[1fr_1fr_170px_170px_auto]">
               <TransportSelect label="Départ" value={origin} onChange={setOrigin} options={activeMode === 'flight' ? currentOriginOptions.map((item) => [item, item]) : [['all', 'Tous les départs'], ...currentOriginOptions.map((item) => [item, item])]} />
               <TransportSelect label="Arrivée" value={destination} onChange={setDestination} options={activeMode === 'flight' ? currentDestinationOptions.map((item) => [item, item]) : [['all', 'Toutes les arrivées'], ...currentDestinationOptions.map((item) => [item, item])]} />
-              <label className="block rounded-lg border border-slate-200 px-4 py-3">
+              <label className="transport-select-field block rounded-lg border border-slate-200 px-4 py-3">
                 <span className="text-xs font-bold text-slate-500">Jour départ</span>
                 <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
               </label>
-              <label className="block rounded-lg border border-slate-200 px-4 py-3">
+              <label className="transport-select-field block rounded-lg border border-slate-200 px-4 py-3">
                 <span className="text-xs font-bold text-slate-500">Jour retour</span>
                 <input type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
               </label>
-              <button type="button" onClick={() => setSelectedId(filteredOptions[0]?.id ?? selectedId)} className="flex h-full min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-7 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
+              <button type="button" onClick={() => setSelectedId(filteredOptions[0]?.id ?? selectedId)} className="transport-primary-action flex h-full min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-7 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
             </div>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <section className="transport-filter-panel rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]">
               <div>
                 <div className="flex justify-between text-xs font-black text-slate-500"><span>Budget max.</span><span>{budgetLabel}</span></div>
@@ -4049,12 +4079,12 @@ function Transport() {
               <TransportSelect label="Escales / arrêts" value={stopFilter} onChange={setStopFilter} options={[['all', 'Tous'], ['direct', 'Direct uniquement'], ['stops', 'Avec escale / arrêt']]} />
               <TransportSelect label="Service" value={serviceFilter} onChange={setServiceFilter} options={[['all', 'Tous'], ['refundable', 'Modifiable'], ['bagage', 'Bagage'], ['wifi', 'Wi-Fi'], ['privé', 'Privé']]} />
               <TransportSelect label="Tri" value={sortBy} onChange={setSortBy} options={[['recommended', 'Recommandés'], ['price', 'Prix croissant'], ['duration', 'Durée'], ['departure', 'Départ']]} />
-              <button type="button" onClick={resetFilters} className="h-full min-h-12 rounded-lg border border-slate-200 px-5 font-black text-blue-800">Réinitialiser</button>
+              <button type="button" onClick={resetFilters} className="transport-reset-button h-full min-h-12 rounded-lg border border-slate-200 px-5 font-black text-blue-800">Réinitialiser</button>
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
+          <section className="transport-results-panel overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="transport-results-header flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
               <h2 className="text-2xl font-black">{activeMode === 'all' ? 'Billets disponibles' : transportModes.find(([key]) => key === activeMode)?.[1]} <span className="text-sm font-bold text-slate-500">{filteredOptions.length} résultat{filteredOptions.length > 1 ? 's' : ''}</span></h2>
               <div className="flex flex-wrap gap-2">
                 <FilterChip active={origin !== 'all'}>{origin === 'all' ? 'Tous départs' : origin}</FilterChip>
@@ -4068,7 +4098,7 @@ function Transport() {
                 {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => setSelectedId(ticket.id)} />)}
               </div>
             ) : flightQuery.isLoading && (activeMode === 'flight' || activeMode === 'all') ? (
-              <div className="p-10 text-center">
+              <div className="transport-loading-state p-10 text-center">
                 <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
                 <h3 className="mt-5 text-xl font-black text-slate-950">Recherche en cours</h3>
                 <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Nous récupérons les offres de vols réelles disponibles pour cet itinéraire.</p>
@@ -4078,7 +4108,23 @@ function Transport() {
             ) : (
               <TransportEmptyState title="Aucun billet ne correspond aux filtres" text="Élargissez le budget, changez le type de transport ou retirez le filtre direct." onReset={resetFilters} />
             )}
-            <div className="m-5 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-amber-50 px-5 py-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><ShieldCheck className="text-amber-500" />Les conditions varient selon le transporteur. Les détails sont vérifiés avant paiement.</span><button className="rounded-lg bg-white px-5 py-3 font-black text-blue-800">Voir les conditions</button></div>
+            <div className="transport-conditions-note m-5 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-amber-50 px-5 py-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><ShieldCheck className="text-amber-500" />Les conditions varient selon le transporteur. Les détails sont vérifiés avant paiement.</span><button className="rounded-lg bg-white px-5 py-3 font-black text-blue-800">Voir les conditions</button></div>
+          </section>
+
+          <section className="transport-side-card transport-secure-card relative overflow-hidden rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
+            <div className="relative z-10 grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+              <div>
+                <h2 className="text-xl font-black">Réservation sécurisée</h2>
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  {['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}
+                </div>
+              </div>
+              <div className="secure-visual relative hidden h-28 w-40 md:block">
+                <div className="absolute right-0 top-2 grid h-24 w-24 place-items-center rounded-[28px] bg-blue-700 text-white shadow-lg shadow-blue-700/25"><Lock size={34} /></div>
+                <ShieldCheck className="absolute right-20 top-0 text-blue-900" size={34} />
+                <CreditCard className="absolute bottom-0 left-0 rounded-2xl bg-white p-2 text-blue-700 shadow-md" size={46} />
+              </div>
+            </div>
           </section>
 
         </div>
@@ -4113,14 +4159,14 @@ function Transport() {
               <div className="flex justify-between text-sm font-semibold text-slate-500"><span>Prix sélectionné</span><b className="text-xl text-blue-800">{selectedTicket ? formatTicketPrice(selectedTicket) : '-'}</b></div>
               <div className="mt-2 text-xs font-bold text-slate-500">{selectedTicket?.baggage ?? 'Sélectionnez un billet'}</div>
             </div>
-            <button type="button" disabled={!selectedTicket} onClick={() => setReservationOpen(true)} className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white disabled:bg-slate-300">Continuer vers la réservation</button>
+            <button type="button" disabled={!selectedTicket} onClick={() => setReservationOpen(true)} className="transport-primary-action mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white disabled:bg-slate-300">Continuer vers la réservation</button>
           </section>
           <section className="transport-side-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black">Transport sur place</h2>
             <p className="mt-1 text-sm font-semibold text-slate-500">Réservez votre trajet à l'arrivée</p>
             <div className="mt-5 divide-y divide-slate-100">
               {[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport", 'text-blue-700 bg-blue-50', 'local'], [Train, 'Tram / Métro', 'Déplacements en ville', 'text-indigo-700 bg-indigo-50', 'local'], [Bus, 'Bus', 'Lignes régulières', 'text-emerald-700 bg-emerald-50', 'bus'], [Car, 'Chauffeur', 'Trajet privé avec chauffeur', 'text-slate-900 bg-slate-100', 'driver']].map(([Icon, title, sub, tone, mode]) => (
-                <button type="button" onClick={() => switchTransportMode(mode)} className="group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
+                <button type="button" onClick={() => switchTransportMode(mode)} className="transport-local-button group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
                   <span className="flex min-w-0 items-center gap-4">
                     <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}><Icon size={21} /></span>
                     <span className="min-w-0"><b>{title}</b><span className="mt-1 block text-sm font-semibold text-slate-500">{sub}</span></span>
@@ -4128,21 +4174,6 @@ function Transport() {
                   <ChevronDown className="-rotate-90 text-slate-400 transition group-hover:text-blue-700" size={18} />
                 </button>
               ))}
-            </div>
-          </section>
-          <section className="transport-side-card transport-secure-card relative overflow-hidden rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-            <div className="relative z-10 grid grid-cols-[1fr_auto] gap-4">
-              <div>
-                <h2 className="text-xl font-black">Réservation sécurisée</h2>
-                <div className="mt-5 space-y-3">
-                  {['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}
-                </div>
-              </div>
-              <div className="secure-visual relative hidden h-36 w-28 sm:block">
-                <div className="absolute right-0 top-4 grid h-24 w-24 place-items-center rounded-[28px] bg-blue-700 text-white shadow-lg shadow-blue-700/25"><Lock size={34} /></div>
-                <ShieldCheck className="absolute right-7 top-0 text-blue-900" size={34} />
-                <CreditCard className="absolute bottom-0 left-0 rounded-2xl bg-white p-2 text-blue-700 shadow-md" size={46} />
-              </div>
             </div>
           </section>
         </aside>
@@ -4176,7 +4207,7 @@ function Transport() {
 
 function TransportSelect({ label, value, onChange, options }) {
   return (
-    <label className="block rounded-lg border border-slate-200 px-4 py-3">
+    <label className="transport-select-field block rounded-lg border border-slate-200 px-4 py-3">
       <span className="text-xs font-bold text-slate-500">{label}</span>
       <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none">
         {options.map(([optionValue, labelValue]) => <option key={optionValue} value={optionValue}>{labelValue}</option>)}
@@ -4186,7 +4217,7 @@ function TransportSelect({ label, value, onChange, options }) {
 }
 
 function FilterChip({ active, children }) {
-  return <span className={`rounded-full px-3 py-1 text-xs font-black ${active ? 'bg-blue-50 text-blue-800' : 'bg-slate-100 text-slate-500'}`}>{children}</span>
+  return <span className={`transport-filter-chip rounded-full px-3 py-1 text-xs font-black ${active ? 'bg-blue-50 text-blue-800' : 'bg-slate-100 text-slate-500'}`}>{children}</span>
 }
 
 function TransportEmptyState({ title, text, onReset }) {
@@ -4534,16 +4565,16 @@ function BriefcaseIcon() {
 
 function TicketRow({ ticket, index, selected, onSelect }) {
   return (
-    <motion.article initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className={`grid items-center gap-5 p-6 lg:grid-cols-[1.25fr_0.9fr_1fr_0.9fr_0.9fr_auto] ${selected ? 'bg-blue-50/55' : ''}`}>
+    <motion.article initial={{ opacity: 0, y: 18, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: index * 0.035, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} className={`transport-ticket-row grid items-center gap-5 p-6 lg:grid-cols-[1.25fr_0.9fr_1fr_0.9fr_0.9fr_auto] ${selected ? 'is-selected bg-blue-50/55' : ''}`}>
       <div className="flex items-center gap-4">
-        <img src={ticket.logo} alt={ticket.provider} className="h-16 w-16 rounded-lg border border-slate-100 bg-white object-contain p-2" />
+        <img src={ticket.logo} alt={ticket.provider} className="transport-ticket-logo h-16 w-16 rounded-lg border border-slate-100 bg-white object-contain p-2" />
         <div><div className="font-black">{ticket.provider}</div><div className="text-sm font-semibold text-slate-500">{ticket.code}</div><div className="mt-2 flex flex-wrap gap-2">{ticket.tags.slice(0, 2).map((tag) => <FilterChip key={tag} active>{tag}</FilterChip>)}</div></div>
       </div>
       <div><div className="text-2xl font-black">{ticket.departure}</div><div className="text-sm font-bold">{ticket.origin}</div></div>
       <div className="text-center"><div className="font-bold">{ticket.duration}</div><div className={`mt-2 text-sm font-bold ${ticket.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{ticket.stopLabel}</div></div>
       <div><div className="text-2xl font-black">{ticket.arrival}</div><div className="text-sm font-bold">{ticket.destination}</div></div>
       <div><div className="text-2xl font-black text-blue-800">{formatTicketPrice(ticket)}</div><div className="text-sm font-semibold text-slate-500">{ticket.className}</div></div>
-      <div className="space-y-3"><button type="button" onClick={onSelect} className={`h-11 rounded-lg px-8 font-black ${selected ? 'bg-slate-950 text-white' : 'bg-blue-700 text-white'}`}>{selected ? 'Sélectionné' : 'Choisir'}</button><button type="button" onClick={onSelect} className="block w-full text-sm font-black text-blue-800">Détails</button></div>
+      <div className="space-y-3"><button type="button" onClick={onSelect} className={`transport-ticket-button h-11 rounded-lg px-8 font-black ${selected ? 'bg-slate-950 text-white' : 'bg-blue-700 text-white'}`}>{selected ? 'Sélectionné' : 'Choisir'}</button><button type="button" onClick={onSelect} className="block w-full text-sm font-black text-blue-800">Détails</button></div>
     </motion.article>
   )
 }
