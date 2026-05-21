@@ -7,10 +7,10 @@ import {
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
-  X, Video, SlidersHorizontal,
+  X, Video, SlidersHorizontal, LogOut, Camera, Plus, Trash2, Clock3, AlertTriangle,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import universityHero from './assets/university-student-hero.png'
 import supportHero from './assets/support-student-hero.png'
 import dashboardStudentHero from './assets/dashboard-african-student.png'
@@ -239,32 +239,60 @@ function AccountPage() {
 }
 
 function Shell() {
-  const [open, setOpen] = useState(false)
   const [languageOpen, setLanguageOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [sidebarHover, setSidebarHover] = useState(false)
+  const location = useLocation()
+  const isSettingsPage = location.pathname.startsWith('/parametres')
+  const sidebarOpen = sidebarHover
+
+  if (isSettingsPage) {
+    return (
+      <div className="min-h-screen bg-[#f7f8fb] text-slate-950">
+        <main className="p-5 lg:p-8"><AnimatedRoutes /></main>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
-      {open && <button type="button" className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px]" aria-label="Fermer la navigation" onClick={() => setOpen(false)} />}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 overflow-hidden rounded-r-2xl bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 transition ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-full min-h-0 flex-col p-6">
-          <div className="flex items-center justify-between">
-            <Logo />
-            <button type="button" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-lg text-blue-100 hover:bg-white/10" aria-label="Fermer la navigation"><X size={22} /></button>
+    <div className="app-shell min-h-screen bg-slate-50 text-slate-950">
+      {settingsOpen && <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Fermer le menu paramètres" onClick={() => setSettingsOpen(false)} />}
+      <aside
+        onMouseEnter={() => setSidebarHover(true)}
+        onMouseLeave={() => setSidebarHover(false)}
+        className={`shell-sidebar fixed inset-y-0 left-0 z-50 overflow-hidden bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 ${sidebarOpen ? 'is-open' : ''}`}
+      >
+        <div className="flex h-full min-h-0 flex-col p-4">
+          <div className="flex h-14 items-center gap-3">
+            <div className="rail-menu-button grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" aria-hidden="true">
+              <img src="/studyway-menu-logo.jpeg" alt="" className="h-10 w-10 rounded-xl object-cover" />
+            </div>
+            <div className="sidebar-brand min-w-0">
+              <div>
+                <div className="text-2xl font-black tracking-tight text-white">Study<span className="text-blue-300">Way</span></div>
+                <div className="text-[11px] font-medium text-blue-100">Votre avenir, notre mission</div>
+              </div>
+            </div>
           </div>
-          <nav className="sidebar-nav mt-10 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">{navItems.map(({ label, icon: Icon, to, badge }) => <NavLink key={label} to={to} onClick={() => setOpen(false)} className={({ isActive }) => `flex h-12 items-center gap-3 rounded-lg px-4 text-sm font-bold transition ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}><Icon size={21} /><span className="flex-1">{label}</span>{badge && <span className="grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}</NavLink>)}</nav>
-          <div className="mt-6 shrink-0 rounded-lg border border-white/10 bg-blue-600/20 p-5"><div className="font-black">Besoin d'aide ?</div><p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p><Link to="/messages" onClick={() => setOpen(false)} className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Message</span><span className="message-menu-badge">3</span></Link></div>
+          <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+            {navItems.map(({ label, icon: Icon, to, badge }) => (
+              <NavLink key={label} to={to} className={({ isActive }) => `shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold transition ${isActive ? 'is-active bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}>
+                <Icon className="shell-nav-icon shrink-0" size={22} />
+                <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
+                {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="sidebar-scroll-cue grid place-items-center text-blue-100"><ChevronDown size={22} /></div>
+          <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
+            <div className="font-black">Besoin d'aide ?</div>
+            <p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p>
+            <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Message</span><span className="message-menu-badge">3</span></Link>
+          </div>
         </div>
       </aside>
-      <div>
-        <header className="sticky top-0 z-30 grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
-          <div>
-            <button type="button" onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg transition hover:bg-slate-200" aria-label="Ouvrir la navigation">
-              <span className="flex flex-col gap-1.5">
-                <span className="block h-0.5 w-7 rounded-full bg-black" />
-                <span className="block h-0.5 w-7 rounded-full bg-black" />
-                <span className="block h-0.5 w-7 rounded-full bg-black" />
-              </span>
-            </button>
-          </div>
+      <div className={`shell-content ${sidebarOpen ? 'is-compressed' : ''}`}>
+        <header className="sticky top-0 z-30 grid h-20 grid-cols-[1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
           <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -277,7 +305,10 @@ function Shell() {
             </div>
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
-            <Link to="/parametres" className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100" aria-label="Paramètres"><Settings size={22} /></Link>
+            <div className="relative z-50">
+              <button type="button" onClick={() => setSettingsOpen((value) => !value)} className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100" aria-label="Paramètres"><Settings size={22} /></button>
+              {settingsOpen && <SettingsDropdown onClose={() => setSettingsOpen(false)} />}
+            </div>
           </div>
         </header>
         <main className="p-5 lg:p-8"><AnimatedRoutes /></main>
@@ -311,6 +342,10 @@ function AnimatedRoutes() {
         <Route path="/guides/:slug" element={<StudentGuideDetail />} />
         <Route path="/guides" element={<StudentGuides />} />
         <Route path="/profil" element={<Profile />} />
+        <Route path="/parametres" element={<ProfileSettings />} />
+        <Route path="/parametres/facturation" element={<BillingSettings />} />
+        <Route path="/parametres/paiement" element={<PaymentSettings />} />
+        <Route path="/parametres/connexions" element={<LoginHistorySettings />} />
         <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
         <Route path="/visa/:country/:type/demande" element={<VisaApplication />} />
@@ -328,6 +363,225 @@ function AnimatedRoutes() {
 
 function PageTitle({ title, subtitle }) {
   return <div className="mb-8"><h1 className="text-3xl font-black tracking-tight">{title}</h1><p className="mt-1 text-slate-500">{subtitle}</p></div>
+}
+
+function SettingsDropdown({ onClose }) {
+  const navigate = useNavigate()
+  const items = [
+    [UserRound, 'Modifier le profil', '/parametres'],
+    [FileText, 'Adresses de facturation', '/parametres/facturation'],
+    [CreditCard, 'Méthodes de paiement', '/parametres/paiement'],
+    [Clock3, 'Historique de connexion', '/parametres/connexions'],
+  ]
+  const openPage = (to) => {
+    onClose()
+    navigate(to)
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12, scale: 0.96, filter: 'blur(8px)' }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+      className="settings-dropdown absolute right-0 top-14 w-[324px] rounded-[20px] border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-300/60"
+    >
+      <div className="px-1 pb-4">
+        <div className="text-[15px] font-black leading-6 text-slate-800">Lemouel jonadab AMAH-TCHTOUTCHOUI</div>
+        <div className="mt-1 text-sm font-semibold text-slate-500">jaceamah14@gmail.com</div>
+      </div>
+      <div className="space-y-2">
+        {items.map(([Icon, label, to], index) => (
+          <motion.div key={label} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 + index * 0.035 }}>
+            <button type="button" onClick={() => openPage(to)} className={`flex w-full cursor-pointer items-center gap-5 rounded-xl border px-4 py-3.5 text-left text-[15px] font-black shadow-sm transition ${index === 0 ? 'border-blue-600 bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-700' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>
+              <Icon size={23} className={index === 0 ? 'text-white' : 'text-slate-500'} />
+              {label}
+            </button>
+          </motion.div>
+        ))}
+      </div>
+      <div className="my-4 h-px bg-slate-200" />
+      <Link to="/login" onClick={onClose} className="flex items-center gap-5 rounded-xl px-4 py-3.5 text-[15px] font-black text-slate-700 transition hover:bg-rose-50 hover:text-rose-700">
+        <LogOut size={23} className="text-slate-500" />
+        Déconnexion
+      </Link>
+    </motion.div>
+  )
+}
+
+function SettingsPageFrame({ title, children }) {
+  return (
+    <div className="settings-page -m-5 min-h-screen overflow-hidden bg-[#f7f8fb] px-6 py-8 text-slate-950 lg:-m-8 lg:px-[58px]">
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }} className="mb-8 flex items-center justify-between gap-5">
+        <div className="flex items-center gap-4">
+          <Link to="/" className="grid h-12 w-12 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-md shadow-slate-200/70"><ChevronDown className="rotate-90" size={22} /></Link>
+          <h1 className="text-2xl font-black tracking-tight">{title}</h1>
+        </div>
+        <div className="hidden items-center gap-3 text-sm font-semibold text-slate-500 lg:flex">Explorer <ChevronDown className="-rotate-90" size={16} /> <span className="text-slate-800">{title}</span></div>
+      </motion.div>
+      <motion.div
+        className="mx-auto max-w-[1420px]"
+        initial={{ opacity: 0, y: 20, scale: 0.985, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  )
+}
+
+function SettingsProfileCard() {
+  return (
+    <motion.aside initial={{ opacity: 0, x: -28, scale: 0.985 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }} className="min-h-[635px] rounded-xl border border-slate-200 bg-white px-8 py-9 shadow-sm">
+      <div className="flex flex-col items-center text-center">
+        <div className="relative">
+          <img src={avatars.kossi} alt="Lemouel jonadab AMAH-TCHTOUTCHOUI" className="h-28 w-28 rounded-full border-4 border-blue-100 object-cover" />
+          <span className="absolute bottom-1 right-0 grid h-10 w-10 place-items-center rounded-full bg-amber-400 text-white shadow-lg shadow-amber-200"><Camera size={18} /></span>
+        </div>
+        <h2 className="mt-8 max-w-[310px] text-2xl font-black leading-tight">Lemouel jonadab AMAH-TCHTOUTCHOUI</h2>
+        <p className="mt-2 font-semibold text-slate-500">jaceamah14@gmail.com</p>
+      </div>
+      <div className="my-8 h-px bg-slate-200" />
+      <div className="space-y-5 text-sm">
+        <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Membre depuis</span><b>20.05.2026</b></div>
+        <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Commandes totales</span><b>0</b></div>
+      </div>
+      <div className="mt-9 space-y-5 pl-3">
+        <SettingsSideLink icon={WalletCards} label="Adresse de facturation" to="/parametres/facturation" />
+        <SettingsSideLink icon={CreditCard} label="Méthodes de paiement" to="/parametres/paiement" />
+        <SettingsSideLink icon={Clock3} label="Historique de connexion" to="/parametres/connexions" />
+      </div>
+    </motion.aside>
+  )
+}
+
+function SettingsSideLink({ icon: Icon, label, to }) {
+  const navigate = useNavigate()
+  return <button type="button" onClick={() => navigate(to)} className="flex w-full items-center gap-4 rounded-xl px-3 py-2 text-left font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800"><Icon size={20} className="text-slate-400" />{label}</button>
+}
+
+function SettingsActionCard({ icon: Icon, title, text, tone = 'blue', danger = false, index = 0 }) {
+  const toneClass = danger ? 'bg-rose-50 text-rose-600' : tone === 'purple' ? 'bg-violet-50 text-violet-600' : 'bg-blue-50 text-amber-500'
+  return (
+    <motion.button initial={{ opacity: 0, x: 34, scale: 0.985 }} animate={{ opacity: 1, x: 0, scale: 1 }} whileHover={{ y: -4 }} transition={{ delay: 0.12 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className={`flex min-h-[122px] w-full items-center gap-4 rounded-xl border p-7 text-left shadow-sm ${danger ? 'border-rose-200 bg-rose-50/70' : 'border-slate-200 bg-white'}`}>
+      <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-lg ${toneClass}`}><Icon size={23} /></span>
+      <span><span className={`block text-xl font-black ${danger ? 'text-rose-700' : 'text-slate-950'}`}>{title}</span><span className={`mt-1 block text-sm font-semibold ${danger ? 'text-red-600' : 'text-slate-500'}`}>{text}</span></span>
+    </motion.button>
+  )
+}
+
+function ProfileSettings() {
+  return (
+    <SettingsPageFrame title="Paramètres du profil">
+      <div className="grid gap-8 xl:grid-cols-[450px_1fr]">
+        <SettingsProfileCard />
+        <div className="space-y-8">
+          <SettingsActionCard icon={UserRound} title="Informations personnelles" text="Mettez à jour vos informations personnelles et vos préférences de contact." index={0} />
+          <SettingsActionCard icon={Lock} title="Changer le mot de passe" text="Utilisez un mot de passe fort pour sécuriser votre compte." tone="purple" index={1} />
+          <SettingsActionCard icon={Trash2} title="Supprimer le compte" text="Si vous souhaitez supprimer définitivement votre compte, utilisez le bouton ci-dessous." danger index={2} />
+        </div>
+      </div>
+    </SettingsPageFrame>
+  )
+}
+
+function BillingSettings() {
+  return (
+    <SettingsPageFrame title="Adresses de facturation">
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-wrap items-end justify-between gap-5">
+        <div><h2 className="text-3xl font-black">Adresses de facturation</h2><p className="mt-3 font-semibold text-slate-500">Ajoutez, modifiez ou supprimez vos adresses de facturation.</p></div>
+        <button className="flex h-14 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={22} />Ajouter une adresse</button>
+      </motion.div>
+      <motion.section initial={{ opacity: 0, y: 24, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.36 }} className="grid min-h-[360px] place-items-center rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="text-center">
+          <WalletCards className="mx-auto text-slate-300" size={68} />
+          <h3 className="mt-8 text-xl font-black">Aucune adresse trouvée</h3>
+          <p className="mt-4 font-semibold text-slate-500">Vous n'avez pas encore ajouté d'adresse de facturation.</p>
+          <button className="mt-6 inline-flex h-12 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={20} />Ajoutez votre première adresse</button>
+        </div>
+      </motion.section>
+      <SettingsBackLink />
+    </SettingsPageFrame>
+  )
+}
+
+function PaymentSettings() {
+  return (
+    <SettingsPageFrame title="Méthodes de paiement">
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <h2 className="text-3xl font-black">Méthodes de paiement</h2>
+        <p className="mt-3 font-semibold text-slate-500">Gérez vos méthodes de paiement.</p>
+      </motion.div>
+      <div className="grid gap-7 xl:grid-cols-2">
+        <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} />
+        <PaymentMethodCard icon={ZapIcon} title="Portefeuille crypto" text="Entrez les détails de votre portefeuille crypto." tone="orange" index={1} />
+      </div>
+      <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }} className="mt-8 rounded-xl border border-blue-200 bg-blue-50 p-7">
+        <div className="flex gap-5">
+          <Info className="mt-1 shrink-0 text-amber-500" size={24} />
+          <div><h3 className="font-black text-blue-950">Informations de versement</h3><p className="mt-3 font-semibold leading-7 text-blue-800">Vos gains sont versés selon la méthode spécifiée ici. Veuillez vous assurer que vos informations sont correctes.</p></div>
+        </div>
+      </motion.section>
+      <SettingsBackLink />
+    </SettingsPageFrame>
+  )
+}
+
+function ZapIcon(props) {
+  return <Send {...props} />
+}
+
+function PaymentMethodCard({ icon: Icon, title, text, tone, index = 0 }) {
+  const toneClass = tone === 'orange' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-amber-500'
+  return (
+    <motion.button initial={{ opacity: 0, y: 28, scale: 0.97, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }} whileHover={{ y: -4 }} transition={{ delay: 0.1 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="flex min-h-28 items-center justify-between rounded-xl border border-slate-200 bg-white p-7 text-left shadow-sm">
+      <span className="flex items-center gap-4"><span className={`grid h-[60px] w-[60px] shrink-0 place-items-center rounded-lg ${toneClass}`}><Icon size={24} /></span><span><b className="text-2xl">{title}</b><span className="mt-2 block font-semibold text-slate-500">{text}</span></span></span>
+      {tone !== 'orange' && <ChevronDown size={24} className="text-slate-400" />}
+    </motion.button>
+  )
+}
+
+function LoginHistorySettings() {
+  const rows = [
+    ['21.05.2026', '05:29:25', '46.193.66.49', 'Chrome 147.0.0.0 / Windows 10', 'Chrome 147.0.0.0', 'Aubervilliers, France', 'Session active'],
+    ['20.05.2026', '19:02:28', '46.193.66.49', 'Chrome 147.0.0.0 / Windows 10', 'Chrome 147.0.0.0', 'Aubervilliers, France', 'Réussi'],
+  ]
+  const tips = [
+    [CheckCircle2, 'Vérification régulière', 'Vérifiez régulièrement votre historique de connexion et identifie...', 'bg-blue-50 text-amber-500'],
+    [AlertTriangle, 'Activité suspecte', 'Si vous remarquez une connexion non reconnue, changez...', 'bg-rose-50 text-rose-600'],
+    [Lock, 'Mot de passe fort', 'Utilisez un mot de passe fort et unique pour protéger votre compte.', 'bg-emerald-50 text-emerald-600'],
+    [LogOut, 'Déconnexion', "N'oubliez pas de vous déconnecter après avoir utilisé des apps.", 'bg-amber-50 text-amber-600'],
+  ]
+
+  return (
+    <SettingsPageFrame title="Historique de connexion">
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <h2 className="text-3xl font-black">Historique de connexion</h2>
+        <p className="mt-3 font-semibold text-slate-500">Consultez toutes les activités de connexion de votre compte.</p>
+      </motion.div>
+      <motion.section initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-blue-200 bg-blue-50 p-7">
+        <h3 className="flex items-center gap-3 font-black text-blue-950"><Info className="text-amber-500" size={22} />Conseils de sécurité</h3>
+        <div className="mt-6 grid gap-4 md:grid-cols-4">
+          {tips.map(([Icon, title, text, tone], index) => <motion.div key={title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="flex gap-4 rounded-lg bg-white p-4"><span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}><Icon size={18} /></span><span><b className="text-sm">{title}</b><span className="mt-1 block text-sm font-semibold leading-5 text-slate-500">{text}</span></span></motion.div>)}
+        </div>
+      </motion.section>
+      <motion.section initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mt-8 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="grid min-w-[1180px] grid-cols-[190px_180px_1.25fr_1fr_1fr_140px] border-b border-slate-200 px-8 py-5 text-xs font-black uppercase tracking-wide text-slate-500">
+          <span>Date / Heure</span><span>Adresse IP</span><span>Appareil</span><span>Navigateur</span><span>Localisation</span><span>Statut</span>
+        </div>
+        {rows.map(([date, time, ip, device, browser, location, status], index) => (
+          <div key={`${date}-${time}`} className={`grid min-w-[1180px] grid-cols-[190px_180px_1.25fr_1fr_1fr_140px] items-center px-8 py-6 font-semibold ${index === 0 ? 'bg-emerald-50/40' : ''}`}>
+            <span><b className="block">{date}</b><span className="text-sm text-slate-500">{time}</span></span><span>{ip}</span><span>{device}</span><span>{browser}</span><span>{location}</span><span className="w-fit rounded-full bg-emerald-100 px-3 py-1 text-sm font-black text-emerald-700">{status}</span>
+          </div>
+        ))}
+      </motion.section>
+      <SettingsBackLink />
+    </SettingsPageFrame>
+  )
+}
+
+function SettingsBackLink() {
+  return <Link to="/parametres" className="mt-8 inline-flex items-center gap-3 font-semibold text-slate-500 hover:text-blue-800"><ArrowRight className="rotate-180" size={18} />Retour au profil</Link>
 }
 
 function StatCard({ icon: Icon, label, value, tone = 'blue' }) {
