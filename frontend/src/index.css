@@ -96,7 +96,7 @@ a:hover {
   --sidebar-ease: cubic-bezier(0.19, 1, 0.22, 1);
   --sidebar-fast: cubic-bezier(0.16, 1, 0.3, 1);
   width: 82px;
-  border-radius: 0 20px 20px 0;
+  border-radius: 0;
   transform: translateZ(0);
   transition:
     width 520ms var(--sidebar-ease),
@@ -144,7 +144,7 @@ a:hover {
 
 .shell-sidebar.is-open {
   width: 292px;
-  border-radius: 0 30px 30px 0;
+  border-radius: 0;
   box-shadow:
     24px 0 62px rgba(15, 23, 42, 0.2),
     0 22px 54px rgba(37, 99, 235, 0.14),
@@ -186,7 +186,7 @@ a:hover {
   content: "";
   position: absolute;
   inset: -7px;
-  border-radius: 22px;
+  border-radius: 0;
   border: 1px solid rgba(125, 211, 252, 0.22);
   opacity: 0;
   transform: scale(0.88);
@@ -292,7 +292,7 @@ a:hover {
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: 18px;
+  border-radius: 0;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(125, 211, 252, 0.14)),
     linear-gradient(180deg, rgba(59, 130, 246, 0.28), rgba(14, 165, 233, 0.1));
@@ -311,7 +311,7 @@ a:hover {
   height: 2.35rem;
   flex: 0 0 2.35rem;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 0;
   transform: translate3d(0, 0, 0);
   transition:
     transform 420ms var(--sidebar-fast),
@@ -336,10 +336,9 @@ a:hover {
 }
 
 .shell-nav-link:hover .shell-nav-icon-wrap {
-  background: rgba(255, 255, 255, 0.08);
+  background: transparent;
   box-shadow:
-    0 10px 24px rgba(14, 165, 233, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.11);
+    0 10px 24px rgba(14, 165, 233, 0.1);
   transform: translate3d(2px, 0, 0) scale(1.04);
 }
 
@@ -348,10 +347,9 @@ a:hover {
 }
 
 .shell-nav-link.is-active .shell-nav-icon-wrap {
-  background: rgba(255, 255, 255, 0.13);
+  background: transparent;
   box-shadow:
-    0 11px 24px rgba(56, 189, 248, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.13) inset;
+    0 11px 24px rgba(56, 189, 248, 0.14);
 }
 
 .shell-nav-link.is-active .shell-nav-icon {
@@ -421,7 +419,7 @@ a:hover {
   justify-content: center;
   gap: 0;
   padding: 0;
-  border-radius: 18px;
+  border-radius: 0;
   color: rgba(239, 246, 255, 0.9) !important;
   transform: translate3d(0, 0, 0) scale(0.985);
 }
@@ -432,10 +430,9 @@ a:hover {
 
 .shell-sidebar:not(.is-open) .shell-nav-link:hover .shell-nav-icon-wrap {
   transform: scale(1.07);
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   box-shadow:
-    0 0 24px rgba(125, 211, 252, 0.18),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.13);
+    0 0 24px rgba(125, 211, 252, 0.16);
 }
 
 .shell-sidebar:not(.is-open) .shell-nav-link.is-active {
@@ -443,8 +440,8 @@ a:hover {
 }
 
 .shell-sidebar:not(.is-open) .shell-nav-active-pill {
-  inset: 3px;
-  border-radius: 18px;
+  inset: 3px 0;
+  border-radius: 0;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(125, 211, 252, 0.2)),
     linear-gradient(180deg, rgba(59, 130, 246, 0.34), rgba(14, 165, 233, 0.14));
