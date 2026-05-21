@@ -268,22 +268,6 @@ function Shell() {
 
   return (
     <div className="app-shell min-h-screen bg-slate-50 text-slate-950">
-      <AnimatePresence>
-        {settingsOpen && (
-          <motion.div className="settings-modal-layer fixed inset-0 z-[90] grid place-items-center px-4 py-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
-            <motion.button
-              type="button"
-              aria-label="Fermer les paramètres"
-              className="settings-modal-backdrop absolute inset-0"
-              onClick={() => setSettingsOpen(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            <SettingsHubWindow onClose={() => setSettingsOpen(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
       <aside
         onMouseEnter={() => setSidebarHover(true)}
         onMouseLeave={() => setSidebarHover(false)}
@@ -345,7 +329,24 @@ function Shell() {
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
             <div className="relative z-50">
-              <button type="button" onClick={() => setSettingsOpen(true)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute || settingsOpen ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
+              <button type="button" onClick={() => setSettingsOpen((value) => !value)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute || settingsOpen ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
+              <AnimatePresence>
+                {settingsOpen && (
+                  <>
+                    <motion.button
+                      type="button"
+                      aria-label="Fermer les paramètres"
+                      className="settings-popover-backdrop fixed inset-0 z-[70]"
+                      onClick={() => setSettingsOpen(false)}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.16 }}
+                    />
+                    <SettingsHubWindow onClose={() => setSettingsOpen(false)} />
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
@@ -417,11 +418,12 @@ function SettingsHubWindow({ onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label="Paramètres"
-      initial={{ opacity: 0, y: 34, scale: 0.9, rotateX: -7, filter: 'blur(18px)' }}
-      animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: 18, scale: 0.94, filter: 'blur(10px)' }}
-      transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }}
-      className="settings-hub-window relative w-full max-w-[430px] border border-slate-200 bg-white/95 p-5 shadow-2xl shadow-slate-950/20 backdrop-blur-xl"
+      initial={{ opacity: 0, x: 22, y: -12, scale: 0.94, rotateX: -8, filter: 'blur(14px)' }}
+      animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, x: 18, y: -8, scale: 0.95, filter: 'blur(10px)' }}
+      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      style={{ transformOrigin: 'top right' }}
+      className="settings-hub-window settings-hub-popover relative w-full max-w-[430px] border border-slate-200 bg-white/95 p-5 shadow-2xl shadow-slate-950/20 backdrop-blur-xl"
     >
       <div className="flex items-start justify-between gap-5 px-1 pb-5">
         <div>
@@ -1341,6 +1343,7 @@ function Housing() {
                   </div>
                 </div>
                 <motion.div initial={{ opacity: 0, x: 26, scale: 0.97 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.14, duration: 0.54, ease: [0.16, 1, 0.3, 1] }} className="housing-hero-photo-stage">
+                  <span className="housing-hero-image-glow" aria-hidden="true" />
                   <img src={housingStudentHero} alt="Studio étudiant moderne" className="housing-hero-slide housing-hero-slide-student" />
                   <img src={housingHotelHero} alt="Chambre d'hôtel moderne" className="housing-hero-slide housing-hero-slide-hotel" />
                   <div className="housing-hero-rating-card">
@@ -1361,8 +1364,8 @@ function Housing() {
                   <div>
                     <h2 className="text-2xl font-black text-slate-950">Logements étudiants</h2>
                     <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Résidences, studios, chambres et colocations pour une installation durable près du campus.</p>
-                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
-                      {['Bail étudiant', 'Dossier accompagné', 'Quartiers vérifiés'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black">
+                      {['Bail étudiant', 'Dossier accompagné', 'Quartiers vérifiés'].map((item) => <span key={item} className="housing-choice-chip housing-choice-chip-blue rounded-full px-3 py-1">{item}</span>)}
                     </div>
                   </div>
                   <span className="self-center rounded-lg bg-blue-700 p-3 text-white"><ArrowRight size={20} /></span>
@@ -1372,8 +1375,8 @@ function Housing() {
                   <div>
                     <h2 className="text-2xl font-black text-slate-950">Hôtels</h2>
                     <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Hôtels disponibles pour arrivée, rendez-vous visa, séjour court ou transition avant le logement final.</p>
-                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
-                      {['Réservation rapide', 'Avantages inclus', 'Détails transparents'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black">
+                      {['Réservation rapide', 'Avantages inclus', 'Détails transparents'].map((item) => <span key={item} className="housing-choice-chip housing-choice-chip-emerald rounded-full px-3 py-1">{item}</span>)}
                     </div>
                   </div>
                   <span className="self-center rounded-lg bg-emerald-600 p-3 text-white"><ArrowRight size={20} /></span>
