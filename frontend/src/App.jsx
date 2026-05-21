@@ -263,7 +263,7 @@ function Shell() {
         className={`shell-sidebar fixed inset-y-0 left-0 z-50 overflow-hidden bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 ${sidebarOpen ? 'is-open' : ''}`}
       >
         <div className="flex h-full min-h-0 flex-col p-4">
-          <div className="flex h-14 items-center gap-3">
+          <div className="sidebar-header flex h-14 items-center gap-3">
             <div className="rail-menu-button grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" aria-hidden="true">
               <img src="/studyway-menu-logo.jpeg" alt="" className="h-10 w-10 rounded-xl object-cover" />
             </div>
@@ -276,7 +276,7 @@ function Shell() {
           </div>
           <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
             {navItems.map(({ label, icon: Icon, to, badge }) => (
-              <NavLink key={label} to={to} className={({ isActive }) => `shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold transition ${isActive ? 'is-active bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-blue-50 hover:bg-white/10'}`}>
+              <NavLink key={label} to={to} className={({ isActive }) => `shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold transition ${isActive ? 'is-active' : 'text-blue-50 hover:bg-white/10'}`}>
                 <Icon className="shell-nav-icon shrink-0" size={22} />
                 <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
                 {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
