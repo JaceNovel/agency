@@ -40,4 +40,17 @@ return [
         'exports_json_url' => env('PARCOURSUP_EXPORTS_JSON_URL', 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-parcoursup/exports/json'),
     ],
 
+    'duffel' => [
+        'access_token' => env('DUFFEL_ACCESS_TOKEN'),
+        'version' => env('DUFFEL_VERSION', 'v2'),
+        'base_url' => env('DUFFEL_BASE_URL', 'https://api.duffel.com'),
+    ],
+
+    'moneroo' => [
+        'secret_key' => env('MONEROO_SECRET_KEY'),
+        'base_url' => env('MONEROO_BASE_URL', 'https://api.moneroo.io'),
+        'return_url' => env('MONEROO_RETURN_URL', env('APP_URL').'/payments/moneroo/return'),
+        'webhook_secret' => env('MONEROO_WEBHOOK_SECRET'),
+    ],
+
 ];

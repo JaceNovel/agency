@@ -157,6 +157,7 @@ class ParcoursupOpenDataService
             'admission_rate' => $this->numeric($this->field($fields, ['taux_acces_ens', 'taux_acces', 'taux_admission'])),
             'capacity' => (int) $this->numeric($this->field($fields, ['capa_fin', 'capacite', 'capacity'])),
             'website' => $this->field($fields, ['lien_form_psup', 'url_formation', 'website']),
+            'image_url' => $this->field($fields, ['image_url', 'photo_url', 'photo', 'image']),
             'description' => $this->description($formationName, $university, $specialization),
             'tuition' => null,
             'created_at' => $now,

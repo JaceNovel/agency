@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('admission_rate', 5, 2)->nullable()->index();
             $table->unsignedInteger('capacity')->nullable();
             $table->string('website')->nullable();
+            $table->string('image_url')->nullable();
             $table->text('description')->nullable();
             $table->unsignedInteger('tuition')->nullable();
             $table->timestamps();

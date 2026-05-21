@@ -25,6 +25,7 @@ class ParcoursupFormationResource extends JsonResource
             'admission_rate' => $this->admission_rate,
             'capacity' => $this->capacity,
             'website' => $this->website,
+            'image_url' => $this->image_url,
             'description' => $this->description,
             'tuition' => $this->tuition,
             'is_favorite' => (bool) ($this->is_favorite ?? false),

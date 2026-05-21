@@ -1,5 +1,15 @@
 # React + Vite
 
+## University photos
+
+Formation cards first use the `image_url` returned by the API. When no exact
+photo is stored and the formation has coordinates, set `VITE_GOOGLE_MAPS_API_KEY`
+to let the frontend render a Google Street View image for that establishment:
+
+```bash
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
+```
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

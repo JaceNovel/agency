@@ -76,6 +76,7 @@ class ParcoursupFormationRepository
                 'admission_rate',
                 'capacity',
                 'website',
+                'image_url',
                 'description',
                 'tuition',
                 'updated_at',

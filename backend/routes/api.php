@@ -3,6 +3,10 @@
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\DuffelFlightController;
+use App\Http\Controllers\Api\V1\DuffelStayController;
+use App\Http\Controllers\Api\V1\FlightReservationController;
+use App\Http\Controllers\Api\V1\MonerooPaymentController;
 use App\Http\Controllers\Api\V1\ParcoursupFormationController;
 use App\Http\Controllers\Api\V1\ResourceIndexController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +26,28 @@ Route::prefix('v1')->middleware('throttle:api')->group(function (): void {
         Route::get('formations', [ParcoursupFormationController::class, 'index']);
         Route::get('search', [ParcoursupFormationController::class, 'search']);
         Route::get('formations/{id}', [ParcoursupFormationController::class, 'show']);
+    });
+
+    Route::prefix('stays')->group(function (): void {
+        Route::get('hotels', [DuffelStayController::class, 'search']);
+    });
+
+    Route::prefix('flights')->group(function (): void {
+        Route::get('offers', [DuffelFlightController::class, 'search']);
+        Route::get('offers/{offerId}', [DuffelFlightController::class, 'show']);
+        Route::get('offers/{offerId}/seat-maps', [DuffelFlightController::class, 'seatMaps']);
+    });
+
+    Route::prefix('payments/moneroo')->group(function (): void {
+        Route::post('initialize', [MonerooPaymentController::class, 'initialize']);
+        Route::get('{paymentId}/verify', [MonerooPaymentController::class, 'verify']);
+        Route::post('webhook', [MonerooPaymentController::class, 'webhook']);
+    });
+
+    Route::prefix('flight-reservations')->group(function (): void {
+        Route::get('/', [FlightReservationController::class, 'index']);
+        Route::get('{reservation}', [FlightReservationController::class, 'show']);
+        Route::get('{reservation}/ticket', [FlightReservationController::class, 'ticket'])->name('flight-reservations.ticket');
     });
 
     Route::middleware('auth:sanctum')->group(function (): void {
