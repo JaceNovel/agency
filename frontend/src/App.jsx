@@ -1052,17 +1052,35 @@ function Housing() {
         </section>
       </div>
 
-        <section className="-mb-5 rounded-t-2xl bg-slate-500 px-5 py-12 text-white lg:-mb-8 lg:px-8">
-          <h2 className="mb-7 text-center text-2xl font-black">Pourquoi choisir nos logements ?</h2>
-          <div className="grid gap-5 rounded-lg bg-slate-600 p-6 md:grid-cols-4">
+        <motion.section
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.28, once: true }}
+          transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
+          className="housing-why-section -mb-5 overflow-hidden rounded-t-2xl px-5 py-14 text-white lg:-mb-8 lg:px-8"
+        >
+          <div className="mx-auto max-w-6xl text-center">
+            <span className="housing-why-pill inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/15">Logements étudiants vérifiés</span>
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-white">Pourquoi choisir nos logements ?</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-6 text-blue-50/85">Une sélection sécurisée, un paiement protégé et un accompagnement pensé pour arriver sereinement.</p>
+          </div>
+          <div className="mx-auto mt-9 grid max-w-6xl gap-5 md:grid-cols-4">
             {why.map(([Icon, title, text], index) => (
-              <motion.div key={title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="flex gap-4">
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/15 text-white"><Icon size={24} /></div>
-                <div><div className="font-black text-white">{title}</div><p className="mt-2 text-sm leading-6 text-white/80">{text}</p></div>
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ amount: 0.45, once: true }}
+                transition={{ delay: index * 0.09, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="housing-why-card rounded-lg border border-white/15 p-5 text-left shadow-lg shadow-blue-950/10 backdrop-blur"
+              >
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-blue-700 shadow-lg shadow-blue-950/15"><Icon size={24} /></div>
+                <div className="mt-5 font-black text-white">{title}</div>
+                <p className="mt-2 text-sm font-medium leading-6 text-blue-50/82">{text}</p>
               </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
     </div>
   )
 }
@@ -1242,7 +1260,12 @@ function Universities() {
           </div>
         </section>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.18, once: true }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-2xl font-black text-slate-950">Formations disponibles</h2>
             <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${totalResults} résultats`}</span>
@@ -1268,7 +1291,7 @@ function Universities() {
               </motion.button>
             )}
           </div>
-        </section>
+        </motion.section>
       </div>
     </div>
   )
@@ -1290,9 +1313,10 @@ function UniversityResultCard({ formation, index }) {
   const domain = formation.specialization ?? 'Domaine à vérifier'
   const city = formation.city ?? 'France'
   const universityImage = getUniversityCardImage(formation)
+  const shouldAnimateOnScroll = index < 4
 
   return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/70">
+    <motion.article initial={shouldAnimateOnScroll ? { opacity: 0, y: 38, filter: 'blur(6px)' } : false} whileInView={shouldAnimateOnScroll ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined} viewport={shouldAnimateOnScroll ? { amount: 0.22, once: true } : undefined} transition={shouldAnimateOnScroll ? { delay: index * 0.08, duration: 0.42, ease: [0.22, 1, 0.36, 1] } : undefined} whileHover={{ y: -8 }} className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/70">
       <div className="relative min-h-[168px] overflow-hidden border-b border-slate-100 bg-slate-100 p-5">
         <img
           src={universityImage}
