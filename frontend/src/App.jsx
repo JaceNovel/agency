@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
   ClipboardList, CreditCard, FileText, GraduationCap, Home, LayoutDashboard,
@@ -250,7 +250,7 @@ function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [sidebarHover, setSidebarHover] = useState(false)
   const location = useLocation()
-  const isSettingsPage = location.pathname.startsWith('/parametres')
+  const isSettingsPage = location.pathname.startsWith('/parametres') || location.pathname.startsWith('/settings')
   const isSettingsRoute = location.pathname.startsWith('/settings')
   const sidebarOpen = sidebarHover
   const activeNavIndex = navItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
@@ -265,7 +265,22 @@ function Shell() {
 
   return (
     <div className="app-shell min-h-screen bg-slate-50 text-slate-950">
-      {settingsOpen && <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Fermer le menu paramètres" onClick={() => setSettingsOpen(false)} />}
+      <AnimatePresence>
+        {settingsOpen && (
+          <motion.div className="settings-modal-layer fixed inset-0 z-[90] grid place-items-center px-4 py-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
+            <motion.button
+              type="button"
+              aria-label="Fermer les paramètres"
+              className="settings-modal-backdrop absolute inset-0"
+              onClick={() => setSettingsOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <SettingsHubWindow onClose={() => setSettingsOpen(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <aside
         onMouseEnter={() => setSidebarHover(true)}
         onMouseLeave={() => setSidebarHover(false)}
@@ -327,8 +342,7 @@ function Shell() {
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
             <div className="relative z-50">
-              <button type="button" onClick={() => setSettingsOpen((value) => !value)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
-              {settingsOpen && <SettingsDropdown onClose={() => setSettingsOpen(false)} />}
+              <button type="button" onClick={() => setSettingsOpen(true)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute || settingsOpen ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
             </div>
           </div>
         </header>
@@ -367,10 +381,10 @@ function AnimatedRoutes() {
         <Route path="/parametres/facturation" element={<BillingSettings />} />
         <Route path="/parametres/paiement" element={<PaymentSettings />} />
         <Route path="/parametres/connexions" element={<LoginHistorySettings />} />
-        <Route path="/settings/profile" element={<SettingsPlaceholderPage pageKey="profile" />} />
-        <Route path="/settings/billing" element={<SettingsPlaceholderPage pageKey="billing" />} />
-        <Route path="/settings/payment-methods" element={<SettingsPlaceholderPage pageKey="payment-methods" />} />
-        <Route path="/settings/login-history" element={<SettingsPlaceholderPage pageKey="login-history" />} />
+        <Route path="/settings/profile" element={<ProfileSettings />} />
+        <Route path="/settings/billing" element={<BillingSettings />} />
+        <Route path="/settings/payment-methods" element={<PaymentSettings />} />
+        <Route path="/settings/login-history" element={<LoginHistorySettings />} />
         <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
         <Route path="/visa/:country/:type/demande" element={<VisaApplication />} />
@@ -390,109 +404,56 @@ function PageTitle({ title, subtitle }) {
   return <div className="mb-8"><h1 className="text-3xl font-black tracking-tight">{title}</h1><p className="mt-1 text-slate-500">{subtitle}</p></div>
 }
 
-function SettingsDropdown({ onClose }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const openPage = (to) => {
-    onClose()
-    navigate(to)
-  }
-
+function SettingsHubWindow({ onClose }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.96, filter: 'blur(8px)' }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-      transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-      className="settings-dropdown absolute right-0 top-14 w-[324px] rounded-[20px] border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-300/60"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Paramètres"
+      initial={{ opacity: 0, y: 34, scale: 0.9, rotateX: -7, filter: 'blur(18px)' }}
+      animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: 18, scale: 0.94, filter: 'blur(10px)' }}
+      transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }}
+      className="settings-hub-window relative w-full max-w-[430px] border border-slate-200 bg-white/95 p-5 shadow-2xl shadow-slate-950/20 backdrop-blur-xl"
     >
-      <div className="px-1 pb-4">
-        <div className="text-[15px] font-black leading-6 text-slate-800">Lemouel jonadab AMAH-TCHTOUTCHOUI</div>
-        <div className="mt-1 text-sm font-semibold text-slate-500">jaceamah14@gmail.com</div>
-      </div>
-      <div className="space-y-2">
-        {settingsItems.map(({ icon: Icon, label, to }, index) => {
-          const isActive = location.pathname === to
-          return (
-          <motion.div key={label} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 + index * 0.035 }}>
-            <button type="button" onClick={() => openPage(to)} className={`settings-menu-item flex w-full cursor-pointer items-center gap-5 rounded-xl border px-4 py-3.5 text-left text-[15px] font-black shadow-sm transition ${isActive ? 'is-active border-blue-600 bg-blue-600 text-white shadow-blue-600/20' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>
-              <Icon size={23} className={isActive ? 'text-white' : 'text-slate-500'} />
-              {label}
-            </button>
-          </motion.div>
-          )
-        })}
-      </div>
-      <div className="my-4 h-px bg-slate-200" />
-      <Link to="/login" onClick={onClose} className="flex items-center gap-5 rounded-xl px-4 py-3.5 text-[15px] font-black text-slate-700 transition hover:bg-rose-50 hover:text-rose-700">
-        <LogOut size={23} className="text-slate-500" />
-        Déconnexion
-      </Link>
-    </motion.div>
-  )
-}
-
-function SettingsPlaceholderPage({ pageKey }) {
-  const page = settingsItems.find((item) => item.to.endsWith(pageKey)) ?? settingsItems[0]
-  const Icon = page.icon
-
-  return (
-    <section className="settings-placeholder-page min-h-[calc(100vh-9rem)]">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col justify-between gap-5 rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur md:flex-row md:items-center lg:p-6"
-        >
-          <div className="flex items-center gap-4">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 shadow-inner shadow-blue-100">
-              <Icon size={23} />
-            </span>
-            <div>
-              <p className="text-sm font-bold text-slate-500">Paramètres</p>
-              <h1 className="text-2xl font-black tracking-tight text-slate-950">{page.title}</h1>
-            </div>
-          </div>
-          <Link to="/" className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800">
-            Retour dashboard
-          </Link>
-        </motion.div>
-
-        <div className="grid gap-6 lg:grid-cols-[270px_1fr]">
-          <motion.nav
-            initial={{ opacity: 0, x: -18 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-            className="settings-tabs flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white/90 p-2 shadow-sm backdrop-blur lg:flex-col lg:overflow-visible"
-            aria-label="Navigation des paramètres"
-          >
-            {settingsItems.map(({ icon: ItemIcon, label, to }) => (
-              <NavLink key={to} to={to} className={({ isActive }) => `settings-tab relative flex min-w-fit items-center gap-3 rounded-lg px-3 py-3 text-sm font-black transition ${isActive ? 'is-active text-blue-900' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-800'}`}>
-                <ItemIcon size={19} className="shrink-0" />
-                <span>{label}</span>
-              </NavLink>
-            ))}
-          </motion.nav>
-
-          <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.99 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-            className="grid min-h-[420px] place-items-center rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
-          >
-            <div>
-              <span className="mx-auto grid h-16 w-16 place-items-center rounded-lg bg-slate-50 text-slate-400">
-                <Icon size={30} />
-              </span>
-              <h2 className="mt-6 text-xl font-black text-slate-950">{page.title}</h2>
-              <p className="mt-3 max-w-md text-sm font-semibold leading-6 text-slate-500">
-                Cette page est prête. Le contenu sera ajouté plus tard.
-              </p>
-            </div>
-          </motion.div>
+      <div className="flex items-start justify-between gap-5 px-1 pb-5">
+        <div>
+          <p className="text-sm font-black uppercase tracking-wide text-blue-700">Paramètres</p>
+          <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-950">Centre de contrôle</h1>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Choisissez une section pour continuer.</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="grid h-12 w-12 place-items-center bg-blue-50 text-blue-700 shadow-inner shadow-blue-100">
+            <Settings size={23} />
+          </span>
+          <button type="button" onClick={onClose} className="grid h-10 w-10 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Fermer">
+            <X size={20} />
+          </button>
         </div>
       </div>
-    </section>
+
+      <div className="space-y-3">
+        {settingsItems.map(({ icon: Icon, label, to }, index) => (
+          <motion.div
+            key={to}
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.08 + index * 0.055, duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Link to={to} onClick={onClose} className="settings-hub-button group flex min-h-[68px] items-center gap-4 border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition">
+              <span className="settings-hub-icon grid h-11 w-11 shrink-0 place-items-center bg-slate-50 text-slate-500 transition group-hover:bg-blue-50 group-hover:text-blue-700">
+                <Icon size={22} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-black text-slate-900">{label}</span>
+                <span className="mt-1 block text-xs font-semibold text-slate-500">Ouvrir la page</span>
+              </span>
+              <ArrowRight className="settings-hub-arrow shrink-0 text-slate-300 transition group-hover:text-blue-600" size={19} />
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   )
 }
 
@@ -535,9 +496,9 @@ function SettingsProfileCard() {
         <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Commandes totales</span><b>0</b></div>
       </div>
       <div className="mt-9 space-y-5 pl-3">
-        <SettingsSideLink icon={WalletCards} label="Adresse de facturation" to="/parametres/facturation" />
-        <SettingsSideLink icon={CreditCard} label="Méthodes de paiement" to="/parametres/paiement" />
-        <SettingsSideLink icon={Clock3} label="Historique de connexion" to="/parametres/connexions" />
+        <SettingsSideLink icon={WalletCards} label="Adresse de facturation" to="/settings/billing" />
+        <SettingsSideLink icon={CreditCard} label="Méthodes de paiement" to="/settings/payment-methods" />
+        <SettingsSideLink icon={Clock3} label="Historique de connexion" to="/settings/login-history" />
       </div>
     </motion.aside>
   )
@@ -669,7 +630,7 @@ function LoginHistorySettings() {
 }
 
 function SettingsBackLink() {
-  return <Link to="/parametres" className="mt-8 inline-flex items-center gap-3 font-semibold text-slate-500 hover:text-blue-800"><ArrowRight className="rotate-180" size={18} />Retour au profil</Link>
+  return <Link to="/settings/profile" className="mt-8 inline-flex items-center gap-3 font-semibold text-slate-500 hover:text-blue-800"><ArrowRight className="rotate-180" size={18} />Retour au profil</Link>
 }
 
 function StatCard({ icon: Icon, label, value, tone = 'blue' }) {
