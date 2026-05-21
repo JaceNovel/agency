@@ -1,13 +1,13 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
+  ArrowLeft, ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
   ClipboardList, CreditCard, FileText, GraduationCap, Home, LayoutDashboard,
   Lock, Mail, MessageCircle, Plane, Search, Send, Settings,
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
-  X, Video, SlidersHorizontal, LogOut, Camera, Plus, Trash2, Clock3, AlertTriangle,
+  X, Video, SlidersHorizontal, LogOut, Camera, Plus, Trash2, Clock3, AlertTriangle, Download, Award,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -373,7 +373,9 @@ function AnimatedRoutes() {
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
         <Route path="/universites" element={<Universities />} />
+        <Route path="/universites/:id/postuler" element={<UniversityApplication />} />
         <Route path="/universites/:id" element={<UniversityFormationDetail />} />
+        <Route path="/documents" element={<StudentRequests />} />
         <Route path="/guides/:slug" element={<StudentGuideDetail />} />
         <Route path="/guides" element={<StudentGuides />} />
         <Route path="/profil" element={<Profile />} />
@@ -393,6 +395,8 @@ function AnimatedRoutes() {
         <Route path="/transport" element={<Transport />} />
         <Route path="/voyage" element={<Transport />} />
         <Route path="/esim" element={<Esim />} />
+        <Route path="/contact/conseiller" element={<AdvisorContact />} />
+        <Route path="/contact/email" element={<EmailContact />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="*" element={<Placeholder />} />
       </Routes>
@@ -1257,6 +1261,9 @@ function FinanceDocumentChecklist({ docs }) {
 }
 
 function Housing() {
+  const [housingMode, setHousingMode] = useState(null)
+  const [selectedHotel, setSelectedHotel] = useState(0)
+  const displayPrice = (amount) => `${Math.round(amount * 1.15).toLocaleString('fr-FR')} FCFA`
   const housingImages = [
     'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
     'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80',
@@ -1267,15 +1274,23 @@ function Housing() {
     'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=900&q=80',
     'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80',
   ]
+  const hotelImages = [
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=80',
+  ]
   const homes = [
-    ['Studio cosy - Montparnasse', 'Paris 14e, France', '492 000 FCFA', 'Studio', '20 m²', 'Meublé', 'Disponible dès le 15 juin', 'Coup de cœur'],
-    ['Appartement - Lyon Part-Dieu', 'Lyon, France', '446 000 FCFA', 'T2', '35 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
-    ['Chambre - Résidence étudiante', 'Toulouse, France', '295 000 FCFA', 'Chambre', '15 m²', 'Meublé', 'Disponible dès le 1er juillet', 'Vérifié'],
-    ['Studio - La Defense', 'Courbevoie, France', '525 000 FCFA', 'Studio', '22 m²', 'Meublé', 'Disponible maintenant', 'Coup de cœur'],
-    ['T2 lumineux - Paris', 'Paris 11e, France', '472 000 FCFA', 'T2', '32 m²', 'Équipé', 'Disponible bientôt', 'Vérifié'],
-    ['Colocation meublee', 'Lille, France', '341 000 FCFA', 'Colocation', '18 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
-    ['Chambre calme - Centre', 'Bordeaux, France', '387 000 FCFA', 'Chambre', '17 m²', 'Wi-Fi', 'Disponible maintenant', 'Vérifié'],
-    ['Studio moderne - Nantes', 'Nantes, France', '400 000 FCFA', 'Studio', '24 m²', 'Meublé', 'Disponible en août', 'Vérifié'],
+    ['Studio cosy - Montparnasse', 'Paris 14e, France', displayPrice(492000), 'Studio', '20 m²', 'Meublé', 'Disponible dès le 15 juin', 'Coup de cœur'],
+    ['Appartement - Lyon Part-Dieu', 'Lyon, France', displayPrice(446000), 'T2', '35 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre - Résidence étudiante', 'Toulouse, France', displayPrice(295000), 'Chambre', '15 m²', 'Meublé', 'Disponible dès le 1er juillet', 'Vérifié'],
+    ['Studio - La Defense', 'Courbevoie, France', displayPrice(525000), 'Studio', '22 m²', 'Meublé', 'Disponible maintenant', 'Coup de cœur'],
+    ['T2 lumineux - Paris', 'Paris 11e, France', displayPrice(472000), 'T2', '32 m²', 'Équipé', 'Disponible bientôt', 'Vérifié'],
+    ['Colocation meublee', 'Lille, France', displayPrice(341000), 'Colocation', '18 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre calme - Centre', 'Bordeaux, France', displayPrice(387000), 'Chambre', '17 m²', 'Wi-Fi', 'Disponible maintenant', 'Vérifié'],
+    ['Studio moderne - Nantes', 'Nantes, France', displayPrice(400000), 'Studio', '24 m²', 'Meublé', 'Disponible en août', 'Vérifié'],
   ]
   const why = [
     [ShieldCheck, 'Logements vérifiés', 'Chaque logement est vérifié manuellement par notre équipe'],
@@ -1283,14 +1298,76 @@ function Housing() {
     [MessageCircle, 'Accompagnement', "Aide pour l'installation et toutes vos démarches"],
     [Users, 'Communauté étudiante', "Rejoignez une communauté d'étudiants comme vous"],
   ]
+  const hotelQuery = useQuery({
+    queryKey: ['duffel-stays-hotels', 'Paris'],
+    queryFn: () => fetchJson('/api/v1/stays/hotels?city=Paris&rooms=1&adults=1&radius=8'),
+    enabled: housingMode === 'hotel',
+    staleTime: 1000 * 60 * 10,
+    retry: 1,
+  })
+  const hotelResults = housingMode === 'hotel' && hotelQuery.data?.data?.length ? hotelQuery.data.data : []
+  const activeHotel = hotelResults[selectedHotel] ?? hotelResults[0]
+
+  if (!housingMode) {
+    return (
+      <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
+        <div className="px-5 lg:px-8">
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="grid min-h-[520px] lg:grid-cols-[0.92fr_1.08fr]">
+              <div className="relative flex flex-col justify-between bg-[#061b47] p-8 text-white lg:p-10">
+                <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(37,99,235,.48),transparent_45%),linear-gradient(180deg,#061b47,#082f7a)]" />
+                <div className="relative">
+                  <span className="inline-flex rounded-full bg-white/12 px-4 py-2 text-xs font-black uppercase tracking-wide ring-1 ring-white/15">Séjour & installation</span>
+                  <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight lg:text-5xl">Choisissez votre solution d’hébergement</h1>
+                  <p className="mt-4 max-w-lg text-base font-medium leading-7 text-blue-50/90">StudyWay vous accompagne pour réserver une adresse fiable, que ce soit pour une installation étudiante ou un séjour hôtelier à l’arrivée.</p>
+                </div>
+                <div className="relative mt-10 grid gap-4 text-sm font-bold sm:grid-cols-3">
+                  {[[ShieldCheck, 'Vérifié'], [CreditCard, 'Paiement sécurisé'], [MessageCircle, 'Conseiller dédié']].map(([Icon, label]) => (
+                    <div key={label} className="flex items-center gap-3 rounded-lg bg-white/10 p-4 ring-1 ring-white/10"><Icon size={20} />{label}</div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid gap-5 p-6 lg:p-8">
+                <button type="button" onClick={() => setHousingMode('student')} className="group grid min-h-[220px] gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200 md:grid-cols-[180px_1fr_auto]">
+                  <img src={housingImages[0]} alt="Logement étudiant" className="h-44 w-full rounded-lg object-cover md:h-full" />
+                  <div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-800"><Home size={25} /></div>
+                    <h2 className="mt-5 text-2xl font-black text-slate-950">Logements étudiants</h2>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Résidences, studios, chambres et colocations pour une installation durable près du campus.</p>
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
+                      {['Bail étudiant', 'Dossier accompagné', 'Quartiers vérifiés'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
+                    </div>
+                  </div>
+                  <span className="self-center rounded-lg bg-blue-700 p-3 text-white"><ArrowRight size={20} /></span>
+                </button>
+                <button type="button" onClick={() => setHousingMode('hotel')} className="group grid min-h-[220px] gap-5 rounded-lg border border-slate-200 bg-white p-6 text-left hover:border-blue-200 md:grid-cols-[180px_1fr_auto]">
+                  <img src={hotelImages[0]} alt="Hôtel" className="h-44 w-full rounded-lg object-cover md:h-full" />
+                  <div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700"><Building2 size={25} /></div>
+                    <h2 className="mt-5 text-2xl font-black text-slate-950">Hôtels</h2>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">Hôtels disponibles pour arrivée, rendez-vous visa, séjour court ou transition avant le logement final.</p>
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-black text-slate-600">
+                      {['Réservation rapide', 'Avantages inclus', 'Détails transparents'].map((item) => <span key={item} className="rounded-full bg-slate-100 px-3 py-1">{item}</span>)}
+                    </div>
+                  </div>
+                  <span className="self-center rounded-lg bg-emerald-600 p-3 text-white"><ArrowRight size={20} /></span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
       <div className="px-5 lg:px-8">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
-            <h1 className="typewriter-title text-4xl font-black tracking-tight text-slate-950">Trouvez votre logement</h1>
-            <p className="mt-3 text-base font-medium text-slate-500">Des milliers de logements vérifiés pour étudiants dans toute l'Europe.</p>
+            <button type="button" onClick={() => setHousingMode(null)} className="mb-4 text-sm font-black text-blue-800">Changer de catégorie</button>
+            <h1 className="typewriter-title text-4xl font-black tracking-tight text-slate-950">{housingMode === 'hotel' ? 'Réserver un hôtel' : 'Trouvez votre logement étudiant'}</h1>
+            <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l'Europe."}</p>
           </div>
           <button className="flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
             <MessageCircle size={20} />
@@ -1301,10 +1378,10 @@ function Housing() {
         <div className="mt-8 grid items-start gap-8 xl:grid-cols-[1fr_360px]">
           <div className="space-y-6">
             <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[1.15fr_1.05fr_1fr_1fr_auto]">
-              <HousingSearchItem icon={MapPin} label="Ville ou pays" value="Paris, France" />
-              <HousingSearchItem label="Type de logement" value="Tous les types" select />
-              <HousingSearchItem label="Budget max." value="525 000 FCFA" select />
-              <HousingSearchItem label="Disponibilité" value="Dès maintenant" select />
+              <HousingSearchItem icon={MapPin} label="Ville ou pays" value={housingMode === 'hotel' ? 'Paris, France' : 'Paris, France'} />
+              <HousingSearchItem label={housingMode === 'hotel' ? 'Type d’hôtel' : 'Type de logement'} value={housingMode === 'hotel' ? 'Tous les hôtels' : 'Tous les types'} select />
+              <HousingSearchItem label="Budget max." value={housingMode === 'hotel' ? '150 000 FCFA' : '605 000 FCFA'} select />
+              <HousingSearchItem label={housingMode === 'hotel' ? 'Dates' : 'Disponibilité'} value={housingMode === 'hotel' ? '2 nuits' : 'Dès maintenant'} select />
               <button className="flex h-14 items-center justify-center gap-3 rounded-lg bg-[#082f7a] px-7 text-sm font-black text-white shadow-lg shadow-blue-900/20">
                 Rechercher <Search size={19} />
               </button>
@@ -1315,25 +1392,25 @@ function Housing() {
               <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_1fr_1fr]">
                 <div>
                   <div className="font-bold text-slate-900">Prix</div>
-                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-600"><span>0 FCFA</span><span>656 000+ FCFA</span></div>
+                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-600"><span>0 FCFA</span><span>{housingMode === 'hotel' ? '175 000+ FCFA' : '656 000+ FCFA'}</span></div>
                   <input type="range" defaultValue="78" className="mt-3 w-full accent-blue-800" />
                 </div>
-                <HousingChecks title="Type de logement" items={['Studio (342)', 'Appartement (523)', 'Chambre (689)', 'Colocation (215)']} compact />
-                <HousingChecks title="Équipements" items={['Wi-Fi', 'Meublé']} compact />
+                <HousingChecks title={housingMode === 'hotel' ? 'Catégorie' : 'Type de logement'} items={housingMode === 'hotel' ? ['Premium (12)', 'Confort (38)', 'Famille (19)', 'Affaires (21)'] : ['Studio (342)', 'Appartement (523)', 'Chambre (689)', 'Colocation (215)']} compact />
+                <HousingChecks title="Équipements" items={housingMode === 'hotel' ? ['Petit-déjeuner', 'Parking', 'Salle de sport', 'Annulation flexible'] : ['Wi-Fi', 'Meublé']} compact />
               </div>
             </section>
           </div>
 
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 className="text-lg font-black text-slate-950">Rechercher sur la carte</h3>
-            <p className="mt-2 text-sm font-medium text-slate-500">Voir les logements autour de vous</p>
+            <h3 className="text-lg font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels proches' : 'Rechercher sur la carte'}</h3>
+            <p className="mt-2 text-sm font-medium text-slate-500">{housingMode === 'hotel' ? 'Comparer les quartiers et accès' : 'Voir les logements autour de vous'}</p>
             <div className="relative mt-5 h-36 overflow-hidden rounded-lg bg-blue-50">
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.08)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.08)_1px,transparent_1px)] bg-[size:42px_42px]" />
               <div className="absolute left-[43%] top-[43%] rounded-full bg-white px-4 py-2 text-xl font-black text-blue-950 shadow-lg">Paris</div>
-              {[
-                ['426k', 'left-[34%] top-[15%]'], ['459k', 'right-[14%] top-[23%]'], ['597k', 'left-[18%] top-[37%]'],
-                ['197k', 'left-[49%] top-[55%]'], ['525k', 'right-[9%] bottom-[18%]'], ['394k', 'left-[7%] top-[48%]'],
-              ].map(([price, pos]) => <span key={`${price}-${pos}`} className={`absolute ${pos} rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-md`}>{price}</span>)}
+              {(housingMode === 'hotel'
+                ? [['97k', 'left-[34%] top-[15%]'], ['136k', 'right-[14%] top-[23%]'], ['88k', 'left-[18%] top-[37%]'], ['112k', 'left-[49%] top-[55%]'], ['82k', 'right-[9%] bottom-[18%]'], ['102k', 'left-[7%] top-[48%]']]
+                : [['566k', 'left-[34%] top-[15%]'], ['513k', 'right-[14%] top-[23%]'], ['604k', 'left-[18%] top-[37%]'], ['339k', 'left-[49%] top-[55%]'], ['604k', 'right-[9%] bottom-[18%]'], ['392k', 'left-[7%] top-[48%]']]
+              ).map(([price, pos]) => <span key={`${price}-${pos}`} className={`absolute ${pos} rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-md`}>{price}</span>)}
             </div>
             <button className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#082f7a] font-black text-white"><MapPin size={18} />Voir sur la carte</button>
           </section>
@@ -1343,15 +1420,27 @@ function Housing() {
       <div className="px-5 lg:px-8">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-xl font-black text-slate-950">Logements disponibles <span className="font-bold text-slate-400">(1,248)</span></h2>
+            <h2 className="text-xl font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels disponibles' : 'Logements disponibles'} <span className="font-bold text-slate-400">({housingMode === 'hotel' ? hotelResults.length : '1,248'})</span></h2>
             <label className="flex items-center gap-3 text-sm font-bold text-slate-600">
               Trier par :
               <span className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-slate-900">Recommandés <ChevronDown size={16} /></span>
             </label>
           </div>
-          <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
-            {homes.map((home, index) => <HousingCard key={home[0]} home={home} image={housingImages[index]} index={index} />)}
-          </div>
+          {housingMode === 'hotel' ? (
+            <div className="grid gap-7 xl:grid-cols-[1fr_390px]">
+              <div className="grid gap-7 md:grid-cols-2">
+                {hotelQuery.isLoading && <div className="col-span-full rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm font-black text-blue-900">Recherche des hôtels disponibles...</div>}
+                {hotelQuery.isError && <HotelEmptyState title="Hôtels non disponibles" text={hotelQuery.error?.message || "Les hôtels réels ne peuvent pas être chargés pour le moment. Vérifiez l’accès fournisseur côté serveur puis relancez la recherche."} />}
+                {!hotelQuery.isLoading && !hotelQuery.isError && hotelResults.length === 0 && <HotelEmptyState title="Aucun hôtel trouvé" text="Aucun hôtel n’a été retourné pour cette ville et ces dates. Essayez une autre période ou un rayon plus large." />}
+                {hotelResults.map((hotel, index) => <HotelCard key={hotel.id ?? hotel.name} hotel={hotel} image={hotel.image ?? hotelImages[index % hotelImages.length]} index={index} active={selectedHotel === index} onSelect={() => setSelectedHotel(index)} />)}
+              </div>
+              {activeHotel && <HotelDetails hotel={activeHotel} image={activeHotel.image ?? hotelImages[selectedHotel % hotelImages.length]} />}
+            </div>
+          ) : (
+            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+              {homes.map((home, index) => <HousingCard key={home[0]} home={home} image={housingImages[index]} index={index} />)}
+            </div>
+          )}
         </section>
       </div>
 
@@ -1363,8 +1452,8 @@ function Housing() {
           className="housing-why-section -mb-5 overflow-hidden rounded-t-2xl px-5 py-14 text-white lg:-mb-8 lg:px-8"
         >
           <div className="mx-auto max-w-6xl text-center">
-            <span className="housing-why-pill inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/15">Logements étudiants vérifiés</span>
-            <h2 className="mt-5 text-3xl font-black tracking-tight text-white">Pourquoi choisir nos logements ?</h2>
+            <span className="housing-why-pill inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/15">{housingMode === 'hotel' ? 'Hôtels sélectionnés' : 'Logements étudiants vérifiés'}</span>
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-white">{housingMode === 'hotel' ? 'Un séjour réservé avec le sérieux d’une agence' : 'Pourquoi choisir nos logements ?'}</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-6 text-blue-50/85">Une sélection sécurisée, un paiement protégé et un accompagnement pensé pour arriver sereinement.</p>
           </div>
           <div className="mx-auto mt-9 grid max-w-6xl gap-5 md:grid-cols-4">
@@ -1431,6 +1520,97 @@ function HousingCard({ home, image, index }) {
         <div className="mt-5 flex items-center gap-2 text-sm font-bold text-emerald-600"><CheckCircle2 size={16} />{availability}</div>
       </div>
     </motion.article>
+  )
+}
+
+function HotelCard({ hotel, image, index, active, onSelect }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.045 }}
+      whileHover={{ y: -5 }}
+      className={`housing-card overflow-hidden rounded-lg border bg-white shadow-sm ${active ? 'border-blue-400 ring-4 ring-blue-50' : 'border-slate-200'}`}
+    >
+      <div className="relative h-52 overflow-hidden">
+        <img src={image} alt={hotel.name} className="h-full w-full object-cover" />
+        <span className="absolute left-3 top-3 rounded-lg bg-white px-3 py-1 text-xs font-black text-blue-950 shadow-sm">{hotel.category}</span>
+        <span className="absolute right-3 top-3 flex items-center gap-1 rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-sm"><Star size={13} fill="currentColor" />{hotel.rating}</span>
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="truncate text-lg font-black text-slate-950">{hotel.name}</h3>
+            <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-500"><MapPin size={15} />{hotel.location}</p>
+          </div>
+          <b className="shrink-0 text-right text-xl font-black text-slate-950">{hotel.price}<span className="block text-xs font-bold text-slate-500">/ nuit</span></b>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3 text-xs font-bold text-slate-600">
+          <span className="flex items-center gap-2 rounded-lg bg-slate-50 p-3"><Building2 size={15} />{hotel.room}</span>
+          <span className="flex items-center gap-2 rounded-lg bg-slate-50 p-3"><Train size={15} />{hotel.distance}</span>
+        </div>
+        <div className="mt-5 flex items-center gap-2 text-sm font-bold text-emerald-600"><CheckCircle2 size={16} />{hotel.availability}</div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {hotel.benefits.slice(0, 3).map((benefit) => <span key={benefit} className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-800">{benefit}</span>)}
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button type="button" onClick={onSelect} className="h-11 rounded-lg border border-blue-200 font-black text-blue-800">Voir détails</button>
+          <button type="button" className="h-11 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/15">Réserver</button>
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+function HotelEmptyState({ title, text }) {
+  return (
+    <div className="col-span-full rounded-lg border border-slate-200 bg-slate-50 p-8 text-center">
+      <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-white text-blue-800 shadow-sm"><Building2 size={28} /></div>
+      <h3 className="mt-5 text-xl font-black text-slate-950">{title}</h3>
+      <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">{text}</p>
+      <button type="button" className="mt-6 inline-flex h-11 items-center gap-3 rounded-lg bg-blue-700 px-6 font-black text-white"><Search size={17} />Relancer la recherche</button>
+    </div>
+  )
+}
+
+function HotelDetails({ hotel, image }) {
+  return (
+    <aside className="sticky top-6 h-fit overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="relative h-48 overflow-hidden">
+        <img src={image} alt={hotel.name} className="h-full w-full object-cover" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-5 text-white">
+          <div className="flex items-center gap-2 text-sm font-black"><Star size={16} fill="currentColor" />{hotel.rating} · {hotel.category}</div>
+          <h3 className="mt-1 text-xl font-black">{hotel.name}</h3>
+        </div>
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-2 text-sm font-semibold text-slate-500"><MapPin size={15} />{hotel.location}</p>
+            <p className="mt-2 text-sm font-bold text-emerald-600">{hotel.availability}</p>
+          </div>
+          <b className="text-right text-2xl font-black text-slate-950">{hotel.price}<span className="block text-xs font-bold text-slate-500">/ nuit</span></b>
+        </div>
+        <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
+          <h4 className="font-black text-blue-950">Avantages inclus</h4>
+          <div className="mt-4 grid gap-3">
+            {hotel.benefits.map((benefit) => <div key={benefit} className="flex items-center gap-3 text-sm font-bold text-blue-950"><CheckCircle2 size={17} className="text-emerald-600" />{benefit}</div>)}
+          </div>
+        </div>
+        <div className="mt-6">
+          <h4 className="font-black text-slate-950">Détails du séjour</h4>
+          <div className="mt-4 grid gap-3">
+            {hotel.details.map((detail) => <div key={detail} className="flex items-start gap-3 text-sm font-semibold leading-6 text-slate-600"><Info size={17} className="mt-1 shrink-0 text-blue-700" />{detail}</div>)}
+          </div>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-3 rounded-lg border border-slate-200 p-4 text-sm">
+          <div><span className="font-semibold text-slate-500">Chambre</span><b className="mt-1 block text-slate-950">{hotel.room}</b></div>
+          <div><span className="font-semibold text-slate-500">Accès</span><b className="mt-1 block text-slate-950">{hotel.distance}</b></div>
+        </div>
+        <button type="button" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20">Réserver cet hôtel <ArrowRight size={18} /></button>
+        <button type="button" className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><MessageCircle size={18} />Demander conseil</button>
+      </div>
+    </aside>
   )
 }
 
@@ -1510,10 +1690,16 @@ function Universities() {
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="career-help-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">Besoin d'aide pour choisir ?</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600">Nos conseillers sont là pour vous aider à trouver la formation idéale.</p>
-            <motion.button whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }} className="career-help-cta mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#082f7a] font-black text-white"><MessageCircle size={18} />Parler à un conseiller</motion.button>
+            <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+              <Link to="/contact/conseiller" className="career-help-cta mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#082f7a] font-black text-white"><MessageCircle size={18} />Parler à un conseiller</Link>
+            </motion.div>
             <div className="mt-6 text-sm font-semibold text-slate-500">Où contactez-nous</div>
             <div className="mt-4 grid grid-cols-3 gap-4">
-              {[MessageCircle, Phone, Mail].map((Icon, index) => <motion.button initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.16 + index * 0.08, type: 'spring', stiffness: 280, damping: 20 }} whileHover={{ y: -4 }} className="career-help-contact grid h-12 place-items-center rounded-lg bg-blue-50 text-blue-800" key={index}><Icon size={20} /></motion.button>)}
+              {[
+                [MessageCircle, '/contact/conseiller'],
+                [Phone, 'tel:+33184804789'],
+                [Mail, '/contact/email'],
+              ].map(([Icon, to], index) => <motion.div initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.16 + index * 0.08, type: 'spring', stiffness: 280, damping: 20 }} whileHover={{ y: -4 }} key={String(to)}><Link to={to} className="career-help-contact grid h-12 place-items-center rounded-lg bg-blue-50 text-blue-800"><Icon size={20} /></Link></motion.div>)}
             </div>
           </motion.section>
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -1677,6 +1863,10 @@ function UniversityFormationDetail() {
   const formationType = formation.formation_type ?? 'Formation Parcoursup'
   const specialization = formation.specialization ?? 'Domaine à vérifier'
   const location = [formation.city, formation.region, formation.country ?? 'France'].filter(Boolean).join(', ')
+  const detailImage = getUniversityCardImage(formation)
+  const mapImage = getUniversityMapImage(formation)
+  const googleMapsUrl = getUniversityGoogleMapsUrl(formation)
+  const hasApplied = getStoredApplications().some((application) => String(application.formationId) === String(formation.id ?? formation.formation_id))
   const dossierItems = [
     "Relevés de notes et derniers bulletins",
     "Passeport ou pièce d’identité",
@@ -1694,18 +1884,28 @@ function UniversityFormationDetail() {
   return (
     <div className="space-y-7">
       <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="grid gap-6 p-7 lg:grid-cols-[1fr_330px]">
+      <section className="relative min-h-[360px] overflow-hidden rounded-lg border border-slate-200 bg-slate-900 shadow-sm">
+        <img
+          src={detailImage}
+          alt=""
+          onError={(event) => {
+            event.currentTarget.onerror = null
+            event.currentTarget.src = universityHero
+          }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,.86)_0%,rgba(15,23,42,.64)_48%,rgba(15,23,42,.32)_100%)]" />
+        <div className="relative grid min-h-[360px] items-end gap-6 p-7 lg:grid-cols-[1fr_330px] lg:items-center">
           <div>
-            <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">{formation.specialization ?? formation.formation_type ?? 'Parcoursup'}</span>
-            <h1 className="mt-5 text-4xl font-black leading-tight text-slate-950">{formation.formation_name}</h1>
-            <p className="mt-4 text-base font-semibold leading-7 text-slate-600">{formation.description}</p>
+            <span className="rounded-full bg-white/95 px-4 py-2 text-sm font-black text-blue-700">{formation.specialization ?? formation.formation_type ?? 'Parcoursup'}</span>
+            <h1 className="mt-5 max-w-5xl text-4xl font-black leading-tight text-white drop-shadow-sm">{formation.formation_name}</h1>
+            <p className="mt-4 max-w-5xl text-base font-semibold leading-7 text-white/88">{formation.description}</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/accompagnement/demarrer" className="support-start-button flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20">Commencer mon accompagnement <ArrowRight className="support-start-arrow" size={18} /></Link>
-              <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-7 font-black text-blue-800">Parler à un conseiller</Link>
+              <Link to={hasApplied ? '/documents' : `/universites/${formation.id ?? formation.formation_id}/postuler`} className={`support-start-button flex h-12 items-center gap-3 rounded-lg px-7 font-black text-white shadow-lg ${hasApplied ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-blue-600 shadow-blue-600/20'}`}>{hasApplied ? 'Déjà postulé' : 'Postuler'} <ArrowRight className="support-start-arrow" size={18} /></Link>
+              <Link to="/messages" className="flex h-12 items-center gap-3 rounded-lg border border-white/50 bg-white/95 px-7 font-black text-blue-800">Parler à un conseiller</Link>
             </div>
           </div>
-          <div className="rounded-lg bg-slate-50 p-5">
+          <div className="rounded-lg bg-white/95 p-5 shadow-xl shadow-slate-950/20 backdrop-blur">
             <h2 className="font-black text-slate-950">Statistiques</h2>
             <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
               <div className="flex justify-between"><span>Taux admission</span><b className="text-blue-700">{rate}</b></div>
@@ -1738,11 +1938,6 @@ function UniversityFormationDetail() {
               <InfoLine label="Pays" value={formation.country ?? 'France'} />
               <InfoLine label="Référence Parcoursup" value={formation.formation_id ?? 'Non communiqué'} />
             </div>
-            {formation.website && (
-              <div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-600">
-                Source publique Parcoursup enregistrée dans StudyWay. La consultation se fait ici, sans quitter la plateforme.
-              </div>
-            )}
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -1764,11 +1959,20 @@ function UniversityFormationDetail() {
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black text-slate-950">Université & localisation</h2>
             <p className="mt-2 text-sm font-semibold text-slate-500">{location}</p>
-            <div className="relative mt-6 h-64 overflow-hidden rounded-lg bg-blue-50">
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(37,99,235,.09)_1px,transparent_1px),linear-gradient(rgba(37,99,235,.09)_1px,transparent_1px)] bg-[size:44px_44px]" />
-              <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30"><MapPin size={30} /></div>
+            <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="relative mt-6 block h-64 overflow-hidden rounded-lg bg-slate-100">
+              <img
+                src={mapImage}
+                alt=""
+                onError={(event) => {
+                  event.currentTarget.onerror = null
+                  event.currentTarget.src = detailImage
+                }}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-slate-950/10" />
+              <div className="absolute right-4 top-4 rounded-lg bg-white/95 px-4 py-2 text-xs font-black text-blue-700 shadow">Ouvrir dans Google Maps</div>
               <div className="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-3 text-sm font-black text-slate-950 shadow">{formation.city ?? 'Localisation'}{formation.latitude ? ` · ${formation.latitude}, ${formation.longitude}` : ''}</div>
-            </div>
+            </a>
           </section>
         </div>
 
@@ -1783,7 +1987,7 @@ function UniversityFormationDetail() {
                 </div>
               ))}
             </div>
-            <Link to="/accompagnement/demarrer" className="support-start-button mt-6 flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-600 font-black text-white">Démarrer avec cette formation <ArrowRight className="support-start-arrow" size={18} /></Link>
+            <Link to={hasApplied ? '/documents' : `/universites/${formation.id ?? formation.formation_id}/postuler`} className={`support-start-button mt-6 flex h-12 items-center justify-center gap-3 rounded-lg font-black text-white ${hasApplied ? 'bg-emerald-600' : 'bg-blue-600'}`}>{hasApplied ? 'Voir ma demande' : 'Postuler'} <ArrowRight className="support-start-arrow" size={18} /></Link>
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -1798,7 +2002,7 @@ function UniversityFormationDetail() {
 
           <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
             <h2 className="font-black text-blue-950">Important</h2>
-            <p className="mt-3 text-sm font-semibold leading-6 text-blue-900">StudyWay utilise les données publiques Parcoursup pour l’orientation uniquement. Le module ne crée pas de compte Parcoursup, ne dépose pas de candidature et n’automatise aucun vœu officiel.</p>
+            <p className="mt-3 text-sm font-semibold leading-6 text-blue-900">StudyWay prépare votre dossier, dépose la candidature pour vous sur le site officiel concerné, suit la réponse de l’établissement et ajoute l’attestation d’admission dans votre espace dès qu’elle est disponible.</p>
           </section>
         </div>
       </div>
@@ -1818,6 +2022,445 @@ function UniversityDetailMetric({ icon: Icon, label, value }) {
   )
 }
 
+function UniversityApplication() {
+  const { id } = useParams()
+  const { data } = useQuery({
+    queryKey: ['parcoursup-formation', id],
+    queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
+    staleTime: 1000 * 60 * 10,
+    retry: 1,
+  })
+  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
+  const formationId = formation.id ?? formation.formation_id
+  const [submitted, setSubmitted] = useState(() => getStoredApplications().some((application) => String(application.formationId) === String(formationId)))
+  const storedProfile = getStoredAcademicProfile()
+  const [cvService, setCvService] = useState(false)
+  const [files, setFiles] = useState(() => storedProfile.documents ?? {})
+  const [profile, setProfile] = useState(() => storedProfile.profile ?? {})
+  const storedApplications = getStoredApplications()
+  const hasReachedApplicationLimit = storedApplications.length >= 5 && !storedApplications.some((application) => String(application.formationId) === String(formationId))
+  const hasSavedAcademicProfile = Boolean(storedProfile.savedAt)
+  const documentGroups = getParcoursupDocumentGroups(formation, profile, hasSavedAcademicProfile)
+  const completedDocuments = new Set(Object.entries(files).filter(([documentId, items]) => documentGroups.some((document) => document.id === documentId) && items.length).map(([documentId]) => documentId))
+  const detailImage = getUniversityCardImage(formation)
+  const mapImage = getUniversityMapImage(formation)
+  const googleMapsUrl = getUniversityGoogleMapsUrl(formation)
+  const location = [formation.city, formation.region, formation.country ?? 'France'].filter(Boolean).join(', ')
+
+  if (cvService) {
+    completedDocuments.add('cv')
+  }
+
+  const requiredDocuments = documentGroups.filter((document) => document.required)
+  const uploadedCount = requiredDocuments.filter((document) => completedDocuments.has(document.id)).length
+  const requiredCount = requiredDocuments.length
+  const hasAcademicProfile = Boolean(profile.studyLevel && profile.bacStatus && profile.lastDiploma && profile.school)
+  const canSubmit = hasAcademicProfile && uploadedCount >= requiredCount && !hasReachedApplicationLimit
+
+  function updateProfile(field, value) {
+    setProfile((current) => ({ ...current, [field]: value }))
+  }
+
+  function handleFilesChange(documentId, selectedFiles) {
+    const nextFiles = Array.from(selectedFiles ?? []).map((file) => ({
+      id: `${documentId}-${file.name}-${file.lastModified}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file),
+    }))
+
+    if (!nextFiles.length) return
+    setFiles((current) => ({ ...current, [documentId]: [...(current[documentId] ?? []), ...nextFiles] }))
+  }
+
+  function removeFile(documentId, fileId) {
+    setFiles((current) => {
+      const nextItems = (current[documentId] ?? []).filter((file) => file.id !== fileId)
+      return { ...current, [documentId]: nextItems }
+    })
+  }
+
+  function submitApplication() {
+    const application = {
+      id: `SW-POST-${Date.now()}`,
+      formationId,
+      formationName: formation.formation_name,
+      universityName: formation.university_name ?? 'Établissement français',
+      city: formation.city ?? 'France',
+      region: formation.region ?? 'Région non communiquée',
+      status: 'submitted',
+      submittedAt: new Date().toISOString(),
+      cvService,
+      profile,
+      documents: Object.fromEntries(Object.entries(files).map(([documentId, items]) => [documentId, items.map((item) => item.name)])),
+      attestationUrl: '',
+    }
+
+    saveAcademicProfile({ profile, documents: files })
+    saveStoredApplication(application)
+    setSubmitted(true)
+  }
+
+  if (submitted) {
+    return (
+      <div className="space-y-7">
+        <Link to={`/universites/${formationId}`} className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour à la formation</Link>
+        <section className="rounded-lg border border-emerald-100 bg-emerald-50 p-8 shadow-sm">
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-700">Déjà postulé</span>
+              <h1 className="mt-5 text-3xl font-black text-emerald-950">Candidature envoyée, en attente de décision</h1>
+              <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-emerald-900">StudyWay récupère votre dossier, vérifie les pièces et effectue la candidature pour vous sur le site officiel. Vous suivrez la réponse dans Mes demandes.</p>
+            </div>
+            <Link to="/documents" className="flex h-12 items-center justify-center gap-3 rounded-lg bg-emerald-600 px-7 font-black text-white shadow-lg shadow-emerald-600/20">Voir mes demandes <ArrowRight size={18} /></Link>
+          </div>
+        </section>
+        <ApplicationProcessPreview status="submitted" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-7">
+      <Link to={`/universites/${formationId}`} className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour à la formation</Link>
+      <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+        <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">Postuler</span>
+        <h1 className="mt-5 text-3xl font-black text-slate-950">{formation.formation_name}</h1>
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold leading-6 text-slate-500"><span>{formation.university_name ?? 'Établissement français'}</span><span>·</span><MapPin size={15} />{location}</p>
+      </section>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
+        <div className="space-y-6">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Profil académique</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{hasSavedAcademicProfile ? 'Votre dossier académique StudyWay est déjà enregistré. Vous pouvez le modifier si une information a changé.' : 'Renseignez votre situation actuelle pour que StudyWay adapte le dossier : bac récent, étudiant en L1/L2, reprise d’études ou diplôme déjà obtenu.'}</p>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <ApplicationField as="select" label="Niveau d’étude actuel" value={profile.studyLevel ?? ''} onChange={(value) => updateProfile('studyLevel', value)} options={['Terminale / Bac en cours', 'Bac obtenu récemment', 'Licence 1', 'Licence 2', 'Licence 3', 'BTS / DUT', 'Autre diplôme supérieur', 'Reprise d’études']} />
+              <ApplicationField label="Dernier diplôme obtenu ou préparé" placeholder="Baccalauréat, Licence 1, BTS..." value={profile.lastDiploma ?? ''} onChange={(value) => updateProfile('lastDiploma', value)} />
+              <ApplicationField label="Filière / série / spécialité" placeholder="Série D, sciences, économie, droit..." value={profile.field ?? ''} onChange={(value) => updateProfile('field', value)} />
+              <ApplicationField label="Établissement actuel ou dernier établissement" placeholder="Nom de votre lycée ou université" value={profile.school ?? ''} onChange={(value) => updateProfile('school', value)} />
+              <ApplicationField label="Pays d’obtention du diplôme" placeholder="Togo, Bénin, Cameroun..." value={profile.studyCountry ?? ''} onChange={(value) => updateProfile('studyCountry', value)} />
+              <ApplicationField label="Année d’obtention ou année en cours" placeholder="2025, 2026..." value={profile.studyYear ?? ''} onChange={(value) => updateProfile('studyYear', value)} />
+              <ApplicationField label="Moyenne générale indicative" placeholder="Ex : 13,5/20" value={profile.average ?? ''} onChange={(value) => updateProfile('average', value)} />
+              <ApplicationField as="select" label="Situation du bac" value={profile.bacStatus ?? ''} onChange={(value) => updateProfile('bacStatus', value)} options={['Bac déjà obtenu', 'Bac en cours', 'Équivalence / diplôme étranger', 'Études supérieures déjà commencées']} />
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">Dossier demandé</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{hasSavedAcademicProfile ? 'Votre dossier académique général est réutilisé. Pour ce nouveau vœu, ajoutez seulement les éléments spécifiques à la formation.' : 'La liste ci-dessous s’adapte automatiquement au profil académique renseigné : bac en cours, bac obtenu, études supérieures commencées ou reprise d’études.'}</p>
+            {!profile.studyLevel ? (
+              <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm font-bold leading-6 text-blue-900">Sélectionnez d’abord votre niveau d’étude actuel pour afficher les pièces à déposer.</div>
+            ) : (
+              <div className="mt-6 grid gap-4">
+                {documentGroups.map((document) => (
+                  <ApplicationDocumentUpload key={document.id} document={document} files={files[document.id] ?? []} onChange={(selectedFiles) => handleFilesChange(document.id, selectedFiles)} onRemove={(fileId) => removeFile(document.id, fileId)} />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        <aside className="space-y-5">
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="relative block h-40 bg-slate-100">
+              <img src={mapImage} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = detailImage }} className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-slate-950/20" />
+              <div className="absolute right-3 top-3 rounded-lg bg-white/95 px-3 py-2 text-[11px] font-black text-blue-700 shadow">Google Maps</div>
+              <div className="absolute bottom-4 left-4 right-4 rounded-lg bg-white/95 px-4 py-3 text-sm font-black text-slate-950 shadow"><MapPin size={16} className="mr-2 inline text-blue-700" />{location}</div>
+            </a>
+            <div className="p-5">
+              <h2 className="font-black text-slate-950">Localisation</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{formation.university_name ?? 'Établissement français'}</p>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">CV adapté à la formation</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Vous pouvez envoyer votre CV, ou payer 5 € pour que StudyWay prépare un CV propre et adapté à cette formation.</p>
+            <button type="button" onClick={() => setCvService((value) => !value)} className={`mt-5 flex w-full items-center justify-between rounded-lg border p-4 text-left transition ${cvService ? 'border-blue-600 bg-white text-blue-900' : 'border-blue-200 bg-white/70 text-slate-700'}`}>
+              <span className="font-black">Créer mon CV avec StudyWay</span>
+              <span className="rounded-full bg-blue-600 px-3 py-1 text-sm font-black text-white">5 €</span>
+            </button>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">Progression</h2>
+            {hasReachedApplicationLimit && <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-800">Vous avez déjà 5 candidatures en cours. Attendez une décision ou contactez StudyWay pour remplacer un vœu.</div>}
+            <div className="mt-4 flex justify-between text-sm font-semibold text-slate-600"><span>Documents requis</span><b>{Math.min(uploadedCount, requiredCount)}/{requiredCount}</b></div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-600" style={{ width: `${Math.min(100, (uploadedCount / requiredCount) * 100)}%` }} /></div>
+            <button type="button" disabled={!canSubmit} onClick={submitApplication} className={`support-start-button mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg font-black text-white ${canSubmit ? 'bg-blue-600 shadow-lg shadow-blue-600/20' : 'cursor-not-allowed bg-slate-300'}`}>Postuler <ArrowRight className="support-start-arrow" size={18} /></button>
+            {!canSubmit && !hasReachedApplicationLimit && <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{hasAcademicProfile ? 'Ajoutez toutes les pièces obligatoires pour envoyer la candidature.' : 'Complétez d’abord le profil académique pour déterminer le dossier à demander.'}</p>}
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function ApplicationField({ label, value, onChange, placeholder, as, options = [] }) {
+  if (as === 'select') {
+    return (
+      <label className="block text-sm font-black text-slate-700">
+        {label}
+        <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
+          <option value="">Sélectionner</option>
+          {options.map((option) => <option key={option} value={option}>{option}</option>)}
+        </select>
+      </label>
+    )
+  }
+
+  return (
+    <label className="block text-sm font-black text-slate-700">
+      {label}
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder={placeholder} />
+    </label>
+  )
+}
+
+function ApplicationDocumentUpload({ document, files, onChange, onRemove }) {
+  const hasFiles = files.length > 0
+  const canUploadMultiple = document.multiple
+
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50/30">
+      <div className="flex items-center justify-between gap-4">
+        <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
+          <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg ${hasFiles ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>{hasFiles ? <CheckCircle2 size={20} /> : <Upload size={20} />}</span>
+          <span className="min-w-0">
+            <span className="block font-black text-slate-950">{document.label}</span>
+            <span className="mt-1 block text-sm font-semibold text-slate-500">{hasFiles ? `${files.length} fichier${files.length > 1 ? 's' : ''} ajouté${files.length > 1 ? 's' : ''}` : document.help}</span>
+          </span>
+          <input type="file" multiple={canUploadMultiple} className="hidden" onChange={(event) => onChange(event.target.files)} />
+        </label>
+        <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-black ${document.required ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>{document.required ? 'Obligatoire' : 'Si demandé'}</span>
+      </div>
+
+      {hasFiles && (
+        <div className="mt-4 grid gap-2">
+          {files.map((file) => (
+            <div key={file.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+              <span className="min-w-0 truncate">{file.name}</span>
+              <span className="flex shrink-0 items-center gap-2">
+                <a href={file.url} target="_blank" rel="noreferrer" className="rounded-lg bg-white px-3 py-2 text-xs font-black text-blue-700 shadow-sm">Visualiser</a>
+                <button type="button" onClick={() => onRemove(file.id)} className="rounded-lg bg-white px-3 py-2 text-xs font-black text-rose-600 shadow-sm">Supprimer</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function getParcoursupDocumentGroups(formation, profile = {}, hasSavedAcademicProfile = false) {
+  const specialization = (formation.specialization ?? formation.formation_type ?? '').toLowerCase()
+  const studyLevel = (profile.studyLevel ?? '').toLowerCase()
+  const bacStatus = (profile.bacStatus ?? '').toLowerCase()
+  const isBacInProgress = studyLevel.includes('terminale') || bacStatus.includes('en cours')
+  const isRecentBac = studyLevel.includes('bac obtenu') || bacStatus.includes('déjà obtenu') || bacStatus.includes('deja obtenu')
+  const hasHigherStudies = ['licence', 'bts', 'dut', 'supérieur', 'superieur', 'reprise'].some((value) => studyLevel.includes(value)) || bacStatus.includes('supérieures') || bacStatus.includes('superieures')
+  const documents = [
+    ['motivation-letter', 'Lettre de motivation / projet de formation motivé', 'Texte ou PDF adapté à ce vœu', true, false],
+    ['cv', 'CV étudiant', 'CV personnel ou CV préparé par StudyWay', true, false],
+    ['complementary', 'Pièces complémentaires demandées par la formation', 'Portfolio, justificatif de niveau, certificat ou autre', false, true],
+  ]
+
+  if (hasSavedAcademicProfile) {
+    if (specialization.includes('droit')) {
+      documents.push(['law-self-assessment', 'Attestation questionnaire Droit', 'Attestation Parcoursup pour les licences de droit', true, false])
+    }
+
+    if (specialization.includes('art')) {
+      documents.push(['portfolio', 'Portfolio artistique', 'Travaux, créations ou dossier personnel', true, true])
+    }
+
+    return documents.map(([id, label, help, required, multiple]) => ({ id, label, help, required, multiple }))
+  }
+
+  documents.unshift(['identity', 'Pièce d’identité ou passeport', 'PDF, JPG ou PNG lisible', true, false])
+  documents.splice(3, 0, ['activities', 'Activités et centres d’intérêt', 'Engagements, expériences, stages, sport, culture', true, false])
+
+  if (!profile.studyLevel) {
+    return documents.map(([id, label, help, required, multiple]) => ({ id, label, help, required, multiple }))
+  }
+
+  if (isBacInProgress) {
+    documents.splice(1, 0,
+      ['transcripts-premiere', 'Bulletins de Première', 'Ajoutez les 3 bulletins ou semestres disponibles', true, true],
+      ['transcripts-terminale', 'Bulletins de Terminale', 'Ajoutez les bulletins disponibles de Terminale', true, true],
+      ['bac-grades', 'Notes du bac disponibles', 'Épreuves anticipées ou contrôle continu si disponible', false, true],
+      ['future-sheet', 'Fiche avenir ou appréciations du lycée', 'À fournir si disponible dans votre pays ou établissement', false, false],
+    )
+  }
+
+  if (isRecentBac && !hasHigherStudies) {
+    documents.splice(1, 0,
+      ['transcripts-premiere', 'Bulletins de Première', 'Ajoutez les 3 bulletins ou semestres disponibles', true, true],
+      ['transcripts-terminale', 'Bulletins de Terminale', 'Ajoutez les 3 bulletins ou semestres disponibles', true, true],
+      ['bac-grades', 'Relevé de notes du baccalauréat', 'Relevé final ou attestation officielle des notes', true, true],
+      ['diploma', 'Diplôme ou attestation de réussite au bac', 'Bac, équivalent ou attestation provisoire', true, true],
+      ['future-sheet', 'Fiche avenir ou appréciations du lycée', 'À fournir si disponible dans votre pays ou établissement', false, false],
+    )
+  }
+
+  if (hasHigherStudies) {
+    documents.splice(1, 0,
+      ['higher-transcripts', 'Relevés de notes d’études supérieures', 'L1, L2, BTS, DUT ou autre parcours commencé', true, true],
+      ['higher-certificate', 'Certificat de scolarité ou attestation universitaire', 'Document récent de votre établissement supérieur', true, true],
+      ['bac-grades', 'Relevé de notes du baccalauréat', 'Relevé final ou équivalent', true, true],
+      ['diploma', 'Diplôme ou attestation de réussite', 'Bac et dernier diplôme obtenu si disponible', true, true],
+      ['transcripts-terminale', 'Bulletins de Terminale', 'Souvent utiles pour compléter le dossier', false, true],
+    )
+  }
+
+  if (specialization.includes('droit')) {
+    documents.push(['law-self-assessment', 'Attestation questionnaire Droit', 'Attestation Parcoursup pour les licences de droit', true, false])
+  }
+
+  if (specialization.includes('art')) {
+    documents.push(['portfolio', 'Portfolio artistique', 'Travaux, créations ou dossier personnel', true, true])
+  }
+
+  return documents.map(([id, label, help, required, multiple]) => ({ id, label, help, required, multiple }))
+}
+
+function ApplicationProcessPreview({ status }) {
+  const activeIndex = status === 'submitted' ? 0 : status === 'admission' ? 1 : status === 'admitted' ? 2 : 3
+
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-black text-slate-950">Processus de candidature</h2>
+      <ProcessLine steps={applicationProcessSteps} activeIndex={activeIndex} icons={[ClipboardList, GraduationCap, Award, FileText]} />
+    </section>
+  )
+}
+
+function StudentRequests() {
+  const [applications, setApplications] = useState(getStoredApplications)
+  const displayedApplications = applications.length ? applications : demoApplications
+
+  function updateStatus(applicationId, status) {
+    const updated = displayedApplications.map((application) => application.id === applicationId ? { ...application, status } : application)
+    setApplications(updated)
+    window.localStorage.setItem(STUDYWAY_APPLICATIONS_KEY, JSON.stringify(updated))
+  }
+
+  return (
+    <div className="space-y-7">
+      <PageTitle title="Mes demandes" subtitle="Suivez vos candidatures StudyWay, les admissions reçues et les attestations disponibles." />
+      <section className="grid gap-4 md:grid-cols-4">
+        {[
+          ['Candidatures', displayedApplications.length, ClipboardList, 'blue'],
+          ['En admission', displayedApplications.filter((application) => application.status === 'admission').length, GraduationCap, 'blue'],
+          ['Admis', displayedApplications.filter((application) => application.status === 'admitted').length, Award, 'green'],
+          ['Attestations', displayedApplications.filter((application) => application.status === 'attestation').length, FileText, 'purple'],
+        ].map(([label, value, Icon, tone]) => <StatCard key={label} icon={Icon} label={label} value={String(value)} tone={tone} />)}
+      </section>
+
+      <section className="grid gap-6">
+        {displayedApplications.map((application) => <StudentRequestCard key={application.id} application={application} onUpdateStatus={updateStatus} />)}
+      </section>
+    </div>
+  )
+}
+
+function StudentRequestCard({ application, onUpdateStatus }) {
+  const activeIndex = applicationStatusIndex(application.status)
+  const submittedDate = application.submittedAt ? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(application.submittedAt)) : 'Enregistrée'
+
+  return (
+    <article className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+        <div>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <span className={`rounded-full px-3 py-1 text-xs font-black ${applicationStatusBadge(application.status)}`}>{applicationStatusLabel(application.status)}</span>
+              <h2 className="mt-4 text-xl font-black text-slate-950">{application.formationName}</h2>
+              <p className="mt-2 text-sm font-semibold text-slate-500">{application.universityName} · {application.city}</p>
+            </div>
+            <div className="text-right text-sm font-semibold text-slate-500">Déposée le<br /><b className="text-slate-800">{submittedDate}</b></div>
+          </div>
+          <ProcessLine steps={applicationProcessSteps} activeIndex={activeIndex} icons={[ClipboardList, GraduationCap, Award, FileText]} />
+        </div>
+
+        <aside className="rounded-lg bg-slate-50 p-5">
+          <h3 className="font-black text-slate-950">Actions</h3>
+          <div className="mt-4 space-y-3">
+            {application.status === 'submitted' && <button type="button" onClick={() => onUpdateStatus(application.id, 'admission')} className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Marquer en admission <ArrowRight size={17} /></button>}
+            {application.status === 'admission' && <button type="button" onClick={() => onUpdateStatus(application.id, 'admitted')} className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 font-black text-white">École acceptée <CheckCircle2 size={17} /></button>}
+            {application.status === 'admitted' && <button type="button" onClick={() => onUpdateStatus(application.id, 'attestation')} className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Choisir cette admission <Award size={17} /></button>}
+            {application.status === 'attestation' ? (
+              <a href={application.attestationUrl || '#'} className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 font-black text-white"><Download size={17} />Télécharger l’attestation</a>
+            ) : (
+              <button type="button" disabled className="flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-slate-200 font-black text-slate-500"><Download size={17} />Attestation en attente</button>
+            )}
+          </div>
+          <p className="mt-4 text-xs font-semibold leading-5 text-slate-500">Quand l’école accepte, StudyWay finalise le choix officiel selon votre décision, récupère l’attestation et la rend disponible ici.</p>
+        </aside>
+      </div>
+    </article>
+  )
+}
+
+const STUDYWAY_APPLICATIONS_KEY = 'studyway-university-applications'
+const STUDYWAY_ACADEMIC_PROFILE_KEY = 'studyway-academic-profile'
+const applicationProcessSteps = ['Postulé', 'Admission', 'Admis', "Attestation d'admission"]
+
+const demoApplications = [
+  {
+    id: 'SW-POST-DEMO-1',
+    formationId: 'demo-licence-info',
+    formationName: 'Licence Informatique',
+    universityName: 'Université Paris Cité',
+    city: 'Paris',
+    region: 'Île-de-France',
+    status: 'submitted',
+    submittedAt: new Date().toISOString(),
+    attestationUrl: '',
+  },
+]
+
+function getStoredApplications() {
+  try {
+    return JSON.parse(window.localStorage.getItem(STUDYWAY_APPLICATIONS_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function saveStoredApplication(application) {
+  const current = getStoredApplications()
+  const withoutDuplicate = current.filter((item) => String(item.formationId) !== String(application.formationId))
+  window.localStorage.setItem(STUDYWAY_APPLICATIONS_KEY, JSON.stringify([application, ...withoutDuplicate].slice(0, 5)))
+}
+
+function getStoredAcademicProfile() {
+  try {
+    return JSON.parse(window.localStorage.getItem(STUDYWAY_ACADEMIC_PROFILE_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function saveAcademicProfile(payload) {
+  window.localStorage.setItem(STUDYWAY_ACADEMIC_PROFILE_KEY, JSON.stringify({ ...payload, savedAt: new Date().toISOString() }))
+}
+
+function applicationStatusIndex(status) {
+  return status === 'submitted' ? 0 : status === 'admission' ? 1 : status === 'admitted' ? 2 : 3
+}
+
+function applicationStatusLabel(status) {
+  return status === 'submitted' ? 'Postulé - en attente de décision' : status === 'admission' ? 'Admission reçue' : status === 'admitted' ? 'Admis - choix à confirmer' : "Attestation d'admission disponible"
+}
+
+function applicationStatusBadge(status) {
+  return status === 'submitted' ? 'bg-blue-50 text-blue-700' : status === 'admission' ? 'bg-amber-50 text-amber-700' : status === 'admitted' ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-700'
+}
+
 function useDebouncedValue(value, delay = 350) {
   const [debouncedValue, setDebouncedValue] = useState(value)
 
@@ -1829,12 +2472,36 @@ function useDebouncedValue(value, delay = 350) {
   return debouncedValue
 }
 
-async function fetchJson(path) {
+function apiUrl(path) {
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
-  const response = await fetch(`${apiBaseUrl}${path}`)
+
+  return `${apiBaseUrl}${path}`
+}
+
+async function fetchJson(path) {
+  const response = await fetch(apiUrl(path))
 
   if (!response.ok) {
-    throw new Error('API unavailable')
+    const errorPayload = await response.json().catch(() => null)
+    throw new Error(errorPayload?.meta?.message || 'API unavailable')
+  }
+
+  return response.json()
+}
+
+async function postJson(path, payload) {
+  const response = await fetch(apiUrl(path), {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const errorPayload = await response.json().catch(() => null)
+    throw new Error(errorPayload?.meta?.message || errorPayload?.message || 'API unavailable')
   }
 
   return response.json()
@@ -1853,24 +2520,76 @@ function formatCompactNumber(value) {
   }).format(number)
 }
 
-const universityCardImages = [
-  universityHero,
-  'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1560440021-33f9b867899d?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1576495199011-eb94736d05d6?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?auto=format&fit=crop&w=900&q=80',
-  parisPackBackground,
-]
-
 function getUniversityCardImage(formation) {
-  const key = `${formation.university_name ?? ''}-${formation.city ?? ''}-${formation.formation_id ?? formation.id ?? ''}`
-  const hash = Array.from(key).reduce((total, character) => total + character.charCodeAt(0), 0)
+  if (formation.image_url) {
+    return formation.image_url
+  }
 
-  return universityCardImages[hash % universityCardImages.length]
+  const mapImage = getUniversityMapImage(formation)
+
+  if (mapImage) {
+    return mapImage
+  }
+
+  return getFallbackCampusImage(formation)
+}
+
+function getUniversityMapImage(formation) {
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+
+  if (googleMapsApiKey) {
+    const location = getUniversityMapLocation(formation)
+
+    if (location) {
+      return `https://maps.googleapis.com/maps/api/staticmap?center=${location}&zoom=17&size=900x500&scale=2&maptype=satellite&markers=color:blue%7C${location}&key=${googleMapsApiKey}`
+    }
+  }
+
+  return null
+}
+
+function getUniversityMapLocation(formation) {
+  if (formation.latitude && formation.longitude) {
+    return encodeURIComponent(`${formation.latitude},${formation.longitude}`)
+  }
+
+  const address = [
+    formation.university_name,
+    formation.city,
+    formation.region,
+    formation.country ?? 'France',
+  ].filter(Boolean).join(', ')
+
+  return address ? encodeURIComponent(address) : null
+}
+
+function getUniversityGoogleMapsUrl(formation) {
+  const query = getUniversityMapLocation(formation)
+
+  return query ? `https://www.google.com/maps/search/?api=1&query=${query}` : 'https://www.google.com/maps'
+}
+
+function getFallbackCampusImage(formation) {
+  const domain = (formation.specialization ?? formation.formation_type ?? '').toLowerCase()
+  const city = (formation.city ?? '').toLowerCase()
+
+  if (domain.includes('hôtellerie') || domain.includes('hotellerie') || domain.includes('tourisme')) {
+    return 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80'
+  }
+
+  if (domain.includes('santé') || domain.includes('sante') || domain.includes('pass')) {
+    return 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=900&q=80'
+  }
+
+  if (domain.includes('art')) {
+    return 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80'
+  }
+
+  if (city.includes('paris')) {
+    return parisPackBackground
+  }
+
+  return universityHero
 }
 
 const parcoursupFallbackFormations = [
@@ -2257,7 +2976,95 @@ function StudentGuideDetail() {
 }
 
 function Profile() {
-  return <div className="grid gap-6 xl:grid-cols-[1fr_420px]"><div className="space-y-6"><Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel><div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="1 607 000 FCFA" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="1 378 000 FCFA" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="230 000 FCFA" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div><Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel></div><div className="space-y-5"><Panel title="Dernières activités"><List items={['Paiement loyer -361 000 FCFA', 'Document ajouté - Attestation de scolarité', 'Paiement université -984 000 FCFA']} /></Panel><Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel><div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div></div></div>
+  const location = useLocation()
+  const initialTab = new URLSearchParams(location.search).get('tab') === 'reservations' ? 'reservations' : 'overview'
+  const [activeTab, setActiveTab] = useState(initialTab)
+  const reservationsQuery = useQuery({
+    queryKey: ['flight-reservations'],
+    queryFn: () => fetchJson('/api/v1/flight-reservations'),
+    enabled: activeTab === 'reservations',
+    staleTime: 1000 * 30,
+  })
+  const reservations = reservationsQuery.data?.data ?? []
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-slate-950">Profil</h1>
+          <p className="mt-2 text-sm font-semibold text-slate-500">Identité, services, réservations et documents de voyage.</p>
+        </div>
+        <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <button type="button" onClick={() => setActiveTab('overview')} className={`h-10 rounded-lg px-5 text-sm font-black ${activeTab === 'overview' ? 'bg-blue-700 text-white' : 'text-slate-600'}`}>Résumé</button>
+          <button type="button" onClick={() => setActiveTab('reservations')} className={`h-10 rounded-lg px-5 text-sm font-black ${activeTab === 'reservations' ? 'bg-blue-700 text-white' : 'text-slate-600'}`}>Mes réservations</button>
+        </div>
+      </div>
+
+      {activeTab === 'overview' ? (
+        <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
+          <div className="space-y-6">
+            <Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel>
+            <div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="1 607 000 FCFA" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="1 378 000 FCFA" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="230 000 FCFA" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div>
+            <Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel>
+          </div>
+          <div className="space-y-5">
+            <Panel title="Dernières activités"><List items={['Paiement loyer -361 000 FCFA', 'Document ajouté - Attestation de scolarité', 'Paiement université -984 000 FCFA']} /></Panel>
+            <Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel>
+            <div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div>
+          </div>
+        </div>
+      ) : (
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
+            <div>
+              <h2 className="text-2xl font-black text-slate-950">Mes réservations</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-500">Retrouvez vos billets et documents de voyage StudyWay.</p>
+            </div>
+            <Link to="/transport" className="flex h-11 items-center gap-3 rounded-lg bg-blue-700 px-5 font-black text-white"><Plane size={18} />Réserver un billet</Link>
+          </div>
+
+          {reservationsQuery.isLoading ? (
+            <div className="p-10 text-center text-sm font-bold text-slate-500">Chargement des réservations...</div>
+          ) : reservations.length ? (
+            <div className="divide-y divide-slate-100">
+              {reservations.map((reservation) => (
+                <article key={reservation.id} className="grid items-center gap-5 p-6 lg:grid-cols-[1.2fr_1fr_1fr_auto]">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-800">{reservation.status_label}</span>
+                      <span className="text-xs font-bold text-slate-400">{reservation.reference}</span>
+                    </div>
+                    <h3 className="mt-3 text-xl font-black text-slate-950">{reservation.provider || 'Compagnie'} {reservation.ticket_code || ''}</h3>
+                    <p className="mt-1 text-sm font-semibold text-slate-500">{reservation.origin || 'Départ'} → {reservation.destination || 'Arrivée'} · {reservation.cabin_class || 'Cabine à confirmer'}</p>
+                  </div>
+                  <div className="text-sm font-semibold text-slate-600">
+                    <div><b className="text-slate-950">Départ :</b> {reservation.departure || '--:--'}</div>
+                    <div className="mt-1"><b className="text-slate-950">Arrivée :</b> {reservation.arrival || '--:--'}</div>
+                    <div className="mt-1"><b className="text-slate-950">Bagage :</b> {reservation.baggage || '-'}</div>
+                  </div>
+                  <div className="text-sm font-semibold text-slate-600">
+                    <div><b className="text-slate-950">Réservation :</b> {reservation.booking_reference || 'En cours'}</div>
+                    <div className="mt-1"><b className="text-slate-950">E-ticket :</b> {reservation.ticket_number || 'En attente'}</div>
+                    <div className="mt-1 text-xl font-black text-blue-800">{reservation.price_label}</div>
+                  </div>
+                  <a href={apiUrl(`/api/v1/flight-reservations/${reservation.id}/ticket`)} className="flex h-11 items-center justify-center gap-3 rounded-lg bg-slate-950 px-5 font-black text-white">
+                    <Download size={18} />Télécharger PDF
+                  </a>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="p-10 text-center">
+              <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
+              <h3 className="mt-5 text-xl font-black text-slate-950">Aucune réservation pour le moment</h3>
+              <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Après un paiement validé et une commande confirmée, le billet apparaîtra ici avec son PDF.</p>
+              <Link to="/transport" className="mt-6 inline-flex h-11 items-center gap-3 rounded-lg bg-blue-700 px-6 font-black text-white">Chercher un billet <ArrowRight size={18} /></Link>
+            </div>
+          )}
+        </section>
+      )}
+    </div>
+  )
 }
 
 function SupportJourney() {
@@ -3046,45 +3853,232 @@ function VisaApplication() {
 }
 
 function Transport() {
-  const transportModes = [['Avion', Plane], ['Train', Train], ['Bus', Bus], ['Tram / Métro', Train], ['Chauffeur (Uber)', Car]]
-  const flights = [
-    ['Air France', 'AF 753', logos.airFrance, '23:45', '6h 45m', 'Direct', '07:30', '295 000 FCFA', 'text-emerald-600'],
-    ['Ethiopian Airlines', 'ET 920', logos.ethiopian, '15:20', '11h 15m', '1 escale (ADD)', '07:35', '252 000 FCFA', 'text-amber-600'],
-    ['Turkish Airlines', 'TK 569', logos.turkish, '09:10', '9h 50m', '1 escale (IST)', '19:00', '276 000 FCFA', 'text-amber-600'],
-    ['RwandAir', 'WB 704', logos.rwandair, '13:30', '8h 20m', '1 escale (KGL)', '21:50', '244 000 FCFA', 'text-amber-600'],
+  const location = useLocation()
+  const paymentSearchParams = new URLSearchParams(location.search)
+  const isPaymentReturn = paymentSearchParams.get('payment') === 'moneroo' || paymentSearchParams.has('paymentStatus')
+  const formatCfa = (amount) => `${amount.toLocaleString('fr-FR')} FCFA`
+  const transportModes = [
+    ['flight', 'Avion', Plane],
+    ['train', 'Train', Train],
+    ['bus', 'Bus', Bus],
+    ['local', 'Tram / Métro', Train],
+    ['driver', 'Chauffeur', Car],
   ]
+  const flightLocationOptions = [
+    ['Lomé (LFW)', 'LFW'],
+    ['Paris (CDG)', 'CDG'],
+    ['Paris (ORY)', 'ORY'],
+    ['Bruxelles (BRU)', 'BRU'],
+    ['Montréal (YUL)', 'YUL'],
+    ['Toronto (YYZ)', 'YYZ'],
+  ]
+  const localTransportOptions = [
+    { id: 'tgv-1', mode: 'train', provider: 'SNCF Connect', code: 'TGV INOUI 8421', logo: logos.france, origin: 'Paris Gare de Lyon', destination: 'Lyon Part-Dieu', departure: '08:56', arrival: '10:58', duration: '2h 02m', stops: 0, stopLabel: 'Direct', baggage: 'Bagages libres', className: '2nde classe', price: 41400, date: '2026-06-26', comfort: 'Rapide', refundable: true, tags: ['E-billet', 'Prise', 'Wi-Fi'] },
+    { id: 'tgv-2', mode: 'train', provider: 'SNCF Connect', code: 'OUIGO 7863', logo: logos.france, origin: 'Paris Montparnasse', destination: 'Bordeaux Saint-Jean', departure: '11:08', arrival: '13:19', duration: '2h 11m', stops: 0, stopLabel: 'Direct', baggage: 'Option bagage possible', className: 'Standard', price: 28750, date: '2026-06-26', comfort: 'Budget', refundable: false, tags: ['Petit prix', 'E-billet'] },
+    { id: 'bus-1', mode: 'bus', provider: 'FlixBus', code: 'FB 421', logo: 'https://logo.clearbit.com/flixbus.com', origin: 'Paris Bercy', destination: 'Lille Europe', departure: '07:30', arrival: '10:45', duration: '3h 15m', stops: 0, stopLabel: 'Direct', baggage: '1 bagage soute', className: 'Standard', price: 13800, date: '2026-06-26', comfort: 'Budget', refundable: false, tags: ['Wi-Fi', 'Prise', 'Bagage'] },
+    { id: 'bus-2', mode: 'bus', provider: 'BlaBlaCar Bus', code: 'BBC 208', logo: 'https://logo.clearbit.com/blablacar.com', origin: 'Paris Bercy', destination: 'Nantes', departure: '14:20', arrival: '19:35', duration: '5h 15m', stops: 1, stopLabel: '1 arrêt', baggage: '1 bagage soute', className: 'Standard', price: 18400, date: '2026-06-26', comfort: 'Budget', refundable: true, tags: ['Flexible', 'Bagage'] },
+    { id: 'rer-b', mode: 'local', provider: 'Île-de-France Mobilités', code: 'RER B', logo: logos.france, origin: 'Aéroport CDG', destination: 'Paris Gare du Nord', departure: 'Toutes les 12 min', arrival: '35 min', duration: '35 min', stops: 8, stopLabel: 'RER direct centre', baggage: 'Bagages autorisés', className: 'Ticket local', price: 6900, date: '2026-06-25', comfort: 'Pratique', refundable: false, tags: ['Rapide', 'Centre-ville'] },
+    { id: 'metro-pass', mode: 'local', provider: 'Navigo Easy', code: 'Pass journée', logo: logos.france, origin: 'Paris', destination: 'Paris zones 1-2', departure: 'Toute la journée', arrival: 'Illimité', duration: '24h', stops: 0, stopLabel: 'Métro / Tram / Bus', baggage: 'Non applicable', className: 'Pass mobilité', price: 8050, date: '2026-06-25', comfort: 'Illimité', refundable: false, tags: ['Métro', 'Tram', 'Bus'] },
+    { id: 'driver-cdg', mode: 'driver', provider: 'Chauffeur privé', code: 'CDG-PARIS', logo: logos.studyway, origin: 'Aéroport CDG', destination: 'Paris centre', departure: 'À votre arrivée', arrival: '50 min', duration: '45-60 min', stops: 0, stopLabel: 'Trajet privé', baggage: '2 bagages', className: 'Berline', price: 62100, date: '2026-06-25', comfort: 'Confort', refundable: true, tags: ['Accueil aéroport', 'Privé', 'Bagages'] },
+    { id: 'driver-student', mode: 'driver', provider: 'Chauffeur étudiant', code: 'ARRIVÉE CAMPUS', logo: logos.studyway, origin: 'Aéroport CDG', destination: 'Résidence étudiante', departure: 'À planifier', arrival: 'Selon adresse', duration: 'Sur mesure', stops: 0, stopLabel: 'Porte à porte', baggage: '3 bagages', className: 'Van', price: 80500, date: '2026-06-25', comfort: 'Installation', refundable: true, tags: ['Porte à porte', 'Van', 'Assistance'] },
+  ]
+  const [activeMode, setActiveMode] = useState('flight')
+  const [origin, setOrigin] = useState('Lomé (LFW)')
+  const [destination, setDestination] = useState('Paris (CDG)')
+  const [date, setDate] = useState('2026-06-25')
+  const [returnDate, setReturnDate] = useState('')
+  const [cabinClass, setCabinClass] = useState('economy')
+  const [maxPrice, setMaxPrice] = useState(1500)
+  const [stopFilter, setStopFilter] = useState('all')
+  const [serviceFilter, setServiceFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('recommended')
+  const [selectedId, setSelectedId] = useState(null)
+  const [reservationOpen, setReservationOpen] = useState(false)
+  const flightOriginCode = getTransportIata(origin, 'LFW')
+  const flightDestinationCode = getTransportIata(destination, 'CDG')
+  const returnDateParam = returnDate ? `&return_date=${returnDate}` : ''
+  const flightQuery = useQuery({
+    queryKey: ['duffel-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, cabinClass],
+    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}&adults=1&cabin_class=${cabinClass}&max_connections=1`),
+    enabled: activeMode === 'flight' || activeMode === 'all',
+    staleTime: 1000 * 60 * 8,
+    retry: 1,
+  })
+  const flightOptions = flightQuery.data?.data ?? []
+  const transportOptions = activeMode === 'flight'
+    ? flightOptions
+    : activeMode === 'all'
+      ? [...flightOptions, ...localTransportOptions]
+      : localTransportOptions
+  const currentOriginOptions = activeMode === 'flight' || activeMode === 'all'
+    ? flightLocationOptions.map(([label]) => label)
+    : Array.from(new Set(localTransportOptions.map((item) => item.origin)))
+  const currentDestinationOptions = activeMode === 'flight' || activeMode === 'all'
+    ? flightLocationOptions.map(([label]) => label)
+    : Array.from(new Set(localTransportOptions.map((item) => item.destination)))
+  const modeCounts = transportModes.reduce((acc, [key]) => {
+    acc[key] = key === 'all' ? flightOptions.length + localTransportOptions.length : key === 'flight' ? flightOptions.length : localTransportOptions.filter((item) => item.mode === key).length
+    return acc
+  }, {})
+  const isFlightMode = activeMode === 'flight' || activeMode === 'all'
+  const budgetLabel = isFlightMode ? `${maxPrice.toLocaleString('fr-FR')} EUR` : formatCfa(maxPrice)
+  const filteredOptions = transportOptions
+    .filter((item) => activeMode === 'all' || item.mode === activeMode)
+    .filter((item) => item.mode === 'flight' || origin === 'all' || item.origin === origin)
+    .filter((item) => item.mode === 'flight' || destination === 'all' || item.destination === destination)
+    .filter((item) => item.price <= maxPrice)
+    .filter((item) => stopFilter === 'all' || (stopFilter === 'direct' ? item.stops === 0 : item.stops > 0))
+    .filter((item) => serviceFilter === 'all' || (serviceFilter === 'refundable' ? item.refundable : item.tags.some((tag) => tag.toLowerCase().includes(serviceFilter))))
+    .sort((a, b) => {
+      if (sortBy === 'price') return a.price - b.price
+      if (sortBy === 'duration') return parseDuration(a.duration) - parseDuration(b.duration)
+      if (sortBy === 'departure') return a.departure.localeCompare(b.departure)
+      return Number(b.refundable) - Number(a.refundable) || a.price - b.price
+    })
+  const selectedTicket = filteredOptions.find((item) => item.id === selectedId) ?? filteredOptions[0] ?? transportOptions.find((item) => item.id === selectedId)
+
+  // When no specific ticket is selected, show a helpful trip title
+  // based on the chosen origin/destination instead of always showing
+  // "Aucun billet sélectionné".
+  const tripTitle = selectedTicket?.provider ?? ((origin && destination && origin !== 'all' && destination !== 'all') ? `${origin} → ${destination}` : 'Aucun billet sélectionné')
+  function resetFilters() {
+    setActiveMode('flight')
+    setOrigin('Lomé (LFW)')
+    setDestination('Paris (CDG)')
+    setDate('2026-06-25')
+    setReturnDate('')
+    setCabinClass('economy')
+    setMaxPrice(1500)
+    setStopFilter('all')
+    setServiceFilter('all')
+    setSortBy('recommended')
+    setReservationOpen(false)
+  }
+
+  function switchTransportMode(mode) {
+    setActiveMode(mode)
+    setSelectedId(null)
+    setReservationOpen(false)
+
+    if (mode === 'flight' || mode === 'all') {
+      setOrigin('Lomé (LFW)')
+      setDestination('Paris (CDG)')
+      setMaxPrice(1500)
+      return
+    }
+
+    setOrigin('all')
+    setDestination('all')
+    setMaxPrice(350000)
+  }
+
+  if (reservationOpen && selectedTicket) {
+    return <TransportReservationPanel ticket={selectedTicket} onClose={() => setReservationOpen(false)} />
+  }
 
   return (
     <div className="transport-page space-y-7">
-      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5">
-        <div><h1 className="text-4xl font-black tracking-tight">Billets & Transport</h1><p className="mt-2 text-lg font-medium text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p></div>
-        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm"><div className="text-xs font-semibold text-slate-500">Mon portefeuille</div><div className="font-black text-emerald-600">820 000 FCFA</div></div>
+      {isPaymentReturn && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4">
+          <motion.div initial={{ opacity: 0, y: 18, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-7 shadow-2xl">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={30} /></div>
+            <h2 className="mt-5 text-2xl font-black text-slate-950">Paiement reçu</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">Veuillez télécharger votre billet dans votre profil, section Mes réservations. Le document est mis à jour dès que la commande est confirmée.</p>
+            <Link to="/profil?tab=reservations" className="mt-6 flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20">
+              Voir mes réservations <ArrowRight size={18} />
+            </Link>
+          </motion.div>
+        </div>
+      )}
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5 border-b border-slate-100 pb-5">
+        <div className="flex items-start gap-4">
+          <button type="button" className="mt-1 grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700"><ArrowLeft size={20} /></button>
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-slate-950">Billets & Transport</h1>
+            <p className="mt-2 text-sm font-semibold text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p>
+          </div>
+        </div>
+        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm">
+          <div className="text-xs font-semibold text-slate-500">Mon portefeuille</div>
+          <div className="font-black text-emerald-600">1 250,00 €</div>
+        </div>
       </motion.div>
 
-      <section className="flex flex-wrap gap-4 border-b border-slate-200 pb-6">
-        {transportModes.map(([label, Icon], index) => <motion.button initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + index * 0.055, duration: 0.26, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} key={label} className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${index === 0 ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}><Icon size={22} />{label}</motion.button>)}
+      <section className="flex flex-wrap gap-4">
+        {transportModes.map(([key, label, Icon], index) => (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 + index * 0.035, duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -3 }}
+            onClick={() => switchTransportMode(key)}
+            key={key}
+            className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${activeMode === key ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}
+          >
+            <Icon size={22} />{label}
+          </motion.button>
+        ))}
       </section>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
         <div className="space-y-7">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="grid items-center gap-4 lg:grid-cols-[1fr_auto_1fr_1fr_1fr_1fr_auto]">
-              <TravelField label="De" value="Lomé (LFW)" sub="Togo" />
-              <button className="grid h-11 w-11 place-items-center rounded-full bg-slate-50 text-blue-800"><ArrowRight className="rotate-180" size={18} /></button>
-              <TravelField label="Vers" value="Paris (CDG)" sub="France" />
-              <TravelField label="Date aller" value="25 juin 2025" icon={CalendarDays} />
-              <TravelField label="Date retour" value="10 août 2025" icon={CalendarDays} />
-              <TravelField label="Passagers" value="1 Passager" icon={ChevronDown} />
-              <button className="h-12 rounded-lg bg-blue-700 px-8 font-black text-white shadow-lg shadow-blue-700/20">Rechercher</button>
+            <div className="grid gap-4 lg:grid-cols-[1fr_1fr_170px_170px_auto]">
+              <TransportSelect label="Départ" value={origin} onChange={setOrigin} options={activeMode === 'flight' ? currentOriginOptions.map((item) => [item, item]) : [['all', 'Tous les départs'], ...currentOriginOptions.map((item) => [item, item])]} />
+              <TransportSelect label="Arrivée" value={destination} onChange={setDestination} options={activeMode === 'flight' ? currentDestinationOptions.map((item) => [item, item]) : [['all', 'Toutes les arrivées'], ...currentDestinationOptions.map((item) => [item, item])]} />
+              <label className="block rounded-lg border border-slate-200 px-4 py-3">
+                <span className="text-xs font-bold text-slate-500">Jour départ</span>
+                <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
+              </label>
+              <label className="block rounded-lg border border-slate-200 px-4 py-3">
+                <span className="text-xs font-bold text-slate-500">Jour retour</span>
+                <input type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
+              </label>
+              <button type="button" onClick={() => setSelectedId(filteredOptions[0]?.id ?? selectedId)} className="flex h-full min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-7 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]">
+              <div>
+                <div className="flex justify-between text-xs font-black text-slate-500"><span>Budget max.</span><span>{budgetLabel}</span></div>
+                <input type="range" min={isFlightMode ? '100' : '5000'} max={isFlightMode ? '3000' : '380000'} step={isFlightMode ? '50' : '5000'} value={maxPrice} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-3 w-full accent-blue-800" />
+              </div>
+              <TransportSelect label="Cabine" value={cabinClass} onChange={setCabinClass} options={[['economy', 'Économie'], ['premium_economy', 'Premium économie'], ['business', 'Business'], ['first', 'Première']]} />
+              <TransportSelect label="Escales / arrêts" value={stopFilter} onChange={setStopFilter} options={[['all', 'Tous'], ['direct', 'Direct uniquement'], ['stops', 'Avec escale / arrêt']]} />
+              <TransportSelect label="Service" value={serviceFilter} onChange={setServiceFilter} options={[['all', 'Tous'], ['refundable', 'Modifiable'], ['bagage', 'Bagage'], ['wifi', 'Wi-Fi'], ['privé', 'Privé']]} />
+              <TransportSelect label="Tri" value={sortBy} onChange={setSortBy} options={[['recommended', 'Recommandés'], ['price', 'Prix croissant'], ['duration', 'Durée'], ['departure', 'Départ']]} />
+              <button type="button" onClick={resetFilters} className="h-full min-h-12 rounded-lg border border-slate-200 px-5 font-black text-blue-800">Réinitialiser</button>
             </div>
           </section>
 
           <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 p-6"><h2 className="text-2xl font-black">Vols disponibles <span className="text-sm font-bold text-slate-500">42 vols trouvés</span></h2><label className="flex items-center gap-3 text-sm font-semibold text-slate-500">Trier par : <span className="rounded-lg border border-slate-200 px-4 py-2 font-bold text-slate-800">Prix (croissant)⌄</span></label></div>
-            <div className="divide-y divide-slate-100">
-              {flights.map((flight, index) => <FlightRow key={flight[1]} flight={flight} index={index} />)}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
+              <h2 className="text-2xl font-black">{activeMode === 'all' ? 'Billets disponibles' : transportModes.find(([key]) => key === activeMode)?.[1]} <span className="text-sm font-bold text-slate-500">{filteredOptions.length} résultat{filteredOptions.length > 1 ? 's' : ''}</span></h2>
+              <div className="flex flex-wrap gap-2">
+                <FilterChip active={origin !== 'all'}>{origin === 'all' ? 'Tous départs' : origin}</FilterChip>
+                <FilterChip active={destination !== 'all'}>{destination === 'all' ? 'Toutes arrivées' : destination}</FilterChip>
+                <FilterChip active>{budgetLabel} max</FilterChip>
+                {isFlightMode && <FilterChip active>{cabinClassLabel(cabinClass)}</FilterChip>}
+              </div>
             </div>
-            <div className="m-5 flex items-center justify-between rounded-lg bg-amber-50 px-5 py-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><ShieldCheck className="text-amber-500" />Bagages, repas et conditions peuvent varier selon la compagnie.</span><button className="rounded-lg bg-white px-5 py-3 font-black text-blue-800">Voir les conditions</button></div>
+            {filteredOptions.length ? (
+              <div className="divide-y divide-slate-100">
+                {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => setSelectedId(ticket.id)} />)}
+              </div>
+            ) : flightQuery.isLoading && (activeMode === 'flight' || activeMode === 'all') ? (
+              <div className="p-10 text-center">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
+                <h3 className="mt-5 text-xl font-black text-slate-950">Recherche en cours</h3>
+                <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Nous récupérons les offres de vols réelles disponibles pour cet itinéraire.</p>
+              </div>
+            ) : flightQuery.isError && activeMode === 'flight' ? (
+              <TransportEmptyState title="Billets indisponibles" text={flightQuery.error?.message || 'Les billets ne peuvent pas être chargés pour le moment. Changez votre recherche ou réessayez plus tard.'} onReset={resetFilters} />
+            ) : (
+              <TransportEmptyState title="Aucun billet ne correspond aux filtres" text="Élargissez le budget, changez le type de transport ou retirez le filtre direct." onReset={resetFilters} />
+            )}
+            <div className="m-5 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-amber-50 px-5 py-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><ShieldCheck className="text-amber-500" />Les conditions varient selon le transporteur. Les détails sont vérifiés avant paiement.</span><button className="rounded-lg bg-white px-5 py-3 font-black text-blue-800">Voir les conditions</button></div>
           </section>
 
         </div>
@@ -3093,36 +4087,40 @@ function Transport() {
           <section className="transport-side-card transport-trip-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-xl font-black">Mon voyage</h2>
-              <span className="transport-card-visual grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-700"><Plane size={34} /></span>
+              <span className="transport-card-visual grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-700"><TransportModeIcon mode={selectedTicket?.mode} size={34} /></span>
             </div>
             <div className="mt-5 grid grid-cols-[22px_1fr] gap-4">
               <div className="relative pt-1">
-                <Plane className="relative z-10 rounded-full bg-white text-blue-700" size={18} />
+                <TransportModeIcon mode={selectedTicket?.mode} className="relative z-10 rounded-full bg-white text-blue-700" size={18} />
                 <span className="absolute left-[8px] top-7 h-28 w-px bg-blue-100" />
                 <span className="absolute left-[5px] top-[94px] h-2.5 w-2.5 rounded-full bg-blue-700 ring-4 ring-blue-50" />
               </div>
               <div>
-                <div className="font-black">Aller</div>
-                <div className="text-sm font-semibold text-slate-500">25 juin 2025</div>
+                <div className="font-black">{tripTitle}</div>
+                <div className="text-sm font-semibold text-slate-500">{date}</div>
                 <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-                  <div><div className="text-xl font-black">23:45</div><div className="font-bold">LFW</div><div className="text-sm text-slate-500">Lomé</div></div>
-                  <div className="text-center text-sm font-bold"><span className="block text-slate-500">6h 45m</span><span className="text-emerald-600">Direct</span></div>
-                  <div className="text-right"><div className="text-xl font-black">07:30</div><div className="font-bold">CDG</div><div className="text-sm text-slate-500">Paris</div></div>
+                  <div><div className="text-xl font-black">{selectedTicket?.departure ?? '--:--'}</div><div className="text-sm font-bold">{selectedTicket?.origin ?? origin}</div></div>
+                  <div className="text-center text-sm font-bold"><span className="block text-slate-500">{selectedTicket?.duration ?? '-'}</span><span className={selectedTicket?.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}>{selectedTicket?.stopLabel ?? '-'}</span></div>
+                  <div className="text-right"><div className="text-xl font-black">{selectedTicket?.arrival ?? '--:--'}</div><div className="text-sm font-bold">{selectedTicket?.destination ?? destination}</div></div>
                 </div>
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
               <UserRound className="text-slate-600" size={21} />
-              <div><b>Passager</b><div className="text-sm text-slate-500">1 Adulte</div></div>
+              <div><b>Passager</b><div className="text-sm text-slate-500">1 Adulte · {selectedTicket?.className ?? 'Économique'}</div></div>
             </div>
-            <button className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white">Continuer vers la réservation</button>
+            <div className="mt-5 rounded-lg bg-slate-50 p-4">
+              <div className="flex justify-between text-sm font-semibold text-slate-500"><span>Prix sélectionné</span><b className="text-xl text-blue-800">{selectedTicket ? formatTicketPrice(selectedTicket) : '-'}</b></div>
+              <div className="mt-2 text-xs font-bold text-slate-500">{selectedTicket?.baggage ?? 'Sélectionnez un billet'}</div>
+            </div>
+            <button type="button" disabled={!selectedTicket} onClick={() => setReservationOpen(true)} className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white disabled:bg-slate-300">Continuer vers la réservation</button>
           </section>
           <section className="transport-side-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black">Transport sur place</h2>
             <p className="mt-1 text-sm font-semibold text-slate-500">Réservez votre trajet à l'arrivée</p>
             <div className="mt-5 divide-y divide-slate-100">
-              {[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport", 'text-blue-700 bg-blue-50'], [Train, 'Tram / Métro', 'Déplacements en ville', 'text-indigo-700 bg-indigo-50'], [Bus, 'Bus', 'Lignes régulières', 'text-emerald-700 bg-emerald-50'], [Car, 'Chauffeur (Uber)', 'Trajet privé avec chauffeur', 'text-slate-900 bg-slate-100']].map(([Icon, title, sub, tone]) => (
-                <button className="group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
+              {[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport", 'text-blue-700 bg-blue-50', 'local'], [Train, 'Tram / Métro', 'Déplacements en ville', 'text-indigo-700 bg-indigo-50', 'local'], [Bus, 'Bus', 'Lignes régulières', 'text-emerald-700 bg-emerald-50', 'bus'], [Car, 'Chauffeur', 'Trajet privé avec chauffeur', 'text-slate-900 bg-slate-100', 'driver']].map(([Icon, title, sub, tone, mode]) => (
+                <button type="button" onClick={() => switchTransportMode(mode)} className="group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
                   <span className="flex min-w-0 items-center gap-4">
                     <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}><Icon size={21} /></span>
                     <span className="min-w-0"><b>{title}</b><span className="mt-1 block text-sm font-semibold text-slate-500">{sub}</span></span>
@@ -3176,22 +4174,407 @@ function Transport() {
   )
 }
 
-function TravelField({ label, value, sub, icon: Icon }) {
-  return <div className="border-r border-slate-100 pr-4"><div className="text-xs font-bold text-slate-500">{label}</div><div className="mt-2 flex items-center justify-between gap-3 font-black">{value}{Icon && <Icon size={18} className="text-slate-500" />}</div>{sub && <div className="mt-1 text-sm text-slate-500">{sub}</div>}</div>
+function TransportSelect({ label, value, onChange, options }) {
+  return (
+    <label className="block rounded-lg border border-slate-200 px-4 py-3">
+      <span className="text-xs font-bold text-slate-500">{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none">
+        {options.map(([optionValue, labelValue]) => <option key={optionValue} value={optionValue}>{labelValue}</option>)}
+      </select>
+    </label>
+  )
 }
 
-function FlightRow({ flight, index }) {
-  const [name, code, logo, départ, duration, stop, arrival, price, tone] = flight
+function FilterChip({ active, children }) {
+  return <span className={`rounded-full px-3 py-1 text-xs font-black ${active ? 'bg-blue-50 text-blue-800' : 'bg-slate-100 text-slate-500'}`}>{children}</span>
+}
+
+function TransportEmptyState({ title, text, onReset }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="grid items-center gap-5 p-6 lg:grid-cols-[1.3fr_0.8fr_1fr_0.8fr_0.8fr_auto]">
-      <div className="flex items-center gap-4"><img src={logo} alt={name} className="h-16 w-16 rounded-lg border border-slate-100 object-contain p-2" /><div><div className="font-black">{name}</div><div className="text-sm text-slate-500">{code}</div></div></div>
-      <div><div className="text-2xl font-black">{départ}</div><div className="font-bold">LFW</div><div className="text-sm text-slate-500">Lomé</div></div>
-      <div className="text-center"><div className="font-bold">{duration}</div><div className={`mt-2 text-sm font-bold ${tone}`}>{stop}</div></div>
-      <div><div className="text-2xl font-black">{arrival} <span className="text-sm text-rose-500">+1</span></div><div className="font-bold">CDG</div><div className="text-sm text-slate-500">Paris (Charles de Gaulle)</div></div>
-      <div><div className="text-2xl font-black text-blue-800">{price}</div><div className="text-sm text-slate-500">Aller simple</div></div>
-      <div className="space-y-3"><button className="h-11 rounded-lg bg-blue-700 px-8 font-black text-white">Choisir</button><button className="block w-full text-sm font-black text-blue-800">Détails⌄</button></div>
-    </motion.div>
+    <div className="p-10 text-center">
+      <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-slate-50 text-blue-800"><Search size={28} /></div>
+      <h3 className="mt-5 text-xl font-black text-slate-950">{title}</h3>
+      <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">{text}</p>
+      <button type="button" onClick={onReset} className="mt-6 h-11 rounded-lg bg-blue-700 px-6 font-black text-white">Réinitialiser la recherche</button>
+    </div>
   )
+}
+
+function TransportReservationPanel({ ticket, onClose }) {
+  const currency = 'XOF'
+  const [firstName, setFirstName] = useState('Christelle')
+  const [lastName, setLastName] = useState('Komi')
+  const [email, setEmail] = useState('christelle@email.com')
+  const [phone, setPhone] = useState('+22890123456')
+  const [title, setTitle] = useState('ms')
+  const [bornOn, setBornOn] = useState('1998-05-15')
+  const [gender] = useState('f')
+  const [nationality, setNationality] = useState('Togolaise')
+  const [passportNumber, setPassportNumber] = useState('A12345678')
+  const [passportExpiry, setPassportExpiry] = useState('2030-06-12')
+  const [baggageOption, setBaggageOption] = useState('none')
+  const [seatOption, setSeatOption] = useState('standard')
+  const [selectedSeat, setSelectedSeat] = useState('')
+  const [airportAssistance, setAirportAssistance] = useState(false)
+  const [error, setError] = useState('')
+  const [isPaying, setIsPaying] = useState(false)
+
+  const offerDetailsQuery = useQuery({
+    queryKey: ['flight-offer-details', ticket.id],
+    queryFn: () => fetchJson(`/api/v1/flights/offers/${ticket.id}`),
+    staleTime: 1000 * 60 * 4,
+    retry: 1,
+  })
+  const seatMapsQuery = useQuery({
+    queryKey: ['flight-seat-maps', ticket.id],
+    queryFn: () => fetchJson(`/api/v1/flights/offers/${ticket.id}/seat-maps`),
+    staleTime: 1000 * 60 * 4,
+    retry: 1,
+  })
+
+  const liveTicket = offerDetailsQuery.data?.data || ticket
+  const availableBagServices = (liveTicket.available_services ?? []).filter((service) => service.type === 'baggage')
+  const selectedBaggageService = availableBagServices.find((service) => service.id === baggageOption)
+  const seatMaps = seatMapsQuery.data?.data ?? []
+  const seatElements = flattenSeatMapElements(seatMaps).filter((seat) => seat.type === 'seat')
+  const selectableSeats = seatElements.filter((seat) => seat.available)
+  const selectedSeatElement = seatElements.find((seat) => seat.designator === selectedSeat)
+  const selectedSeatService = seatOption === 'preferred' ? selectedSeatElement?.available_services?.[0] : null
+  const basePrice = Math.round(Number(liveTicket.price ?? ticket.price ?? 0))
+  const baggagePrice = Math.round(Number(selectedBaggageService?.price ?? 0))
+  const seatPrice = Math.round(Number(selectedSeatService?.price ?? 0))
+  const airportAssistancePrice = airportAssistance ? 25000 : 0
+  const optionTotal = baggagePrice + seatPrice + airportAssistancePrice
+  const totalPrice = basePrice + optionTotal
+  const routeDate = ticket.date || 'Date confirmée après paiement'
+  const cabinOption = liveTicket.className || 'Économique'
+  const selectedServices = [
+    selectedBaggageService ? { id: selectedBaggageService.id, quantity: 1, type: 'baggage' } : null,
+    selectedSeatService ? { id: selectedSeatService.id, quantity: 1, type: 'seat', seat: selectedSeat } : null,
+  ].filter(Boolean)
+
+  useEffect(() => {
+    if (!selectableSeats.length) return
+    if (!selectableSeats.some((seat) => seat.designator === selectedSeat)) {
+      setSelectedSeat(selectableSeats[0].designator)
+    }
+  }, [selectableSeats, selectedSeat])
+
+  function optionPriceLabel(price) {
+    if (!price) return 'Inclus'
+    return `+ ${formatTicketPrice({ price, currency })}`
+  }
+
+  async function startPayment() {
+    setError('')
+
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !bornOn) {
+      setError('Renseignez le prénom, le nom, l’email et la date de naissance du passager.')
+      return
+    }
+
+    setIsPaying(true)
+
+    try {
+      const payment = await postJson('/api/v1/payments/moneroo/initialize', {
+        amount: totalPrice,
+        currency,
+        description: `Billet ${liveTicket.provider} ${liveTicket.code}`,
+        offer_id: liveTicket.id,
+        provider: liveTicket.provider,
+        code: liveTicket.code,
+        origin: liveTicket.origin,
+        destination: liveTicket.destination,
+        departure: liveTicket.departure,
+        arrival: liveTicket.arrival,
+        duration: liveTicket.duration,
+        baggage: selectedBaggageService?.name || liveTicket.baggage,
+        cabin_class: cabinOption,
+        ticket: {
+          ...liveTicket,
+          selected_options: {
+            fare: cabinOption,
+            baggage: selectedBaggageService || null,
+            seat: selectedSeatService || null,
+            selected_seat: selectedSeatElement?.designator || null,
+            airport_assistance: airportAssistance ? {
+              name: 'Accompagnement aéroport StudyWay',
+              price: airportAssistancePrice,
+              currency: 'XOF',
+            } : null,
+            selected_services: selectedServices,
+          },
+          total_price: totalPrice,
+        },
+        customer: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          born_on: bornOn,
+          gender,
+          title,
+          nationality,
+          passport_number: passportNumber,
+          passport_expiry: passportExpiry,
+        },
+      })
+
+      if (!payment.data?.checkout_url) {
+        throw new Error('Moneroo n’a pas renvoyé de lien de paiement.')
+      }
+
+      window.location.href = payment.data.checkout_url
+    } catch (paymentError) {
+      setError(paymentError.message)
+      setIsPaying(false)
+    }
+  }
+
+  return (
+    <div className="transport-page -mx-5 space-y-8 bg-white px-5 py-2 lg:-mx-8 lg:px-8">
+      <div className="flex flex-wrap items-center justify-between gap-5 border-b border-slate-100 pb-6">
+        <div className="flex items-start gap-4">
+          <button type="button" onClick={onClose} className="mt-1 grid h-10 w-10 place-items-center rounded-lg text-slate-700 hover:bg-slate-100"><ArrowLeft size={22} /></button>
+          <div><div className="flex items-center gap-2 text-xl font-black text-blue-800"><Plane size={22} />StudyWay</div><p className="mt-1 text-xs font-bold text-slate-400">Réservation de voyage</p></div>
+        </div>
+        <div className="flex items-center gap-3 text-sm font-bold text-slate-600"><span className="grid h-9 w-9 place-items-center rounded-full bg-slate-50"><Phone size={17} /></span><span><span className="block text-xs text-slate-400">Besoin d’aide ?</span>+33 1 84 80 80 80</span></div>
+      </div>
+
+      <div className="grid grid-cols-5 items-center gap-3 text-xs font-black text-slate-400">
+        {['Recherche', 'Sélection', 'Détails', 'Paiement', 'Confirmation'].map((step, index) => <div key={step} className="flex items-center gap-3"><span className={`grid h-7 w-7 place-items-center rounded-full ${index === 2 ? 'bg-blue-700 text-white' : index < 2 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}`}>{index + 1}</span><span className={index === 2 ? 'text-slate-950' : ''}>{step}</span>{index < 4 && <span className="h-px flex-1 bg-slate-200" />}</div>)}
+      </div>
+
+      <div className="grid gap-8 xl:grid-cols-[1fr_390px]">
+        <main className="space-y-8">
+          <div><h1 className="text-3xl font-black text-slate-950">Détails de la réservation</h1><p className="mt-2 text-sm font-semibold text-slate-500">Personnalisez votre voyage</p></div>
+
+          <section>
+            <h2 className="text-xl font-black text-slate-950">1. Choisissez votre tarif</h2>
+            <div className="mt-5 space-y-4">
+              <FareChoice active onClick={() => {}} title={cabinOption} subtitle="Tarif confirmé pour cette offre" price={formatTicketPrice({ price: basePrice, currency })} features={[liveTicket.baggage || 'Bagage selon tarif', liveTicket.refundable ? 'Remboursement possible' : 'Conditions selon tarif', availableBagServices.length ? 'Bagages additionnels disponibles' : 'Bagages selon offre', selectableSeats.length ? 'Sièges préférés disponibles' : 'Attribution lors de l’enregistrement']} />
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-black text-slate-950">2. Bagages</h2>
+            <div className="mt-5 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <div className="border-b border-slate-100 p-5"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-50 text-slate-700"><BriefcaseIcon /></span><div><b>Bagage en soute</b><p className="text-xs font-semibold text-slate-500">Options proposées par la compagnie pour ce billet</p></div></div></div>
+              {offerDetailsQuery.isLoading && <div className="px-5 py-4 text-sm font-bold text-slate-500">Chargement des bagages disponibles...</div>}
+              {!offerDetailsQuery.isLoading && [['none', 'Aucun bagage supplémentaire', 'Inclus'], ...availableBagServices.map((service) => [service.id, `${service.name}${service.description ? ` · ${service.description}` : ''}`, service.priceLabel])].map(([value, label, price]) => (
+                <label key={value} className={`flex cursor-pointer items-center justify-between border-b border-slate-100 px-5 py-4 last:border-b-0 ${baggageOption === value ? 'bg-blue-50 ring-1 ring-inset ring-blue-500' : 'bg-white'}`}>
+                  <span className="flex items-center gap-3"><input type="radio" checked={baggageOption === value} onChange={() => setBaggageOption(value)} className="h-4 w-4 accent-blue-700" /><b className="text-sm text-slate-800">{label}</b></span><span className="text-sm font-black text-blue-800">{price}</span>
+                </label>
+              ))}
+              {!offerDetailsQuery.isLoading && availableBagServices.length === 0 && <div className="px-5 py-4 text-sm font-semibold text-slate-500">Aucun bagage additionnel n’est proposé pour ce billet.</div>}
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-black text-slate-950">3. Siège</h2>
+            <p className="mt-2 text-sm font-semibold text-slate-500">{liveTicket.origin} → {liveTicket.destination}</p>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <SeatPreference active={seatOption === 'standard'} onClick={() => setSeatOption('standard')} title="Siège standard" subtitle="Attribution lors de l’enregistrement" price="Inclus" />
+              <SeatPreference active={seatOption === 'preferred'} onClick={() => setSeatOption('preferred')} title="Siège préféré" subtitle="Choisissez un siège disponible" price={selectedSeatService?.priceLabel || 'Selon siège'} />
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-black text-slate-950">4. Assistance départ</h2>
+            <label className={`mt-5 flex cursor-pointer items-start justify-between gap-5 rounded-lg border p-5 shadow-sm transition ${airportAssistance ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-blue-200'}`}>
+              <span className="flex gap-4">
+                <input type="checkbox" checked={airportAssistance} onChange={(event) => setAirportAssistance(event.target.checked)} className="mt-1 h-5 w-5 rounded border-slate-300 accent-blue-700" />
+                <span>
+                  <b className="block text-slate-950">Agent StudyWay à l’aéroport</b>
+                  <span className="mt-1 block text-sm font-semibold leading-6 text-slate-500">Un agent vous accompagne à l’aéroport, vous aide avant le départ, vérifie les documents et vous guide jusqu’aux formalités.</span>
+                </span>
+              </span>
+              <span className="shrink-0 text-sm font-black text-blue-800">+ 25 000 XOF</span>
+            </label>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-black text-slate-950">5. Informations des passagers</h2>
+            <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between"><b>Passager 1 (Adulte)</b><button className="text-sm font-black text-blue-700">Modifier</button></div>
+              <div className="mt-5 grid gap-4 md:grid-cols-3">
+                <label className="text-xs font-bold text-slate-500">Civilité<select value={title} onChange={(event) => setTitle(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none"><option value="mr">M.</option><option value="ms">Mme</option></select></label>
+                <label className="text-xs font-bold text-slate-500">Prénom<input value={firstName} onChange={(event) => setFirstName(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Nom<input value={lastName} onChange={(event) => setLastName(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Date de naissance<input type="date" value={bornOn} onChange={(event) => setBornOn(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Nationalité<input value={nationality} onChange={(event) => setNationality(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Numéro de passeport<input value={passportNumber} onChange={(event) => setPassportNumber(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Date d’expiration<input type="date" value={passportExpiry} onChange={(event) => setPassportExpiry(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+                <label className="text-xs font-bold text-slate-500">Téléphone<input value={phone} onChange={(event) => setPhone(event.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 font-semibold text-slate-800 outline-none" /></label>
+              </div>
+            </div>
+          </section>
+
+          {seatOption === 'preferred' && (
+            <section>
+              <h2 className="text-xl font-black text-slate-950">6. Choisissez votre siège <span className="text-sm font-bold text-slate-400">(Optionnel)</span></h2>
+              <p className="mt-2 text-sm font-semibold text-slate-500">{liveTicket.origin} → {liveTicket.destination}</p>
+              <div className="mt-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-5 flex flex-wrap gap-5 text-xs font-bold text-slate-500"><span className="flex items-center gap-2"><span className="h-3 w-3 rounded border border-slate-300 bg-white" />Disponible</span><span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-blue-600" />Sélectionné</span><span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-slate-200" />Indisponible</span></div>
+                {seatMapsQuery.isLoading ? <div className="rounded-lg bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">Chargement du plan de cabine...</div> : selectableSeats.length ? <RealSeatMap seatMaps={seatMaps} selectedSeat={selectedSeat} onSelect={(seat) => { setSelectedSeat(seat); setSeatOption('preferred') }} /> : <div className="rounded-lg bg-slate-50 p-8 text-center"><h3 className="font-black text-slate-950">Sélection de siège indisponible</h3><p className="mt-2 text-sm font-semibold text-slate-500">La compagnie n’a pas transmis de plan de siège pour ce vol. Le siège pourra être attribué plus tard ou à l’enregistrement.</p></div>}
+                <div className="mt-6 flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 p-4"><div><div className="text-xs font-bold text-slate-500">Siège sélectionné</div><div className="mt-1 text-2xl font-black text-blue-800">{selectedSeatElement?.designator || 'Non choisi'}</div><div className="text-xs font-semibold text-slate-500">{selectedSeatService?.priceLabel || 'Selon disponibilité'}</div></div><button type="button" disabled={!selectableSeats.length} onClick={() => setSeatOption('preferred')} className="rounded-lg border border-blue-200 bg-white px-5 py-3 font-black text-blue-700 disabled:text-slate-300">Changer de siège</button></div>
+              </div>
+              <div className="mt-5 rounded-lg bg-blue-50 p-5 text-sm font-semibold text-slate-600"><b className="text-slate-950">Annulation gratuite sous 24h</b><br />Réservez maintenant et annulez gratuitement dans les 24 heures.</div>
+            </section>
+          )}
+        </main>
+
+        <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-100 bg-slate-50 p-5"><h2 className="flex items-center gap-3 text-lg font-black text-slate-950"><Plane className="text-blue-700" size={20} />Récapitulatif de votre voyage</h2></div>
+            <div className="p-5">
+              <div className="flex items-center justify-between text-sm font-black text-slate-900"><span>Vol aller</span><button type="button" onClick={onClose} className="text-blue-700">Modifier</button></div>
+              <div className="mt-5 flex items-center gap-3"><img src={liveTicket.logo} alt={liveTicket.provider} className="h-10 w-10 rounded-full border border-slate-100 object-contain p-1" /><div><b>{liveTicket.provider}</b><div className="text-xs font-semibold text-slate-500">{liveTicket.className || 'Tarif sélectionné'}</div></div></div>
+              <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4"><div><div className="text-2xl font-black">{liveTicket.departure}</div><div className="text-sm font-bold">{liveTicket.origin}</div></div><div className="text-center text-xs font-black text-slate-500"><span className="block h-px w-24 bg-slate-200" />{liveTicket.duration}<span className="block text-emerald-600">{liveTicket.stopLabel}</span></div><div className="text-right"><div className="text-2xl font-black">{liveTicket.arrival}</div><div className="text-sm font-bold">{liveTicket.destination}</div></div></div>
+              <div className="mt-4 text-xs font-semibold text-slate-500">{routeDate}</div>
+            </div>
+            <div className="border-t border-slate-100 p-5">
+              <h3 className="font-black text-slate-950">Détails du tarif</h3>
+              <div className="mt-4 space-y-3 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between"><span>1 x Adulte</span><b>{formatTicketPrice({ price: basePrice, currency })}</b></div>
+                <div className="flex justify-between"><span>Bagage en soute</span><b>{optionPriceLabel(baggagePrice)}</b></div>
+                <div className="flex justify-between"><span>Siège</span><b>{seatOption === 'standard' ? 'Attribution à l’enregistrement' : optionPriceLabel(seatPrice)}</b></div>
+                <div className="flex justify-between"><span>Assistance aéroport</span><b>{airportAssistance ? '+ 25 000 XOF' : 'Non choisi'}</b></div>
+                <div className="flex justify-between border-t border-slate-100 pt-4 text-lg"><span>Total</span><b className="text-2xl text-blue-800">{formatTicketPrice({ price: totalPrice, currency })}</b></div>
+                <p className="text-xs text-slate-400">Prix pour 1 passager</p>
+              </div>
+            </div>
+            {error && <div className="mx-5 rounded-lg border border-red-100 bg-red-50 p-3 text-sm font-bold text-red-700">{error}</div>}
+            <div className="border-t border-slate-100 p-5">
+              <div className="space-y-4">{[[Lock, 'Paiement sécurisé', 'Vos données sont protégées'], [ShieldCheck, 'Tarif vérifié', 'Votre tarif est confirmé avant paiement'], [MessageCircle, 'Support disponible 24/7', 'Notre équipe est là pour vous aider']].map(([Icon, titleText, sub]) => <div key={titleText} className="flex gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-blue-50 text-blue-700"><Icon size={17} /></span><div><b className="text-sm">{titleText}</b><p className="text-xs font-semibold text-slate-500">{sub}</p></div></div>)}</div>
+              <button type="button" onClick={startPayment} disabled={isPaying} className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20 disabled:bg-slate-300 disabled:shadow-none">{isPaying ? 'Redirection...' : 'Continuer vers le paiement'} <ArrowRight size={18} /></button>
+              <p className="mt-3 text-center text-xs font-semibold text-slate-400">Vous pourrez vérifier votre commande à l’étape suivante</p>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function flattenSeatMapElements(seatMaps) {
+  return seatMaps.flatMap((seatMap) => (seatMap.cabins ?? []).flatMap((cabin) => (cabin.rows ?? []).flatMap((row) => (row.sections ?? []).flatMap((section) => section.elements ?? []))))
+}
+
+function RealSeatMap({ seatMaps, selectedSeat, onSelect }) {
+  const cabins = seatMaps.flatMap((seatMap) => seatMap.cabins ?? [])
+
+  return (
+    <div className="mx-auto max-w-2xl rounded-[50%_50%_22%_22%/10%_10%_7%_7%] bg-slate-50 px-6 py-8">
+      {cabins.map((cabin, cabinIndex) => (
+        <div key={cabin.id || cabinIndex} className="space-y-2">
+          {cabin.rows.map((row, rowIndex) => (
+            <div key={`${cabin.id || cabinIndex}-${rowIndex}`} className="flex justify-center gap-4">
+              {row.sections.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="flex gap-2">
+                  {section.elements.map((element, elementIndex) => {
+                    if (element.type !== 'seat') {
+                      return <span key={`${elementIndex}-${element.type}`} className="h-9 w-9" />
+                    }
+
+                    const isSelected = selectedSeat === element.designator
+
+                    return (
+                      <button
+                        key={element.designator || elementIndex}
+                        type="button"
+                        disabled={!element.available}
+                        title={element.available_services?.[0]?.priceLabel || element.designator}
+                        onClick={() => onSelect(element.designator)}
+                        className={`grid h-9 w-9 place-items-center rounded-lg border text-[11px] font-black ${isSelected ? 'border-blue-600 bg-blue-600 text-white' : element.available ? 'border-slate-300 bg-white text-slate-700 hover:border-blue-500 hover:bg-blue-50' : 'border-slate-200 bg-slate-200 text-slate-400'}`}
+                      >
+                        {element.available ? element.designator : '×'}
+                      </button>
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function FareChoice({ active, onClick, title, subtitle, price, features }) {
+  return (
+    <button type="button" onClick={onClick} className={`w-full rounded-lg border p-5 text-left transition ${active ? 'border-blue-500 bg-blue-50/45 shadow-sm' : 'border-slate-200 bg-white hover:border-blue-200'}`}>
+      <div className="flex items-start justify-between gap-5">
+        <div className="flex gap-4"><span className="grid h-11 w-11 place-items-center rounded-lg bg-blue-50 text-blue-700"><Plane size={19} /></span><div><h3 className="text-lg font-black text-slate-950">{title}</h3><p className="mt-1 text-xs font-semibold text-slate-500">{subtitle}</p></div></div>
+        <div className="text-right"><div className="text-xl font-black text-slate-950">{price}</div><div className="text-xs font-semibold text-slate-500">par passager</div><span className={`mt-3 ml-auto grid h-5 w-5 place-items-center rounded-full border ${active ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'}`}>{active && <CheckCircle2 size={14} />}</span></div>
+      </div>
+      <div className="mt-5 grid gap-3 text-xs font-semibold text-slate-600 md:grid-cols-5">
+        {features.map((item) => <div key={item} className="flex items-center gap-2"><CheckCircle2 size={14} className={item.includes('Non') || item.includes('payantes') ? 'text-slate-300' : 'text-emerald-500'} />{item}</div>)}
+      </div>
+    </button>
+  )
+}
+
+function SeatPreference({ active, onClick, title, subtitle, price }) {
+  return (
+    <button type="button" onClick={onClick} className={`rounded-lg border p-5 text-left transition ${active ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-blue-200'}`}>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-3"><span className="grid h-10 w-10 place-items-center rounded-lg bg-blue-50 text-blue-700"><Plane size={17} /></span><div><b className="block text-sm text-slate-950">{title}</b><span className="mt-1 block text-xs font-semibold text-slate-500">{subtitle}</span></div></div>
+        <span className="text-sm font-black text-blue-800">{price}</span>
+      </div>
+    </button>
+  )
+}
+
+function BriefcaseIcon() {
+  return <span className="text-base font-black">▣</span>
+}
+
+function TicketRow({ ticket, index, selected, onSelect }) {
+  return (
+    <motion.article initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className={`grid items-center gap-5 p-6 lg:grid-cols-[1.25fr_0.9fr_1fr_0.9fr_0.9fr_auto] ${selected ? 'bg-blue-50/55' : ''}`}>
+      <div className="flex items-center gap-4">
+        <img src={ticket.logo} alt={ticket.provider} className="h-16 w-16 rounded-lg border border-slate-100 bg-white object-contain p-2" />
+        <div><div className="font-black">{ticket.provider}</div><div className="text-sm font-semibold text-slate-500">{ticket.code}</div><div className="mt-2 flex flex-wrap gap-2">{ticket.tags.slice(0, 2).map((tag) => <FilterChip key={tag} active>{tag}</FilterChip>)}</div></div>
+      </div>
+      <div><div className="text-2xl font-black">{ticket.departure}</div><div className="text-sm font-bold">{ticket.origin}</div></div>
+      <div className="text-center"><div className="font-bold">{ticket.duration}</div><div className={`mt-2 text-sm font-bold ${ticket.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{ticket.stopLabel}</div></div>
+      <div><div className="text-2xl font-black">{ticket.arrival}</div><div className="text-sm font-bold">{ticket.destination}</div></div>
+      <div><div className="text-2xl font-black text-blue-800">{formatTicketPrice(ticket)}</div><div className="text-sm font-semibold text-slate-500">{ticket.className}</div></div>
+      <div className="space-y-3"><button type="button" onClick={onSelect} className={`h-11 rounded-lg px-8 font-black ${selected ? 'bg-slate-950 text-white' : 'bg-blue-700 text-white'}`}>{selected ? 'Sélectionné' : 'Choisir'}</button><button type="button" onClick={onSelect} className="block w-full text-sm font-black text-blue-800">Détails</button></div>
+    </motion.article>
+  )
+}
+
+function TransportModeIcon({ mode, ...props }) {
+  const icons = { flight: Plane, train: Train, bus: Bus, local: Train, driver: Car }
+  const Icon = icons[mode] || Globe2
+  return <Icon {...props} />
+}
+
+function formatTicketPrice(ticket) {
+  return ticket.priceLabel || `${Number(ticket.price ?? 0).toLocaleString('fr-FR')} FCFA`
+}
+
+function cabinClassLabel(value) {
+  return {
+    economy: 'Économie',
+    premium_economy: 'Premium économie',
+    business: 'Business',
+    first: 'Première',
+  }[value] || 'Économie'
+}
+
+function getTransportIata(label, fallback) {
+  return label.match(/\(([A-Z]{3})\)/)?.[1] || fallback
+}
+
+function parseDuration(duration) {
+  const hours = Number(duration.match(/(\d+)h/)?.[1] ?? 0)
+  const minutes = Number(duration.match(/(\d+)\s*min|h\s*(\d+)/)?.[1] ?? duration.match(/h\s*(\d+)/)?.[1] ?? 0)
+  return hours * 60 + minutes
 }
 
 function Esim() {
@@ -3317,6 +4700,115 @@ function EsimPlan({ plan, index }) {
       <div className="mt-5 text-lg font-black">{price}</div>
       <button className="mt-4 h-11 w-full rounded-lg bg-blue-50 font-black text-blue-800 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">Choisir</button>
     </motion.article>
+  )
+}
+
+function AdvisorContact() {
+  const automaticMessage = "Bonjour StudyWay, j’ai besoin d’aide pour choisir une formation adaptée à mon profil et préparer ma candidature."
+  const advisorReply = "Bonjour Christelle, nous avons bien reçu votre demande. Un conseiller StudyWay peut analyser votre profil, vous proposer des formations cohérentes et vous guider pour le dépôt de candidature."
+  const [draft, setDraft] = useState(automaticMessage)
+  const [messages, setMessages] = useState([
+    { id: 1, side: 'right', text: automaticMessage },
+    { id: 2, side: 'left', text: advisorReply },
+  ])
+
+  function sendAdvisorMessage() {
+    const text = draft.trim()
+    if (!text) return
+
+    setMessages((current) => [
+      ...current,
+      { id: Date.now(), side: 'right', text },
+      { id: Date.now() + 1, side: 'left', text: "Message reçu. Un conseiller StudyWay revient vers vous avec une réponse personnalisée." },
+    ])
+    setDraft('')
+  }
+
+  return (
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+          <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Parler à un conseiller StudyWay</h1>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Un message automatique est préparé pour lancer la conversation. Vous pouvez ensuite contacter directement l’agence.</p>
+        </div>
+        <Link to="/contact/email" className="flex h-11 items-center gap-3 rounded-lg border border-blue-200 bg-white px-5 font-black text-blue-800"><Mail size={17} />Envoyer un email</Link>
+      </div>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 bg-slate-50 px-6 py-5">
+            <div className="flex items-center gap-4">
+              <ThreadAvatar thread={{ title: 'Conseiller StudyWay', tone: 'blue', icon: MessageCircle, online: true }} />
+              <div><h2 className="font-black text-slate-950">Conseiller admission</h2><p className="text-sm font-semibold text-emerald-600">Disponible maintenant</p></div>
+            </div>
+          </div>
+          <div className="space-y-4 bg-white p-6">
+            <div className="max-h-[360px] space-y-4 overflow-y-auto pr-2">
+              {messages.map((message) => (
+                <motion.div key={message.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`${message.side === 'right' ? 'ml-auto bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'} max-w-[82%] rounded-lg px-5 py-4 text-sm font-semibold leading-6 shadow-sm`}>
+                  {message.text}
+                </motion.div>
+              ))}
+            </div>
+            <textarea value={draft} onChange={(event) => setDraft(event.target.value)} className="mt-4 min-h-28 w-full resize-none rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder="Écrivez votre message..." />
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={sendAdvisorMessage} className="flex h-11 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white"><Send size={17} />Envoyer le message</button>
+              <a href="https://wa.me/33184804789" target="_blank" rel="noreferrer" className="flex h-11 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-6 font-black text-emerald-700"><MessageCircle size={17} />WhatsApp</a>
+            </div>
+          </div>
+        </section>
+
+        <aside className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">Contacter l’agence</h2>
+            <div className="mt-5 space-y-3">
+              <a href="tel:+33184804789" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><Phone className="text-blue-700" size={20} />+33 1 84 80 47 89</a>
+              <a href="https://wa.me/33184804789" target="_blank" rel="noreferrer" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><MessageCircle className="text-emerald-600" size={20} />WhatsApp agence</a>
+              <Link to="/contact/email" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><Mail className="text-blue-700" size={20} />contact@studyway.com</Link>
+            </div>
+          </section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <h2 className="font-black text-blue-950">Message envoyé automatiquement</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Le conseiller reçoit le contexte : choix de formation, profil étudiant et besoin d’accompagnement pour postuler.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function EmailContact() {
+  return (
+    <div className="space-y-7">
+      <div>
+        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+        <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Contacter StudyWay par email</h1>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Envoyez votre demande à l’agence. Un conseiller vous répondra avec les prochaines étapes.</p>
+      </div>
+      <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="grid gap-5 md:grid-cols-2">
+            <FormInput label="Nom complet" placeholder="Christelle Komi" />
+            <FormInput label="Adresse email" placeholder="christelle@email.com" />
+            <FormInput label="Téléphone" placeholder="+228 90 12 34 56" />
+            <FormSelect label="Objet" placeholder="Choisir une demande" />
+          </div>
+          <div className="mt-5">
+            <FormTextarea label="Message" placeholder="Bonjour StudyWay, j’aimerais être accompagnée pour choisir mes formations et déposer mes candidatures." />
+          </div>
+          <button type="button" className="mt-6 flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20"><Mail size={18} />Envoyer l’email</button>
+        </section>
+        <aside className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+          <h2 className="font-black text-blue-950">Coordonnées</h2>
+          <div className="mt-5 space-y-4 text-sm font-semibold text-blue-900">
+            <div className="flex items-center gap-3"><Mail size={18} />contact@studyway.com</div>
+            <div className="flex items-center gap-3"><Phone size={18} />+33 1 84 80 47 89</div>
+            <div className="flex items-center gap-3"><MessageCircle size={18} />WhatsApp disponible</div>
+          </div>
+        </aside>
+      </div>
+    </div>
   )
 }
 
