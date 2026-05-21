@@ -564,6 +564,589 @@ a:hover {
   }
 }
 
+/* Housing page custom styles */
+.housing-hero-surface {
+  background-clip: padding-box;
+}
+
+.housing-page {
+  --housing-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.housing-landing-shell,
+.housing-results-hero,
+.housing-search-surface,
+.housing-filter-panel,
+.housing-map-card,
+.housing-listing-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.92));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.94) inset,
+    0 24px 70px rgba(15, 23, 42, 0.075);
+}
+
+.housing-landing-shell::before,
+.housing-results-hero::before,
+.housing-search-surface::before,
+.housing-listing-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.07), transparent 18rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8), transparent 36%);
+  opacity: 0.9;
+}
+
+.housing-landing-shell > *,
+.housing-results-hero > *,
+.housing-search-surface > *,
+.housing-listing-section > * {
+  position: relative;
+}
+
+.housing-landing-hero {
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.housing-landing-hero::before {
+  content: "";
+  position: absolute;
+  inset: -22% -18% auto auto;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 999px;
+  background: rgba(125, 211, 252, 0.18);
+  filter: blur(10px);
+  z-index: 0;
+}
+
+.housing-landing-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(180deg, #000, transparent 88%);
+  z-index: 0;
+}
+
+.housing-hero-photo-stage {
+  position: relative;
+  min-height: 360px;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 28px 70px rgba(2, 8, 23, 0.34),
+    0 12px 24px rgba(30, 64, 175, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transform: translate3d(0, 0, 0);
+}
+
+.housing-hero-photo-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 34%),
+    linear-gradient(0deg, rgba(2, 8, 23, 0.24), transparent 40%);
+}
+
+.housing-hero-image-glow {
+  position: absolute;
+  inset: -28%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 35% 18%, rgba(255, 255, 255, 0.58), transparent 16rem),
+    conic-gradient(from 160deg, rgba(96, 165, 250, 0), rgba(255, 255, 255, 0.32), rgba(16, 185, 129, 0.18), rgba(96, 165, 250, 0));
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation:
+    housing-image-glow-enter 980ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    housing-image-glow-drift 8s ease-in-out 1s infinite;
+}
+
+.housing-hero-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.08) contrast(1.02);
+  transform: scale(1.02);
+  will-change: opacity, transform;
+}
+
+.housing-hero-slide-student {
+  animation: housing-slide-student 10s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.housing-hero-slide-hotel {
+  animation: housing-slide-hotel 10s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.housing-hero-rating-card,
+.housing-hero-social-card {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  box-shadow:
+    0 18px 38px rgba(2, 8, 23, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(18px);
+  animation: housing-float-card 4.8s ease-in-out infinite;
+}
+
+.housing-hero-rating-card {
+  top: 18px;
+  right: 18px;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.45rem;
+  padding: 0.85rem 1rem;
+  min-width: 142px;
+}
+
+.housing-hero-rating-card small {
+  grid-column: 2;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.housing-hero-social-card {
+  right: 18px;
+  bottom: 18px;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.7rem;
+  padding: 0.85rem 1rem;
+  min-width: 210px;
+  animation-delay: -1.8s;
+}
+
+.housing-hero-social-card small {
+  grid-column: 2;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.housing-avatar-stack {
+  grid-row: span 2;
+  display: flex;
+  align-items: center;
+}
+
+.housing-avatar-stack i {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.95), transparent 22%),
+    linear-gradient(135deg, #f97316, #3b82f6);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.housing-avatar-stack i + i {
+  margin-left: -9px;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.95), transparent 22%),
+    linear-gradient(135deg, #22c55e, #06b6d4);
+}
+
+.housing-avatar-stack i:nth-child(3) {
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.95), transparent 22%),
+    linear-gradient(135deg, #a855f7, #f43f5e);
+}
+
+@keyframes housing-slide-student {
+  0% {
+    opacity: 0;
+    transform: scale(1.13) translate3d(22px, 18px, 0);
+    filter: blur(10px) saturate(1.02) contrast(1);
+  }
+  8%, 43% {
+    opacity: 1;
+    transform: scale(1.02) translate3d(0, 0, 0);
+    filter: blur(0) saturate(1.08) contrast(1.02);
+  }
+  52%, 93% {
+    opacity: 0;
+    transform: scale(1.09) translate3d(-18px, -8px, 0);
+    filter: blur(5px) saturate(1.04) contrast(1.01);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.13) translate3d(22px, 18px, 0);
+    filter: blur(10px) saturate(1.02) contrast(1);
+  }
+}
+
+@keyframes housing-slide-hotel {
+  0%, 43% {
+    opacity: 0;
+    transform: scale(1.1) translate3d(18px, 12px, 0);
+    filter: blur(6px) saturate(1.03) contrast(1);
+  }
+  52%, 93% {
+    opacity: 1;
+    transform: scale(1.02) translate3d(0, 0, 0);
+    filter: blur(0) saturate(1.1) contrast(1.03);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1) translate3d(18px, 12px, 0);
+    filter: blur(6px) saturate(1.03) contrast(1);
+  }
+}
+
+@keyframes housing-image-glow-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(28%, -18%, 0) rotate(12deg) scale(0.88);
+  }
+  100% {
+    opacity: 0.5;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes housing-image-glow-drift {
+  0%, 100% {
+    transform: translate3d(-4%, -2%, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, 4%, 0) rotate(10deg) scale(1.08);
+  }
+}
+
+@keyframes housing-float-card {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+.housing-hero-proof,
+.housing-choice-card,
+.housing-card,
+.housing-map-card,
+.housing-filter-panel {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 320ms var(--housing-ease),
+    border-color 280ms ease,
+    box-shadow 320ms ease,
+    background-color 280ms ease;
+}
+
+.housing-hero-proof {
+  backdrop-filter: blur(16px);
+}
+
+.housing-choice-panel {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(59, 130, 246, 0.065), transparent 18rem),
+    linear-gradient(180deg, rgba(248, 251, 255, 0.82), rgba(255, 255, 255, 0.96));
+}
+
+.housing-choice-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 18px 46px rgba(15, 23, 42, 0.06);
+}
+
+.housing-choice-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.7), transparent 42%),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.06), transparent);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.housing-choice-card:hover {
+  border-color: rgba(37, 99, 235, 0.24);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 26px 64px rgba(15, 23, 42, 0.1),
+    0 10px 24px rgba(37, 99, 235, 0.065);
+  transform: translate3d(0, -4px, 0);
+}
+
+.housing-choice-card:hover::before {
+  opacity: 1;
+}
+
+.housing-choice-card > * {
+  position: relative;
+}
+
+.housing-choice-chip {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.84) inset,
+    0 8px 18px rgba(15, 23, 42, 0.055);
+  transition:
+    transform 260ms var(--housing-ease),
+    box-shadow 260ms ease,
+    filter 260ms ease;
+}
+
+.housing-choice-chip-blue {
+  color: #1d4ed8;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.98), rgba(239, 246, 255, 0.9));
+  border: 1px solid rgba(147, 197, 253, 0.58);
+}
+
+.housing-choice-chip-emerald {
+  color: #047857;
+  background: linear-gradient(135deg, rgba(209, 250, 229, 0.96), rgba(236, 253, 245, 0.9));
+  border: 1px solid rgba(110, 231, 183, 0.52);
+}
+
+.housing-choice-card:hover .housing-choice-chip {
+  transform: translate3d(0, -1px, 0);
+  filter: saturate(1.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    0 12px 24px rgba(37, 99, 235, 0.085);
+}
+
+.housing-choice-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(15, 23, 42, 0.22));
+  opacity: 0.65;
+  transition: opacity 320ms ease;
+}
+
+.housing-choice-image img {
+  transition: transform 560ms var(--housing-ease), filter 360ms ease;
+}
+
+.housing-choice-card:hover .housing-choice-image img {
+  transform: scale(1.06);
+  filter: saturate(1.08) contrast(1.03);
+}
+
+.housing-results-hero {
+  background:
+    radial-gradient(circle at 86% 10%, rgba(14, 165, 233, 0.08), transparent 18rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.9));
+}
+
+.housing-back-button,
+.housing-advisor-button,
+.housing-search-surface button,
+.housing-map-card button {
+  transition:
+    transform 260ms var(--housing-ease),
+    box-shadow 260ms ease,
+    background-color 260ms ease,
+    color 260ms ease;
+}
+
+.housing-back-button:hover {
+  transform: translate3d(-2px, 0, 0);
+}
+
+.housing-advisor-button:hover,
+.housing-search-surface button:hover,
+.housing-map-card button:hover {
+  box-shadow:
+    0 16px 34px rgba(37, 99, 235, 0.18),
+    0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.housing-search-surface {
+  border-radius: 18px;
+}
+
+.housing-search-item {
+  border-radius: 14px;
+  padding: 0.55rem 0.75rem;
+  transition: background-color 220ms ease, transform 260ms var(--housing-ease);
+}
+
+.housing-search-item:hover {
+  background: rgba(239, 246, 255, 0.78);
+  transform: translate3d(0, -1px, 0);
+}
+
+.housing-filter-panel,
+.housing-map-card {
+  border-radius: 18px;
+}
+
+.housing-map-preview {
+  box-shadow:
+    inset 0 0 0 1px rgba(37, 99, 235, 0.1),
+    inset 0 24px 70px rgba(59, 130, 246, 0.08);
+}
+
+.housing-map-preview span {
+  transition: transform 240ms var(--housing-ease), box-shadow 240ms ease;
+}
+
+.housing-map-preview span:hover {
+  transform: translate3d(0, -2px, 0) scale(1.03);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.18);
+}
+
+.housing-listing-section {
+  border-radius: 22px;
+}
+
+.housing-card {
+  position: relative;
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.94) inset,
+    0 18px 44px rgba(15, 23, 42, 0.07);
+}
+
+.housing-card:hover {
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 30px 70px rgba(15, 23, 42, 0.11),
+    0 12px 24px rgba(37, 99, 235, 0.06);
+}
+
+.housing-badge {
+  backdrop-filter: blur(12px);
+}
+
+.favorite-button {
+  transition:
+    transform 240ms var(--housing-ease),
+    background-color 240ms ease,
+    color 240ms ease,
+    box-shadow 240ms ease;
+}
+
+.favorite-button:hover,
+.favorite-button.is-favorite {
+  transform: scale(1.08);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+}
+
+.housing-why-section {
+  position: relative;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(125, 211, 252, 0.26), transparent 22rem),
+    radial-gradient(circle at 84% 12%, rgba(16, 185, 129, 0.18), transparent 20rem),
+    linear-gradient(135deg, #061b47 0%, #082f7a 54%, #061b47 100%);
+}
+
+.housing-why-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(180deg, #000, transparent 92%);
+}
+
+.housing-why-section > * {
+  position: relative;
+}
+
+.housing-why-pill,
+.housing-why-card {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.housing-why-card {
+  transition: transform 300ms var(--housing-ease), background-color 300ms ease, border-color 300ms ease;
+}
+
+.housing-why-card:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  transform: translate3d(0, -4px, 0);
+}
+
+.housing-hero-left {
+  position: relative;
+  overflow: hidden;
+}
+
+.housing-option-card {
+  overflow: hidden;
+}
+
+.housing-option-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.housing-search-surface {
+  /* subtle glass effect */
+}
+
+.housing-search-item {
+  padding: 8px 0;
+}
+
+.housing-image-overlay {
+  pointer-events: none;
+}
+
+.housing-badge {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.favorite-button.is-favorite {
+  background: radial-gradient(ellipse at center, rgba(255,230,235,0.9), rgba(255,230,235,0.85));
+}
+
+/* Subtle entrance for housing cards */
+.housing-card {
+  will-change: transform;
+}
+
+/* Responsive tweaks */
+@media (max-width: 767px) {
+  .housing-hero-left .inline-flex { font-size: 11px; }
+}
+
+
 .sidebar-panel {
   opacity: 0;
   transform: translateX(-104%) scale(0.985);
@@ -611,6 +1194,11 @@ a:hover {
   backdrop-filter: blur(12px) saturate(1.08);
 }
 
+.settings-popover-backdrop {
+  cursor: default;
+  background: transparent;
+}
+
 .settings-hub-page {
   background:
     radial-gradient(circle at 50% 4%, rgba(37, 99, 235, 0.08), transparent 24rem),
@@ -623,6 +1211,18 @@ a:hover {
   border-radius: 26px;
 }
 
+.settings-hub-popover {
+  position: absolute;
+  top: 3.65rem;
+  right: 0;
+  z-index: 80;
+  width: min(430px, calc(100vw - 2rem));
+  box-shadow:
+    0 28px 72px rgba(15, 23, 42, 0.18),
+    0 10px 24px rgba(37, 99, 235, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 .settings-hub-window::before {
   content: "";
   position: absolute;
@@ -632,6 +1232,19 @@ a:hover {
     linear-gradient(135deg, rgba(255, 255, 255, 0.9), transparent 32%),
     radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.1), transparent 13rem);
   opacity: 0.9;
+}
+
+.settings-hub-popover::after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border-left: 1px solid rgba(226, 232, 240, 0.9);
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  transform: rotate(45deg);
 }
 
 .settings-hub-window > * {
@@ -817,6 +1430,366 @@ main [class*="rounded-lg"]:hover img.object-cover {
   background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.2), transparent);
 }
 
+.transport-page {
+  --transport-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transport-hero-banner,
+.transport-mode-strip,
+.transport-search-panel,
+.transport-filter-panel,
+.transport-results-panel,
+.transport-side-card,
+.transport-arrival-pack {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.92));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.94) inset,
+    0 22px 62px rgba(15, 23, 42, 0.07);
+}
+
+.transport-hero-banner {
+  min-height: 224px;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.9));
+}
+
+.transport-hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.86) 38%, rgba(255, 255, 255, 0.44) 67%, rgba(255, 255, 255, 0.18) 100%),
+    radial-gradient(circle at 18% 20%, rgba(37, 99, 235, 0.12), transparent 18rem),
+    linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+  background-size: auto, auto, 38px 38px, 38px 38px;
+}
+
+.transport-hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: auto 1.4rem 1.2rem auto;
+  width: 42%;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.82), transparent);
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.72);
+}
+
+.transport-hero-banner > * {
+  position: relative;
+  z-index: 3;
+}
+
+.transport-hero-bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+  opacity: 0.88;
+  filter: saturate(1.08) contrast(1.02);
+  transform: scale(1.025);
+  transition:
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 420ms ease,
+    opacity 420ms ease;
+  will-change: transform;
+}
+
+.transport-hero-banner:hover .transport-hero-bg-image {
+  opacity: 0.95;
+  transform: scale(1.065);
+  filter: saturate(1.16) contrast(1.04);
+}
+
+.transport-back-button,
+.transport-wallet-card,
+.transport-tab,
+.transport-select-field,
+.transport-primary-action,
+.transport-reset-button,
+.transport-ticket-button,
+.transport-local-button,
+.transport-arrival-pack button {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 280ms var(--transport-ease),
+    border-color 240ms ease,
+    background-color 240ms ease,
+    color 240ms ease,
+    box-shadow 280ms ease;
+}
+
+.transport-back-button:hover,
+.transport-wallet-card:hover,
+.transport-tab:hover,
+.transport-select-field:hover,
+.transport-reset-button:hover,
+.transport-local-button:hover {
+  transform: translate3d(0, -2px, 0);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.08),
+    0 6px 14px rgba(37, 99, 235, 0.055);
+}
+
+.transport-wallet-card {
+  backdrop-filter: blur(16px);
+}
+
+.transport-mode-strip {
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 251, 255, 0.9));
+}
+
+.transport-tab {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.transport-tab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.78), transparent 55%),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.08), transparent);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.transport-tab:hover::before,
+.transport-tab.is-active::before {
+  opacity: 1;
+}
+
+.transport-tab.is-active {
+  box-shadow:
+    0 16px 32px rgba(37, 99, 235, 0.12),
+    inset 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+.transport-search-panel,
+.transport-filter-panel,
+.transport-results-panel,
+.transport-side-card {
+  border-radius: 20px;
+}
+
+.transport-search-panel::before,
+.transport-filter-panel::before,
+.transport-results-panel::before,
+.transport-side-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.85), transparent 38%),
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.055), transparent 15rem);
+}
+
+.transport-search-panel > *,
+.transport-filter-panel > *,
+.transport-results-panel > *,
+.transport-side-card > * {
+  position: relative;
+}
+
+.transport-select-field {
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.transport-select-field:focus-within {
+  border-color: rgba(37, 99, 235, 0.38);
+  box-shadow:
+    0 0 0 4px rgba(37, 99, 235, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.transport-primary-action:hover,
+.transport-ticket-button:hover,
+.transport-arrival-pack button:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow:
+    0 18px 36px rgba(37, 99, 235, 0.18),
+    0 8px 16px rgba(15, 23, 42, 0.08);
+}
+
+.transport-results-header {
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.9), rgba(255, 255, 255, 0.76));
+}
+
+.transport-filter-chip {
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.07);
+}
+
+.transport-ticket-row {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 280ms var(--transport-ease),
+    background-color 260ms ease,
+    box-shadow 280ms ease;
+}
+
+.transport-ticket-row::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 18px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.62), transparent 50%),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.055), transparent);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.transport-ticket-row:hover,
+.transport-ticket-row.is-selected {
+  transform: translate3d(0, -2px, 0);
+}
+
+.transport-ticket-row:hover::before,
+.transport-ticket-row.is-selected::before {
+  opacity: 1;
+}
+
+.transport-ticket-row > * {
+  position: relative;
+  z-index: 1;
+}
+
+.transport-ticket-logo {
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.transport-conditions-note {
+  border: 1px solid rgba(245, 158, 11, 0.16);
+  background:
+    linear-gradient(135deg, rgba(255, 251, 235, 0.96), rgba(255, 255, 255, 0.82));
+}
+
+.transport-trip-card {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(37, 99, 235, 0.11), transparent 11rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.9));
+}
+
+.transport-card-visual {
+  box-shadow:
+    0 14px 28px rgba(37, 99, 235, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.transport-local-button span:first-child span:first-child {
+  transition: transform 260ms var(--transport-ease), box-shadow 260ms ease;
+}
+
+.transport-local-button:hover span:first-child span:first-child {
+  transform: scale(1.06);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.09);
+}
+
+.transport-secure-card {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(16, 185, 129, 0.12), transparent 12rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.9));
+}
+
+.transport-secure-card {
+  min-height: 0;
+}
+
+.transport-secure-card .secure-visual {
+  justify-self: end;
+}
+
+@media (max-width: 1023px) {
+  .housing-hero-photo-stage {
+    min-height: 320px;
+  }
+
+  .housing-hero-social-card {
+    left: 18px;
+    right: auto;
+    min-width: 190px;
+  }
+
+  .transport-hero-banner {
+    min-height: 260px;
+  }
+
+  .transport-hero-bg-image {
+    object-position: center;
+  }
+
+  .transport-hero-banner::before {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.78) 55%, rgba(255, 255, 255, 0.34) 100%),
+      radial-gradient(circle at 18% 20%, rgba(37, 99, 235, 0.12), transparent 18rem);
+  }
+
+  .transport-wallet-card {
+    margin-left: 0;
+  }
+}
+
+.transport-arrival-pack {
+  border-radius: 22px;
+  min-height: 156px;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(37, 99, 235, 0.13), transparent 17rem),
+    linear-gradient(135deg, rgba(239, 246, 255, 0.98), rgba(255, 255, 255, 0.84));
+}
+
+.transport-arrival-pack::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.68), transparent 55%),
+    linear-gradient(rgba(37, 99, 235, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.055) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
+}
+
+.arrival-pack-bg {
+  opacity: 0.23;
+  object-position: right center;
+  filter: saturate(1.08);
+}
+
+.arrival-pack-icon {
+  box-shadow:
+    0 12px 24px rgba(37, 99, 235, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.transport-loading-state {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.07), transparent 17rem);
+}
+
 .finance-hero-banner {
   isolation: isolate;
 }
@@ -899,45 +1872,6 @@ main textarea:focus {
 .esim-page article:hover,
 .transport-page article:hover {
   filter: saturate(1.03);
-}
-
-.housing-why-section {
-  position: relative;
-  isolation: isolate;
-  background:
-    linear-gradient(135deg, #061b47 0%, #0b4ba7 54%, #0f9f8f 100%);
-  box-shadow:
-    0 -20px 60px rgba(15, 23, 42, 0.08),
-    0 1px 0 rgba(255, 255, 255, 0.16) inset;
-}
-
-.housing-why-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.62), transparent 78%);
-}
-
-.housing-why-card {
-  background: rgba(37, 99, 235, 0.92);
-  transition:
-    border-color 260ms ease,
-    box-shadow 260ms ease;
-  box-shadow:
-    0 18px 34px rgba(3, 7, 18, 0.14),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
-}
-
-.housing-why-pill {
-  background: rgba(37, 99, 235, 0.92);
-  box-shadow:
-    0 12px 26px rgba(3, 7, 18, 0.14),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
 }
 
 .finance-page .finance-quick-card {
@@ -1209,20 +2143,6 @@ main textarea:focus {
     0 0 18px rgba(52, 211, 153, 0.42);
 }
 
-.transport-arrival-pack::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  pointer-events: none;
-}
-
-.arrival-pack-bg {
-  opacity: 0.92;
-  object-position: center;
-  pointer-events: none;
-}
-
 .arrival-pack-icon {
   transition:
     transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -1256,11 +2176,6 @@ main textarea:focus {
   box-shadow:
     0 18px 34px rgba(37, 99, 235, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.92) inset;
-}
-
-.transport-secure-card {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
 }
 
 .secure-visual::before {
