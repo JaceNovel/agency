@@ -93,17 +93,25 @@ a:hover {
 }
 
 .shell-sidebar {
+  --sidebar-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --sidebar-fast: cubic-bezier(0.16, 1, 0.3, 1);
   width: 82px;
-  border-radius: 0;
+  border-radius: 0 20px 20px 0;
   transform: translateZ(0);
   transition:
-    width 380ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 340ms ease,
-    border-radius 340ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: width;
+    width 520ms var(--sidebar-ease),
+    box-shadow 520ms ease,
+    border-radius 520ms var(--sidebar-ease),
+    background 520ms ease;
+  will-change: width, border-radius, box-shadow;
   background:
-    radial-gradient(circle at 28px 28px, rgba(96, 165, 250, 0.38), transparent 7rem),
-    linear-gradient(180deg, #061b47 0%, #08255d 44%, #061b47 100%);
+    radial-gradient(circle at 34px 34px, rgba(125, 211, 252, 0.26), transparent 8rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.09), transparent 34%),
+    linear-gradient(180deg, #061b47 0%, #08265f 48%, #051638 100%);
+  box-shadow:
+    12px 0 34px rgba(15, 23, 42, 0.13),
+    inset -1px 0 0 rgba(255, 255, 255, 0.1);
+  contain: layout paint;
 }
 
 .shell-sidebar::before {
@@ -113,37 +121,47 @@ a:hover {
   pointer-events: none;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.065) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.42;
-  mask-image: linear-gradient(180deg, #000, transparent 88%);
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    radial-gradient(circle at 82% 16%, rgba(255, 255, 255, 0.16), transparent 12rem);
+  background-size: 24px 24px, 24px 24px, auto;
+  opacity: 0.3;
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.75) 58%, transparent 100%);
+  transition: opacity 520ms ease;
 }
 
 .shell-sidebar::after {
   content: "";
   position: absolute;
-  top: 18px;
+  top: 22px;
   right: 0;
   width: 1px;
-  height: calc(100% - 36px);
-  background: linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.8), transparent);
-  box-shadow: 0 0 22px rgba(96, 165, 250, 0.72);
-  opacity: 0.45;
+  height: calc(100% - 44px);
+  background: linear-gradient(180deg, transparent, rgba(125, 211, 252, 0.82), transparent);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.68);
+  opacity: 0.42;
+  transition: opacity 420ms ease;
 }
 
 .shell-sidebar.is-open {
   width: 292px;
-  border-radius: 0 28px 28px 0;
+  border-radius: 0 30px 30px 0;
   box-shadow:
-    18px 0 54px rgba(15, 23, 42, 0.18),
-    0 0 42px rgba(37, 99, 235, 0.18) inset;
+    24px 0 62px rgba(15, 23, 42, 0.2),
+    0 22px 54px rgba(37, 99, 235, 0.14),
+    inset -1px 0 0 rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(1.22);
+}
+
+.shell-sidebar.is-open::before {
+  opacity: 0.48;
 }
 
 .shell-content {
   margin-left: 82px;
   transition:
-    margin-left 380ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 360ms ease;
+    margin-left 520ms cubic-bezier(0.19, 1, 0.22, 1),
+    filter 420ms ease;
 }
 
 .shell-content.is-compressed {
@@ -153,23 +171,28 @@ a:hover {
 .rail-menu-button {
   position: relative;
   background:
-    linear-gradient(135deg, rgba(2, 8, 23, 0.96), rgba(7, 19, 51, 0.88));
+    linear-gradient(135deg, rgba(2, 8, 23, 0.98), rgba(8, 28, 70, 0.9));
   box-shadow:
     0 14px 30px rgba(37, 99, 235, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+    0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+  transition:
+    transform 460ms var(--sidebar-fast),
+    border-radius 520ms var(--sidebar-ease),
+    box-shadow 420ms ease;
+  will-change: transform, border-radius;
 }
 
 .rail-menu-button::after {
   content: "";
   position: absolute;
   inset: -7px;
-  border-radius: 20px;
-  border: 1px solid rgba(96, 165, 250, 0.22);
+  border-radius: 22px;
+  border: 1px solid rgba(125, 211, 252, 0.22);
   opacity: 0;
   transform: scale(0.88);
   transition:
-    opacity 280ms ease,
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 320ms ease,
+    transform 520ms var(--sidebar-fast);
 }
 
 .shell-sidebar:hover .rail-menu-button::after,
@@ -178,123 +201,165 @@ a:hover {
   transform: scale(1);
 }
 
+.sidebar-header {
+  transition:
+    gap 520ms var(--sidebar-ease),
+    transform 520ms var(--sidebar-ease);
+}
+
 .sidebar-brand {
   opacity: 0;
   width: 0;
+  max-width: 190px;
   overflow: hidden;
-  transform: translateX(-18px) scale(0.94);
+  transform: translate3d(-18px, 0, 0) scale(0.96);
   filter: blur(8px);
   transition:
-    opacity 420ms ease 140ms,
-    width 620ms cubic-bezier(0.19, 1, 0.22, 1),
-    transform 620ms cubic-bezier(0.19, 1, 0.22, 1),
-    filter 520ms ease 140ms;
+    opacity 300ms ease,
+    width 520ms var(--sidebar-ease),
+    transform 560ms var(--sidebar-ease),
+    filter 420ms ease;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .shell-sidebar.is-open .sidebar-brand {
   opacity: 1;
   width: 190px;
-  transform: translateX(0) scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
   filter: blur(0);
+  transition-delay: 100ms, 0ms, 80ms, 80ms;
 }
 
 .sidebar-brand > div {
-  transform: translateX(-8px);
-  transition:
-    transform 620ms cubic-bezier(0.19, 1, 0.22, 1),
-    letter-spacing 420ms ease;
+  transform: translate3d(-8px, 0, 0);
+  transition: transform 620ms var(--sidebar-ease);
 }
 
 .shell-sidebar.is-open .sidebar-brand > div {
-  transform: translateX(0);
-  letter-spacing: 0;
+  transform: translate3d(0, 0, 0);
 }
 
 .rail-menu-button img {
   animation: none;
   transition:
-    height 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform 420ms var(--sidebar-fast),
+    filter 320ms ease;
+  will-change: transform;
+}
+
+.shell-sidebar:not(.is-open) .rail-menu-button {
+  transform: translate3d(0, 3px, 0) scale(0.94);
+}
+
+.shell-sidebar:not(.is-open) .rail-menu-button img {
+  transform: scale(0.92);
 }
 
 .shell-sidebar.is-open .rail-menu-button img {
-  animation: sidebar-logo-pop 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: sidebar-logo-pop 460ms var(--sidebar-fast) both;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition:
+    gap 520ms var(--sidebar-ease),
+    margin-top 520ms var(--sidebar-ease),
+    padding 520ms var(--sidebar-ease);
 }
 
 .shell-nav-link {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
-}
-
-.shell-nav-link::before {
-  content: "";
-  position: absolute;
-  inset: 8px auto 8px 8px;
-  width: 3px;
-  border-radius: 999px;
-  background: #60a5fa;
-  opacity: 0;
-  transform: scaleY(0.35);
+  color: rgba(239, 246, 255, 0.82);
+  transform: translate3d(0, 0, 0);
   transition:
-    opacity 240ms ease,
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    color 260ms ease,
+    transform 360ms var(--sidebar-fast),
+    box-shadow 360ms ease;
+  will-change: transform;
 }
 
-.shell-nav-link.is-active::before,
-.shell-nav-link:hover::before {
-  opacity: 1;
-  transform: scaleY(1);
-}
-
-/* Remove the old left indicator and any ::after decorations globally */
 .shell-nav-link::before,
 .shell-nav-link::after {
-  display: none !important;
+  display: none;
 }
 
-/* Active state: modern premium icon treatment (no left bar) */
-.shell-nav-link.is-active {
-  background: rgba(147,197,253,0.06) !important;
+.shell-nav-active-pill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(125, 211, 252, 0.14)),
+    linear-gradient(180deg, rgba(59, 130, 246, 0.28), rgba(14, 165, 233, 0.1));
+  box-shadow:
+    0 12px 28px rgba(14, 165, 233, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 0 28px rgba(125, 211, 252, 0.14);
+  backdrop-filter: blur(14px) saturate(1.18);
 }
 
-.shell-nav-link.is-active .shell-nav-icon {
-  color: #7cc0ff; /* soft premium blue */
-  background: rgba(124, 192, 255, 0.12);
-  padding: 6px;
-  border-radius: 10px;
-  transition: color 250ms ease, background 250ms ease, transform 250ms ease, box-shadow 250ms ease;
-  transform: none !important;
-}
-
-/* Ensure active label gets a subtle tint (open state) */
-.shell-nav-link.is-active .shell-nav-label {
-  color: rgba(124, 192, 255, 0.95);
-  transition: color 240ms ease;
-}
-
-/* Keep collapsed state alignment stable while showing the active icon styling */
-.shell-sidebar:not(.is-open) .shell-nav-link.is-active {
-  background: transparent !important;
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-link.is-active .shell-nav-icon {
-  background: rgba(124, 192, 255, 0.12);
-  box-shadow: 0 4px 14px rgba(124, 192, 255, 0.06);
+.shell-nav-icon-wrap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 2.35rem;
+  place-items: center;
+  border-radius: 14px;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 420ms var(--sidebar-fast),
+    background-color 280ms ease,
+    box-shadow 280ms ease,
+    color 240ms ease;
+  will-change: transform;
 }
 
 .shell-nav-icon {
-  position: relative;
-  z-index: 1;
-  margin-left: 1px;
+  color: currentColor;
+  stroke-width: 2.25;
+  transform: translate3d(0, 0, 0);
   transition:
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 220ms ease;
+    transform 420ms var(--sidebar-fast),
+    filter 280ms ease;
+  will-change: transform;
 }
 
-.shell-nav-link:hover .shell-nav-icon {
-  transform: translateX(2px) scale(1.08);
+.shell-nav-link:hover {
+  color: #ffffff;
+}
+
+.shell-nav-link:hover .shell-nav-icon-wrap {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 10px 24px rgba(14, 165, 233, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.11);
+  transform: translate3d(2px, 0, 0) scale(1.04);
+}
+
+.shell-nav-link.is-active {
+  color: #ffffff !important;
+}
+
+.shell-nav-link.is-active .shell-nav-icon-wrap {
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 11px 24px rgba(56, 189, 248, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.13) inset;
+}
+
+.shell-nav-link.is-active .shell-nav-icon {
+  filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.56));
+}
+
+.shell-nav-link.is-active .shell-nav-label {
+  color: #e8f6ff;
 }
 
 .shell-nav-label,
@@ -302,13 +367,14 @@ a:hover {
 .sidebar-help,
 .sidebar-scroll-cue {
   opacity: 0;
-  transform: translateX(-16px);
-  filter: blur(5px);
+  transform: translate3d(-14px, 0, 0);
+  filter: blur(6px);
   transition:
-    opacity 360ms ease,
-    transform 560ms cubic-bezier(0.19, 1, 0.22, 1),
-    filter 460ms ease;
+    opacity 300ms ease,
+    transform 560ms var(--sidebar-ease),
+    filter 420ms ease;
   pointer-events: none;
+  will-change: opacity, transform, filter;
 }
 
 .shell-sidebar.is-open .shell-nav-label,
@@ -316,202 +382,109 @@ a:hover {
 .shell-sidebar.is-open .sidebar-help,
 .shell-sidebar.is-open .sidebar-scroll-cue {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
   filter: blur(0);
   pointer-events: auto;
 }
 
-.shell-sidebar.is-open .shell-nav-link:nth-child(1) .shell-nav-label {
-  transition-delay: 80ms;
-}
+.shell-sidebar.is-open .shell-nav-link:nth-child(1) .shell-nav-label { transition-delay: 70ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(2) .shell-nav-label { transition-delay: 95ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(3) .shell-nav-label { transition-delay: 120ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(4) .shell-nav-label { transition-delay: 145ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(5) .shell-nav-label { transition-delay: 170ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(6) .shell-nav-label { transition-delay: 195ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(7) .shell-nav-label { transition-delay: 220ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(8) .shell-nav-label { transition-delay: 245ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(9) .shell-nav-label { transition-delay: 270ms; }
+.shell-sidebar.is-open .shell-nav-link:nth-child(10) .shell-nav-label { transition-delay: 295ms; }
 
-.shell-sidebar.is-open .shell-nav-link:nth-child(2) .shell-nav-label {
-  transition-delay: 105ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(3) .shell-nav-label {
-  transition-delay: 130ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(4) .shell-nav-label {
-  transition-delay: 155ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(5) .shell-nav-label {
-  transition-delay: 180ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(6) .shell-nav-label {
-  transition-delay: 205ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(7) .shell-nav-label {
-  transition-delay: 230ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(8) .shell-nav-label {
-  transition-delay: 255ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(9) .shell-nav-label {
-  transition-delay: 280ms;
-}
-
-.shell-sidebar.is-open .shell-nav-link:nth-child(10) .shell-nav-label {
-  transition-delay: 305ms;
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-link {
-  /* Make each link span the sidebar width and center its icon */
-  width: 100%;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* true horizontal centering */
-  padding-left: 0;
-  padding-right: 0;
-  overflow: visible;
-  border: 0 !important;
-  background: transparent !important;
-  color: rgba(239, 246, 255, 0.92) !important;
-  box-shadow: none !important;
-  transform: none;
-  transition:
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 220ms ease,
-    color 220ms ease,
-    opacity 220ms ease;
-}
-
-.shell-sidebar:not(.is-open) .sidebar-nav {
-  margin-top: 1.35rem;
-  overflow: visible;
-  padding-right: 0;
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-link + .shell-nav-link {
-  margin-top: 0.45rem !important;
-}
-
-/* Closed sidebar: vertical column of icons centered under the logo */
 .shell-sidebar:not(.is-open) .sidebar-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  padding-top: 6px;
-  transition: gap 320ms cubic-bezier(0.22, 1, 0.36, 1), padding-top 320ms ease;
+  justify-content: center;
+  gap: 0;
 }
 
 .shell-sidebar:not(.is-open) .sidebar-brand {
-  display: none;
+  pointer-events: none;
 }
 
 .shell-sidebar:not(.is-open) .sidebar-nav {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem; /* uniform spacing between icons */
-  margin-top: 0.4rem; /* icons start just under the logo */
+  gap: 0.72rem;
+  margin-top: 0.65rem;
   padding-right: 0;
   overflow: visible;
-  transition: margin-top 320ms ease, gap 320ms ease, padding 320ms ease;
 }
 
-.shell-sidebar:not(.is-open) .shell-nav-link + .shell-nav-link {
-  margin-top: 0 !important;
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-label {
-  /* fully collapse labels: no width, no interaction */
-  opacity: 0;
-  width: 0;
-  max-width: 0;
-  padding: 0;
-  margin: 0;
-  flex: 0 0 0;
-  overflow: hidden;
-  pointer-events: none;
-  transform: none;
-  transition: opacity 200ms ease, width 280ms cubic-bezier(0.19,1,0.22,1);
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-badge {
-  /* hide badges cleanly in collapsed state */
-  opacity: 0;
-  width: 0;
-  height: 0;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transition: opacity 200ms ease, width 240ms ease, height 240ms ease;
-}
-
-/* Force icons to be absolutely centered inside each link to guarantee exact alignment */
 .shell-sidebar:not(.is-open) .shell-nav-link {
-  position: relative; /* ensure absolute children are positioned correctly */
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-icon {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  color: rgba(239, 246, 255, 0.92);
-  stroke-width: 2.25;
-  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), color 160ms ease;
+  width: 50px;
+  height: 50px;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  border-radius: 18px;
+  color: rgba(239, 246, 255, 0.9) !important;
+  transform: translate3d(0, 0, 0) scale(0.985);
 }
 
 .shell-sidebar:not(.is-open) .shell-nav-link:hover {
-  background: rgba(255, 255, 255, 0.03) !important;
+  transform: translate3d(0, -1px, 0) scale(1.02);
 }
 
-.shell-sidebar:not(.is-open) .shell-nav-link:hover .shell-nav-icon {
-  color: #ffffff;
-  transform: translate(-50%, -50%) scale(1.08);
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-link.is-active .shell-nav-icon {
-  color: #ffffff;
-  transform: translate(-50%, -50%) scale(1.08);
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.42));
-}
-.shell-sidebar:not(.is-open) .shell-nav-link:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  transform: none;
-}
-
-.shell-sidebar:not(.is-open) .shell-nav-link:hover .shell-nav-icon {
-  color: #ffffff;
-  /* subtle scale on hover without horizontal shift */
-  transform: scale(1.08);
+.shell-sidebar:not(.is-open) .shell-nav-link:hover .shell-nav-icon-wrap {
+  transform: scale(1.07);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 24px rgba(125, 211, 252, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.13);
 }
 
 .shell-sidebar:not(.is-open) .shell-nav-link.is-active {
-  background: transparent !important;
-  color: #ffffff !important;
-  box-shadow: none !important;
-  transform: none;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.shell-sidebar:not(.is-open) .shell-nav-link.is-active::after {
-  opacity: 1;
-  transform: translateY(-50%) scaleY(1);
+.shell-sidebar:not(.is-open) .shell-nav-active-pill {
+  inset: 3px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(125, 211, 252, 0.2)),
+    linear-gradient(180deg, rgba(59, 130, 246, 0.34), rgba(14, 165, 233, 0.14));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 12px 26px rgba(14, 165, 233, 0.16),
+    0 0 26px rgba(125, 211, 252, 0.22);
 }
 
+.shell-sidebar:not(.is-open) .shell-nav-icon-wrap {
+  width: 2.42rem;
+  height: 2.42rem;
+  flex-basis: 2.42rem;
+  transform: scale(0.94);
+}
+
+.shell-sidebar:not(.is-open) .shell-nav-icon {
+  transform: scale(0.96);
+}
+
+.shell-sidebar:not(.is-open) .shell-nav-link:hover .shell-nav-icon,
 .shell-sidebar:not(.is-open) .shell-nav-link.is-active .shell-nav-icon {
-  color: #ffffff;
-  transform: scale(1.08);
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.42));
+  transform: scale(1.06);
+}
+
+.shell-sidebar:not(.is-open) .shell-nav-label,
+.shell-sidebar:not(.is-open) .shell-nav-badge {
+  width: 0;
+  max-width: 0;
+  margin: 0;
+  overflow: hidden;
+  flex: 0 0 0;
+  transform: translate3d(-10px, 0, 0);
 }
 
 .shell-sidebar:not(.is-open) .sidebar-help,
 .shell-sidebar:not(.is-open) .sidebar-scroll-cue {
-  display: none;
+  opacity: 0;
+  transform: translate3d(-12px, 0, 0) scale(0.98);
+  pointer-events: none;
 }
 
 .sidebar-scroll-cue {
@@ -531,6 +504,11 @@ a:hover {
 
   .shell-sidebar.is-open {
     width: 252px;
+  }
+
+  .shell-sidebar:not(.is-open) .shell-nav-link {
+    width: 44px;
+    height: 48px;
   }
 
   .shell-content,
@@ -602,6 +580,54 @@ a:hover {
 .sidebar-panel.is-open {
   opacity: 1;
   transform: translateX(0) scale(1);
+}
+
+.settings-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-menu-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), transparent 46%);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.settings-menu-item:hover::before,
+.settings-menu-item.is-active::before {
+  opacity: 1;
+}
+
+.settings-tab {
+  isolation: isolate;
+}
+
+.settings-tab.is-active {
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.92), rgba(255, 255, 255, 0.94));
+  box-shadow:
+    0 10px 24px rgba(37, 99, 235, 0.08),
+    inset 0 0 0 1px rgba(59, 130, 246, 0.16);
+}
+
+.settings-tab.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 8px auto 8px 0;
+  width: 3px;
+  border-radius: 999px;
+  background: #2563eb;
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.38);
+}
+
+.settings-placeholder-page {
+  background:
+    radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.06), transparent 24rem),
+    radial-gradient(circle at 92% 12%, rgba(14, 165, 233, 0.05), transparent 24rem);
 }
 
 main [class*="rounded-lg"][class*="bg-white"]:hover,

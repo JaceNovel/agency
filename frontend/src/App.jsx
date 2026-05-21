@@ -70,6 +70,13 @@ const navItems = [
   { label: 'eSIM & Forfait', icon: Smartphone, to: '/esim' },
 ]
 
+const settingsItems = [
+  { label: 'Modifier le profil', title: 'Modifier le profil', icon: UserRound, to: '/settings/profile' },
+  { label: 'Adresse de facturation', title: 'Adresse de facturation', icon: FileText, to: '/settings/billing' },
+  { label: 'Méthode de paiement', title: 'Méthode de paiement', icon: CreditCard, to: '/settings/payment-methods' },
+  { label: 'Historique de connexion', title: 'Historique de connexion', icon: Clock3, to: '/settings/login-history' },
+]
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -244,7 +251,9 @@ function Shell() {
   const [sidebarHover, setSidebarHover] = useState(false)
   const location = useLocation()
   const isSettingsPage = location.pathname.startsWith('/parametres')
+  const isSettingsRoute = location.pathname.startsWith('/settings')
   const sidebarOpen = sidebarHover
+  const activeNavIndex = navItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
 
   if (isSettingsPage) {
     return (
@@ -275,13 +284,25 @@ function Shell() {
             </div>
           </div>
           <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
-            {navItems.map(({ label, icon: Icon, to, badge }) => (
-              <NavLink key={label} to={to} className={({ isActive }) => `shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold transition ${isActive ? 'is-active' : 'text-blue-50 hover:bg-white/10'}`}>
-                <Icon className="shell-nav-icon shrink-0" size={22} />
-                <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
-                {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
-              </NavLink>
-            ))}
+            {navItems.map(({ label, icon: Icon, to, badge }, index) => {
+              const isActive = index === activeNavIndex
+              return (
+                <NavLink key={label} to={to} className={`shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold ${isActive ? 'is-active' : 'text-blue-50'}`}>
+                  {isActive && (
+                    <motion.span
+                      layoutId="sidebar-active-pill"
+                      className="shell-nav-active-pill"
+                      transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.82 }}
+                    />
+                  )}
+                  <span className="shell-nav-icon-wrap">
+                    <Icon className="shell-nav-icon" size={22} />
+                  </span>
+                  <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
+                  {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
+                </NavLink>
+              )
+            })}
           </nav>
           <div className="sidebar-scroll-cue grid place-items-center text-blue-100"><ChevronDown size={22} /></div>
           <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
@@ -306,7 +327,7 @@ function Shell() {
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
             <div className="relative z-50">
-              <button type="button" onClick={() => setSettingsOpen((value) => !value)} className="grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100" aria-label="Paramètres"><Settings size={22} /></button>
+              <button type="button" onClick={() => setSettingsOpen((value) => !value)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
               {settingsOpen && <SettingsDropdown onClose={() => setSettingsOpen(false)} />}
             </div>
           </div>
@@ -346,6 +367,10 @@ function AnimatedRoutes() {
         <Route path="/parametres/facturation" element={<BillingSettings />} />
         <Route path="/parametres/paiement" element={<PaymentSettings />} />
         <Route path="/parametres/connexions" element={<LoginHistorySettings />} />
+        <Route path="/settings/profile" element={<SettingsPlaceholderPage pageKey="profile" />} />
+        <Route path="/settings/billing" element={<SettingsPlaceholderPage pageKey="billing" />} />
+        <Route path="/settings/payment-methods" element={<SettingsPlaceholderPage pageKey="payment-methods" />} />
+        <Route path="/settings/login-history" element={<SettingsPlaceholderPage pageKey="login-history" />} />
         <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
         <Route path="/visa/:country/:type/demande" element={<VisaApplication />} />
@@ -367,12 +392,7 @@ function PageTitle({ title, subtitle }) {
 
 function SettingsDropdown({ onClose }) {
   const navigate = useNavigate()
-  const items = [
-    [UserRound, 'Modifier le profil', '/parametres'],
-    [FileText, 'Adresses de facturation', '/parametres/facturation'],
-    [CreditCard, 'Méthodes de paiement', '/parametres/paiement'],
-    [Clock3, 'Historique de connexion', '/parametres/connexions'],
-  ]
+  const location = useLocation()
   const openPage = (to) => {
     onClose()
     navigate(to)
@@ -390,14 +410,17 @@ function SettingsDropdown({ onClose }) {
         <div className="mt-1 text-sm font-semibold text-slate-500">jaceamah14@gmail.com</div>
       </div>
       <div className="space-y-2">
-        {items.map(([Icon, label, to], index) => (
+        {settingsItems.map(({ icon: Icon, label, to }, index) => {
+          const isActive = location.pathname === to
+          return (
           <motion.div key={label} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 + index * 0.035 }}>
-            <button type="button" onClick={() => openPage(to)} className={`flex w-full cursor-pointer items-center gap-5 rounded-xl border px-4 py-3.5 text-left text-[15px] font-black shadow-sm transition ${index === 0 ? 'border-blue-600 bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-700' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>
-              <Icon size={23} className={index === 0 ? 'text-white' : 'text-slate-500'} />
+            <button type="button" onClick={() => openPage(to)} className={`settings-menu-item flex w-full cursor-pointer items-center gap-5 rounded-xl border px-4 py-3.5 text-left text-[15px] font-black shadow-sm transition ${isActive ? 'is-active border-blue-600 bg-blue-600 text-white shadow-blue-600/20' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>
+              <Icon size={23} className={isActive ? 'text-white' : 'text-slate-500'} />
               {label}
             </button>
           </motion.div>
-        ))}
+          )
+        })}
       </div>
       <div className="my-4 h-px bg-slate-200" />
       <Link to="/login" onClick={onClose} className="flex items-center gap-5 rounded-xl px-4 py-3.5 text-[15px] font-black text-slate-700 transition hover:bg-rose-50 hover:text-rose-700">
@@ -405,6 +428,71 @@ function SettingsDropdown({ onClose }) {
         Déconnexion
       </Link>
     </motion.div>
+  )
+}
+
+function SettingsPlaceholderPage({ pageKey }) {
+  const page = settingsItems.find((item) => item.to.endsWith(pageKey)) ?? settingsItems[0]
+  const Icon = page.icon
+
+  return (
+    <section className="settings-placeholder-page min-h-[calc(100vh-9rem)]">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col justify-between gap-5 rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur md:flex-row md:items-center lg:p-6"
+        >
+          <div className="flex items-center gap-4">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 shadow-inner shadow-blue-100">
+              <Icon size={23} />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-slate-500">Paramètres</p>
+              <h1 className="text-2xl font-black tracking-tight text-slate-950">{page.title}</h1>
+            </div>
+          </div>
+          <Link to="/" className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800">
+            Retour dashboard
+          </Link>
+        </motion.div>
+
+        <div className="grid gap-6 lg:grid-cols-[270px_1fr]">
+          <motion.nav
+            initial={{ opacity: 0, x: -18 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+            className="settings-tabs flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white/90 p-2 shadow-sm backdrop-blur lg:flex-col lg:overflow-visible"
+            aria-label="Navigation des paramètres"
+          >
+            {settingsItems.map(({ icon: ItemIcon, label, to }) => (
+              <NavLink key={to} to={to} className={({ isActive }) => `settings-tab relative flex min-w-fit items-center gap-3 rounded-lg px-3 py-3 text-sm font-black transition ${isActive ? 'is-active text-blue-900' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-800'}`}>
+                <ItemIcon size={19} className="shrink-0" />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </motion.nav>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            className="grid min-h-[420px] place-items-center rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
+          >
+            <div>
+              <span className="mx-auto grid h-16 w-16 place-items-center rounded-lg bg-slate-50 text-slate-400">
+                <Icon size={30} />
+              </span>
+              <h2 className="mt-6 text-xl font-black text-slate-950">{page.title}</h2>
+              <p className="mt-3 max-w-md text-sm font-semibold leading-6 text-slate-500">
+                Cette page est prête. Le contenu sera ajouté plus tard.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
   )
 }
 
