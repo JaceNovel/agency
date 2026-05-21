@@ -19,7 +19,7 @@ class DuffelFlightController extends Controller
         if (! $token) {
             return response()->json([
                 'data' => [],
-                'meta' => ['message' => 'Duffel is not configured.'],
+                'meta' => ['message' => 'Le fournisseur de voyage n’est pas configuré.'],
             ], 503);
         }
 
@@ -28,6 +28,8 @@ class DuffelFlightController extends Controller
             'destination' => ['nullable', 'string', 'size:3'],
             'departure_date' => ['nullable', 'date_format:Y-m-d'],
             'return_date' => ['nullable', 'date_format:Y-m-d', 'after:departure_date'],
+            'extra_destination' => ['nullable', 'string', 'size:3'],
+            'extra_departure_date' => ['nullable', 'date_format:Y-m-d', 'after:departure_date'],
             'adults' => ['nullable', 'integer', 'min:1', 'max:9'],
             'cabin_class' => ['nullable', 'string', 'in:economy,premium_economy,business,first'],
             'max_connections' => ['nullable', 'integer', 'min:0', 'max:2'],
@@ -49,6 +51,15 @@ class DuffelFlightController extends Controller
                 'origin' => $destination,
                 'destination' => $origin,
                 'departure_date' => $validated['return_date'],
+            ];
+        }
+
+        if (! empty($validated['extra_destination']) && ! empty($validated['extra_departure_date'])) {
+            $extraDestination = strtoupper($validated['extra_destination']);
+            $slices[] = [
+                'origin' => $destination,
+                'destination' => $extraDestination,
+                'departure_date' => $validated['extra_departure_date'],
             ];
         }
 
@@ -75,7 +86,7 @@ class DuffelFlightController extends Controller
         } catch (ConnectionException) {
             return response()->json([
                 'data' => [],
-                'meta' => ['message' => 'Impossible de joindre Duffel pour le moment.'],
+                'meta' => ['message' => 'Impossible de joindre le fournisseur de voyage pour le moment.'],
             ], 503);
         }
 
@@ -181,7 +192,7 @@ class DuffelFlightController extends Controller
             'mode' => 'flight',
             'provider' => $airlineName,
             'code' => trim(($airlineCode ? $airlineCode.' ' : '').$flightNumber) ?: Arr::get($offer, 'id'),
-            'logo' => $airlineCode ? "https://logo.clearbit.com/{$this->airlineDomain($airlineCode)}" : null,
+            'logo' => $airlineCode ? "https://images.kiwi.com/airlines/64x64/".strtoupper($airlineCode).'.png' : null,
             'origin' => $originCode ? "{$originCode}" : 'Départ',
             'destination' => $destinationCode ? "{$destinationCode}" : 'Arrivée',
             'departure' => $this->formatTime($departingAt),
@@ -372,8 +383,16 @@ class DuffelFlightController extends Controller
     {
         return match (strtoupper($iata)) {
             'AF' => 'airfrance.com',
+            'AT' => 'royalairmaroc.com',
+            'BA' => 'britishairways.com',
+            'DL' => 'delta.com',
+            'EK' => 'emirates.com',
             'ET' => 'ethiopianairlines.com',
+            'KL' => 'klm.com',
+            'LH' => 'lufthansa.com',
+            'QR' => 'qatarairways.com',
             'TK' => 'turkishairlines.com',
+            'UA' => 'united.com',
             'WB' => 'rwandair.com',
             'SN' => 'brusselsairlines.com',
             default => 'duffel.com',
@@ -383,9 +402,9 @@ class DuffelFlightController extends Controller
     private function errorMessage(int $status): string
     {
         return match ($status) {
-            401 => 'La clé Duffel est invalide ou expirée.',
-            403 => 'L’accès Flights Duffel n’est pas activé sur ce compte.',
-            default => 'La recherche de billets Duffel est indisponible pour le moment.',
+            401 => 'La clé fournisseur est invalide ou expirée.',
+            403 => 'L’accès aux billets réels n’est pas activé sur ce compte.',
+            default => 'La recherche de billets est indisponible pour le moment.',
         };
     }
 

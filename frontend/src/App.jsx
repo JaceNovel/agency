@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
+  ArrowLeft, ArrowLeftRight, ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
   ClipboardList, CreditCard, FileText, GraduationCap, Home, LayoutDashboard,
   Lock, Mail, MessageCircle, Plane, Search, Send, Settings,
   ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
@@ -3887,24 +3887,32 @@ function Transport() {
   const [destination, setDestination] = useState('Paris (CDG)')
   const [date, setDate] = useState('2026-06-25')
   const [returnDate, setReturnDate] = useState('')
+  const [multiDestination, setMultiDestination] = useState(false)
+  const [extraDestination, setExtraDestination] = useState('Bruxelles (BRU)')
+  const [extraDate, setExtraDate] = useState('2026-07-02')
   const [cabinClass, setCabinClass] = useState('economy')
-  const [maxPrice, setMaxPrice] = useState(1500)
-  const [stopFilter, setStopFilter] = useState('all')
-  const [serviceFilter, setServiceFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('recommended')
   const [selectedId, setSelectedId] = useState(null)
   const [reservationOpen, setReservationOpen] = useState(false)
   const flightOriginCode = getTransportIata(origin, 'LFW')
   const flightDestinationCode = getTransportIata(destination, 'CDG')
+  const extraDestinationCode = getTransportIata(extraDestination, 'BRU')
   const returnDateParam = returnDate ? `&return_date=${returnDate}` : ''
+  const multiDestinationParam = multiDestination ? `&extra_destination=${extraDestinationCode}&extra_departure_date=${extraDate}` : ''
   const flightQuery = useQuery({
-    queryKey: ['duffel-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, cabinClass],
-    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}&adults=1&cabin_class=${cabinClass}&max_connections=1`),
+    queryKey: ['duffel-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, multiDestination, extraDestinationCode, extraDate, cabinClass],
+    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}${multiDestinationParam}&adults=1&cabin_class=${cabinClass}&max_connections=2`),
     enabled: activeMode === 'flight' || activeMode === 'all',
     staleTime: 1000 * 60 * 8,
     retry: 1,
   })
-  const flightOptions = flightQuery.data?.data ?? []
+  const directFlightQuery = useQuery({
+    queryKey: ['direct-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, multiDestination, extraDestinationCode, extraDate, cabinClass],
+    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}${multiDestinationParam}&adults=1&cabin_class=${cabinClass}&max_connections=0`),
+    enabled: activeMode === 'flight' || activeMode === 'all',
+    staleTime: 1000 * 60 * 8,
+    retry: 1,
+  })
+  const flightOptions = mergeTransportOptions(directFlightQuery.data?.data ?? [], flightQuery.data?.data ?? [])
   const transportOptions = activeMode === 'flight'
     ? flightOptions
     : activeMode === 'all'
@@ -3916,25 +3924,11 @@ function Transport() {
   const currentDestinationOptions = activeMode === 'flight' || activeMode === 'all'
     ? flightLocationOptions.map(([label]) => label)
     : Array.from(new Set(localTransportOptions.map((item) => item.destination)))
-  const modeCounts = transportModes.reduce((acc, [key]) => {
-    acc[key] = key === 'all' ? flightOptions.length + localTransportOptions.length : key === 'flight' ? flightOptions.length : localTransportOptions.filter((item) => item.mode === key).length
-    return acc
-  }, {})
-  const isFlightMode = activeMode === 'flight' || activeMode === 'all'
-  const budgetLabel = isFlightMode ? `${maxPrice.toLocaleString('fr-FR')} EUR` : formatCfa(maxPrice)
   const filteredOptions = transportOptions
     .filter((item) => activeMode === 'all' || item.mode === activeMode)
     .filter((item) => item.mode === 'flight' || origin === 'all' || item.origin === origin)
     .filter((item) => item.mode === 'flight' || destination === 'all' || item.destination === destination)
-    .filter((item) => item.price <= maxPrice)
-    .filter((item) => stopFilter === 'all' || (stopFilter === 'direct' ? item.stops === 0 : item.stops > 0))
-    .filter((item) => serviceFilter === 'all' || (serviceFilter === 'refundable' ? item.refundable : item.tags.some((tag) => tag.toLowerCase().includes(serviceFilter))))
-    .sort((a, b) => {
-      if (sortBy === 'price') return a.price - b.price
-      if (sortBy === 'duration') return parseDuration(a.duration) - parseDuration(b.duration)
-      if (sortBy === 'departure') return a.departure.localeCompare(b.departure)
-      return Number(b.refundable) - Number(a.refundable) || a.price - b.price
-    })
+    .sort((a, b) => parseDuration(a.duration) - parseDuration(b.duration) || a.price - b.price)
   const selectedTicket = filteredOptions.find((item) => item.id === selectedId) ?? filteredOptions[0] ?? transportOptions.find((item) => item.id === selectedId)
 
   // When no specific ticket is selected, show a helpful trip title
@@ -3947,11 +3941,10 @@ function Transport() {
     setDestination('Paris (CDG)')
     setDate('2026-06-25')
     setReturnDate('')
+    setMultiDestination(false)
+    setExtraDestination('Bruxelles (BRU)')
+    setExtraDate('2026-07-02')
     setCabinClass('economy')
-    setMaxPrice(1500)
-    setStopFilter('all')
-    setServiceFilter('all')
-    setSortBy('recommended')
     setReservationOpen(false)
   }
 
@@ -3963,13 +3956,19 @@ function Transport() {
     if (mode === 'flight' || mode === 'all') {
       setOrigin('Lomé (LFW)')
       setDestination('Paris (CDG)')
-      setMaxPrice(1500)
       return
     }
 
     setOrigin('all')
     setDestination('all')
-    setMaxPrice(350000)
+  }
+
+  function runTransportSearch() {
+    setSelectedId(null)
+    if (activeMode === 'flight' || activeMode === 'all') {
+      flightQuery.refetch()
+      directFlightQuery.refetch()
+    }
   }
 
   if (reservationOpen && selectedTicket) {
@@ -3977,7 +3976,7 @@ function Transport() {
   }
 
   return (
-    <div className="transport-page space-y-7">
+    <div className="transport-page -mx-5 bg-white px-5 pb-10 lg:-mx-8 lg:px-8">
       {isPaymentReturn && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4">
           <motion.div initial={{ opacity: 0, y: 18, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-7 shadow-2xl">
@@ -3990,185 +3989,121 @@ function Transport() {
           </motion.div>
         </div>
       )}
-      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-5 border-b border-slate-100 pb-5">
-        <div className="flex items-start gap-4">
-          <button type="button" className="mt-1 grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700"><ArrowLeft size={20} /></button>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">Billets & Transport</h1>
-            <p className="mt-2 text-sm font-semibold text-slate-500">Réservez vos billets d'avion, train, bus, tram ou chauffeur en toute simplicité.</p>
+
+      <div className="mx-auto max-w-[1420px] space-y-8">
+        <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-6 pt-5">
+            <div className="flex gap-7">
+              <button type="button" onClick={() => switchTransportMode('flight')} className={`flex h-14 items-center gap-3 border-b-2 px-1 font-black ${activeMode === 'flight' ? 'border-blue-700 text-blue-700' : 'border-transparent text-slate-600'}`}><Plane size={18} />Billets d’avion</button>
+              <button type="button" onClick={() => switchTransportMode('local')} className={`flex h-14 items-center gap-3 border-b-2 px-1 font-black ${activeMode !== 'flight' ? 'border-blue-700 text-blue-700' : 'border-transparent text-slate-600'}`}><Train size={18} />Transport</button>
+            </div>
+            <div className="flex flex-wrap items-center gap-6 text-sm font-black text-slate-700">
+              <span className="flex items-center gap-2">1 Passager <ChevronDown size={16} /></span>
+              <select value={cabinClass} onChange={(event) => setCabinClass(event.target.value)} className="rounded-lg border-0 bg-transparent font-black outline-none">
+                <option value="economy">Économique</option>
+                <option value="premium_economy">Premium économie</option>
+                <option value="business">Business</option>
+                <option value="first">Première</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div className="ml-auto rounded-lg border border-slate-200 bg-white px-6 py-3 shadow-sm">
-          <div className="text-xs font-semibold text-slate-500">Mon portefeuille</div>
-          <div className="font-black text-emerald-600">1 250,00 €</div>
-        </div>
-      </motion.div>
-
-      <section className="flex flex-wrap gap-4">
-        {transportModes.map(([key, label, Icon], index) => (
-          <motion.button
-            type="button"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 + index * 0.035, duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -3 }}
-            onClick={() => switchTransportMode(key)}
-            key={key}
-            className={`transport-tab flex h-14 min-w-[138px] items-center justify-center gap-3 rounded-lg border px-6 font-black shadow-sm ${activeMode === key ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700'}`}
-          >
-            <Icon size={22} />{label}
-          </motion.button>
-        ))}
-      </section>
-
-      <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
-        <div className="space-y-7">
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="grid gap-4 lg:grid-cols-[1fr_1fr_170px_170px_auto]">
-              <TransportSelect label="Départ" value={origin} onChange={setOrigin} options={activeMode === 'flight' ? currentOriginOptions.map((item) => [item, item]) : [['all', 'Tous les départs'], ...currentOriginOptions.map((item) => [item, item])]} />
-              <TransportSelect label="Arrivée" value={destination} onChange={setDestination} options={activeMode === 'flight' ? currentDestinationOptions.map((item) => [item, item]) : [['all', 'Toutes les arrivées'], ...currentDestinationOptions.map((item) => [item, item])]} />
-              <label className="block rounded-lg border border-slate-200 px-4 py-3">
-                <span className="text-xs font-bold text-slate-500">Jour départ</span>
-                <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
-              </label>
-              <label className="block rounded-lg border border-slate-200 px-4 py-3">
-                <span className="text-xs font-bold text-slate-500">Jour retour</span>
-                <input type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
-              </label>
-              <button type="button" onClick={() => setSelectedId(filteredOptions[0]?.id ?? selectedId)} className="flex h-full min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-7 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
+          <div className="grid gap-4 p-6 lg:grid-cols-[1fr_1fr_1fr_1fr_190px] lg:items-stretch">
+            <div className="relative">
+              <TransportSelect label="De" value={origin} onChange={setOrigin} options={activeMode === 'flight' ? currentOriginOptions.map((item) => [item, item]) : [['all', 'Tous les départs'], ...currentOriginOptions.map((item) => [item, item])]} />
+              <button type="button" aria-label="Inverser départ et arrivée" onClick={() => { const previousOrigin = origin; setOrigin(destination); setDestination(previousOrigin) }} className="absolute -right-5 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-slate-200 bg-white text-blue-700 shadow-sm transition hover:rotate-180 hover:bg-blue-50 lg:grid"><ArrowLeftRight size={18} /></button>
             </div>
-          </section>
-
-          <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]">
-              <div>
-                <div className="flex justify-between text-xs font-black text-slate-500"><span>Budget max.</span><span>{budgetLabel}</span></div>
-                <input type="range" min={isFlightMode ? '100' : '5000'} max={isFlightMode ? '3000' : '380000'} step={isFlightMode ? '50' : '5000'} value={maxPrice} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-3 w-full accent-blue-800" />
-              </div>
-              <TransportSelect label="Cabine" value={cabinClass} onChange={setCabinClass} options={[['economy', 'Économie'], ['premium_economy', 'Premium économie'], ['business', 'Business'], ['first', 'Première']]} />
-              <TransportSelect label="Escales / arrêts" value={stopFilter} onChange={setStopFilter} options={[['all', 'Tous'], ['direct', 'Direct uniquement'], ['stops', 'Avec escale / arrêt']]} />
-              <TransportSelect label="Service" value={serviceFilter} onChange={setServiceFilter} options={[['all', 'Tous'], ['refundable', 'Modifiable'], ['bagage', 'Bagage'], ['wifi', 'Wi-Fi'], ['privé', 'Privé']]} />
-              <TransportSelect label="Tri" value={sortBy} onChange={setSortBy} options={[['recommended', 'Recommandés'], ['price', 'Prix croissant'], ['duration', 'Durée'], ['departure', 'Départ']]} />
-              <button type="button" onClick={resetFilters} className="h-full min-h-12 rounded-lg border border-slate-200 px-5 font-black text-blue-800">Réinitialiser</button>
-            </div>
-          </section>
-
-          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
-              <h2 className="text-2xl font-black">{activeMode === 'all' ? 'Billets disponibles' : transportModes.find(([key]) => key === activeMode)?.[1]} <span className="text-sm font-bold text-slate-500">{filteredOptions.length} résultat{filteredOptions.length > 1 ? 's' : ''}</span></h2>
-              <div className="flex flex-wrap gap-2">
-                <FilterChip active={origin !== 'all'}>{origin === 'all' ? 'Tous départs' : origin}</FilterChip>
-                <FilterChip active={destination !== 'all'}>{destination === 'all' ? 'Toutes arrivées' : destination}</FilterChip>
-                <FilterChip active>{budgetLabel} max</FilterChip>
-                {isFlightMode && <FilterChip active>{cabinClassLabel(cabinClass)}</FilterChip>}
-              </div>
-            </div>
-            {filteredOptions.length ? (
-              <div className="divide-y divide-slate-100">
-                {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => setSelectedId(ticket.id)} />)}
-              </div>
-            ) : flightQuery.isLoading && (activeMode === 'flight' || activeMode === 'all') ? (
-              <div className="p-10 text-center">
-                <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
-                <h3 className="mt-5 text-xl font-black text-slate-950">Recherche en cours</h3>
-                <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Nous récupérons les offres de vols réelles disponibles pour cet itinéraire.</p>
-              </div>
-            ) : flightQuery.isError && activeMode === 'flight' ? (
-              <TransportEmptyState title="Billets indisponibles" text={flightQuery.error?.message || 'Les billets ne peuvent pas être chargés pour le moment. Changez votre recherche ou réessayez plus tard.'} onReset={resetFilters} />
-            ) : (
-              <TransportEmptyState title="Aucun billet ne correspond aux filtres" text="Élargissez le budget, changez le type de transport ou retirez le filtre direct." onReset={resetFilters} />
-            )}
-            <div className="m-5 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-amber-50 px-5 py-4 text-sm font-semibold text-slate-600"><span className="flex items-center gap-3"><ShieldCheck className="text-amber-500" />Les conditions varient selon le transporteur. Les détails sont vérifiés avant paiement.</span><button className="rounded-lg bg-white px-5 py-3 font-black text-blue-800">Voir les conditions</button></div>
-          </section>
-
-        </div>
-
-        <aside className="space-y-5">
-          <section className="transport-side-card transport-trip-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-start justify-between gap-4">
-              <h2 className="text-xl font-black">Mon voyage</h2>
-              <span className="transport-card-visual grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-700"><TransportModeIcon mode={selectedTicket?.mode} size={34} /></span>
-            </div>
-            <div className="mt-5 grid grid-cols-[22px_1fr] gap-4">
-              <div className="relative pt-1">
-                <TransportModeIcon mode={selectedTicket?.mode} className="relative z-10 rounded-full bg-white text-blue-700" size={18} />
-                <span className="absolute left-[8px] top-7 h-28 w-px bg-blue-100" />
-                <span className="absolute left-[5px] top-[94px] h-2.5 w-2.5 rounded-full bg-blue-700 ring-4 ring-blue-50" />
-              </div>
-              <div>
-                <div className="font-black">{tripTitle}</div>
-                <div className="text-sm font-semibold text-slate-500">{date}</div>
-                <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-                  <div><div className="text-xl font-black">{selectedTicket?.departure ?? '--:--'}</div><div className="text-sm font-bold">{selectedTicket?.origin ?? origin}</div></div>
-                  <div className="text-center text-sm font-bold"><span className="block text-slate-500">{selectedTicket?.duration ?? '-'}</span><span className={selectedTicket?.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}>{selectedTicket?.stopLabel ?? '-'}</span></div>
-                  <div className="text-right"><div className="text-xl font-black">{selectedTicket?.arrival ?? '--:--'}</div><div className="text-sm font-bold">{selectedTicket?.destination ?? destination}</div></div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
-              <UserRound className="text-slate-600" size={21} />
-              <div><b>Passager</b><div className="text-sm text-slate-500">1 Adulte · {selectedTicket?.className ?? 'Économique'}</div></div>
-            </div>
-            <div className="mt-5 rounded-lg bg-slate-50 p-4">
-              <div className="flex justify-between text-sm font-semibold text-slate-500"><span>Prix sélectionné</span><b className="text-xl text-blue-800">{selectedTicket ? formatTicketPrice(selectedTicket) : '-'}</b></div>
-              <div className="mt-2 text-xs font-bold text-slate-500">{selectedTicket?.baggage ?? 'Sélectionnez un billet'}</div>
-            </div>
-            <button type="button" disabled={!selectedTicket} onClick={() => setReservationOpen(true)} className="mt-6 h-12 w-full rounded-lg bg-blue-700 font-black text-white disabled:bg-slate-300">Continuer vers la réservation</button>
-          </section>
-          <section className="transport-side-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-black">Transport sur place</h2>
-            <p className="mt-1 text-sm font-semibold text-slate-500">Réservez votre trajet à l'arrivée</p>
-            <div className="mt-5 divide-y divide-slate-100">
-              {[[Train, 'Train / RER', "Rejoindre Paris depuis l'aéroport", 'text-blue-700 bg-blue-50', 'local'], [Train, 'Tram / Métro', 'Déplacements en ville', 'text-indigo-700 bg-indigo-50', 'local'], [Bus, 'Bus', 'Lignes régulières', 'text-emerald-700 bg-emerald-50', 'bus'], [Car, 'Chauffeur', 'Trajet privé avec chauffeur', 'text-slate-900 bg-slate-100', 'driver']].map(([Icon, title, sub, tone, mode]) => (
-                <button type="button" onClick={() => switchTransportMode(mode)} className="group flex w-full items-center justify-between py-4 text-left first:pt-0 last:pb-0" key={title}>
-                  <span className="flex min-w-0 items-center gap-4">
-                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}><Icon size={21} /></span>
-                    <span className="min-w-0"><b>{title}</b><span className="mt-1 block text-sm font-semibold text-slate-500">{sub}</span></span>
-                  </span>
-                  <ChevronDown className="-rotate-90 text-slate-400 transition group-hover:text-blue-700" size={18} />
-                </button>
-              ))}
-            </div>
-          </section>
-          <section className="transport-side-card transport-secure-card relative overflow-hidden rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-            <div className="relative z-10 grid grid-cols-[1fr_auto] gap-4">
-              <div>
-                <h2 className="text-xl font-black">Réservation sécurisée</h2>
-                <div className="mt-5 space-y-3">
-                  {['Paiement 100% sécurisé', 'Support 24/7', 'Billet envoyé par email'].map((item) => <div className="flex items-center gap-3 text-sm font-semibold text-slate-600" key={item}><CheckCircle2 className="text-emerald-600" size={18} />{item}</div>)}
-                </div>
-              </div>
-              <div className="secure-visual relative hidden h-36 w-28 sm:block">
-                <div className="absolute right-0 top-4 grid h-24 w-24 place-items-center rounded-[28px] bg-blue-700 text-white shadow-lg shadow-blue-700/25"><Lock size={34} /></div>
-                <ShieldCheck className="absolute right-7 top-0 text-blue-900" size={34} />
-                <CreditCard className="absolute bottom-0 left-0 rounded-2xl bg-white p-2 text-blue-700 shadow-md" size={46} />
-              </div>
-            </div>
-          </section>
-        </aside>
-
-        <motion.section initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="transport-arrival-pack relative overflow-hidden rounded-lg border border-blue-100 bg-[#f3f7ff] px-6 py-5 text-blue-950 shadow-sm xl:col-span-2">
-          <img src={parisPackBackground} alt="" className="arrival-pack-bg absolute inset-0 h-full w-full object-contain" />
-          <div className="relative z-10 grid gap-5 lg:grid-cols-[300px_auto_1fr_auto] lg:items-center">
-            <div>
-              <h2 className="text-2xl font-black">Pack Arrivée France</h2>
-              <p className="mt-1 text-sm font-black text-blue-950">Vol + Train + eSIM + Chauffeur + Logement</p>
-              <p className="mt-3 text-sm font-semibold text-slate-600">Tout ce qu'il vous faut pour une arrivée sans stress.</p>
-            </div>
-            <div className="arrival-pack-icons flex flex-wrap items-center gap-3 text-blue-950 lg:justify-self-start">
-              {[[Plane, 'Vol'], [Train, 'Train'], [Smartphone, 'eSIM'], [Car, 'Chauffeur'], [Home, 'Logement']].map(([Icon, label], index) => (
-                <div className="flex items-center gap-3" key={label}>
-                  <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.35, once: false }} transition={{ delay: index * 0.045, duration: 0.24 }} className="arrival-pack-icon grid h-11 w-11 place-items-center rounded-full bg-blue-700 text-white shadow-sm" title={label}>
-                    <Icon size={21} />
-                  </motion.span>
-                  {index < 4 && <span className="text-lg font-black text-slate-400">+</span>}
-                </div>
-              ))}
-            </div>
-            <div className="hidden lg:block" aria-hidden="true" />
-            <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="h-12 rounded-lg border-2 border-blue-200 bg-white/80 px-7 font-black text-blue-950 shadow-sm">Découvrir les packs</motion.button>
+            <TransportSelect label="À" value={destination} onChange={setDestination} options={activeMode === 'flight' ? currentDestinationOptions.map((item) => [item, item]) : [['all', 'Toutes les arrivées'], ...currentDestinationOptions.map((item) => [item, item])]} />
+            <label className="block rounded-lg border border-slate-200 px-4 py-4">
+              <span className="text-xs font-bold text-slate-500">Départ</span>
+              <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-2 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
+            </label>
+            <label className="block rounded-lg border border-slate-200 px-4 py-4">
+              <span className="text-xs font-bold text-slate-500">Retour</span>
+              <input type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} className="mt-2 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
+            </label>
+            <button type="button" onClick={runTransportSearch} className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-8 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
           </div>
-        </motion.section>
+          {multiDestination && (
+            <div className="mx-6 mb-4 grid gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-4 md:grid-cols-[1fr_1fr_auto]">
+              <TransportSelect label="Puis vers" value={extraDestination} onChange={setExtraDestination} options={flightLocationOptions.map(([label]) => [label, label])} />
+              <label className="block rounded-lg border border-slate-200 bg-white px-4 py-3">
+                <span className="text-xs font-bold text-slate-500">Date du second trajet</span>
+                <input type="date" value={extraDate} onChange={(event) => setExtraDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
+              </label>
+              <button type="button" onClick={() => setMultiDestination(false)} className="h-full min-h-12 rounded-lg border border-blue-100 bg-white px-5 font-black text-blue-700">Retirer</button>
+            </div>
+          )}
+          <button type="button" onClick={() => setMultiDestination((value) => !value)} className="mx-auto mb-5 flex items-center gap-2 text-sm font-black text-blue-700"><Globe2 size={16} />{multiDestination ? 'Masquer la recherche multi-destinations' : 'Recherche multi-destinations'}</button>
+        </section>
+
+        <section className="grid gap-4 rounded-lg bg-slate-50 p-4 lg:grid-cols-4">
+          {[[ShieldCheck, 'Meilleurs prix garantis', 'Nous vous trouvons le meilleur prix', 'text-emerald-600 bg-emerald-50'], [Lock, 'Paiement sécurisé', 'Vos données sont protégées', 'text-blue-700 bg-blue-50'], [CheckCircle2, 'Annulation flexible', 'Annulez sans frais sous 24h', 'text-emerald-600 bg-emerald-50'], [MessageCircle, 'Support 24/7', 'Nous sommes là pour vous aider', 'text-rose-600 bg-rose-50']].map(([Icon, title, text, tone]) => (
+            <div key={title} className="flex items-center gap-4 rounded-lg bg-white p-4">
+              <span className={`grid h-11 w-11 place-items-center rounded-full ${tone}`}><Icon size={20} /></span>
+              <span><b className="block text-sm text-slate-950">{title}</b><span className="mt-1 block text-xs font-semibold text-slate-500">{text}</span></span>
+            </div>
+          ))}
+        </section>
+
+        <div className="space-y-8">
+          <main className="space-y-6">
+            <section className="space-y-4">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-950">{activeMode === 'flight' ? 'Vols recommandés' : 'Options disponibles'}</h2>
+                  <p className="mt-1 text-sm font-semibold text-slate-500">{filteredOptions.length} résultat{filteredOptions.length > 1 ? 's' : ''} trouvé{filteredOptions.length > 1 ? 's' : ''}</p>
+                </div>
+                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-800">Durée la plus courte en premier</span>
+              </div>
+
+              {filteredOptions.length ? (
+                <div className="space-y-3">
+                  {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => { setSelectedId(ticket.id); if (ticket.mode === 'flight') setReservationOpen(true) }} />)}
+                </div>
+              ) : (flightQuery.isLoading || directFlightQuery.isLoading) && (activeMode === 'flight' || activeMode === 'all') ? (
+                <div className="rounded-lg border border-slate-200 bg-white p-10 text-center shadow-sm">
+                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
+                  <h3 className="mt-5 text-xl font-black text-slate-950">Recherche en cours</h3>
+                  <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Nous récupérons les offres de vols réelles disponibles pour cet itinéraire.</p>
+                </div>
+              ) : (flightQuery.isError && directFlightQuery.isError) && activeMode === 'flight' ? (
+                <TransportEmptyState title="Billets indisponibles" text={flightQuery.error?.message || directFlightQuery.error?.message || 'Les billets ne peuvent pas être chargés pour le moment. Changez votre recherche ou réessayez plus tard.'} onReset={resetFilters} />
+              ) : (
+                <TransportEmptyState title="Aucun billet disponible" text="Changez l’itinéraire, la date ou la cabine puis relancez la recherche." onReset={resetFilters} />
+              )}
+            </section>
+
+            <section className="grid items-center gap-5 rounded-lg border border-blue-100 bg-blue-50 p-5 md:grid-cols-[auto_1fr_auto]">
+              <img src={parisPackBackground} alt="" className="h-20 w-28 rounded-lg object-contain" />
+              <div><h3 className="text-lg font-black text-blue-950">Besoin d’un logement à votre arrivée ?</h3><p className="mt-1 text-sm font-semibold text-slate-600">Réservez votre logement temporaire en même temps que votre billet.</p></div>
+              <Link to="/logement" className="flex h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-6 font-black text-blue-800">Voir les logements</Link>
+            </section>
+
+            <section className="space-y-4">
+              <div><h2 className="text-xl font-black text-slate-950">Options de transport</h2><p className="mt-1 text-sm font-semibold text-slate-500">Sélectionnez votre moyen de transport à votre arrivée.</p></div>
+              <div className="space-y-3">
+                {localTransportOptions.slice(4, 7).map((option) => (
+                  <article key={option.id} className="grid items-center gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[1fr_auto_auto]">
+                    <div className="flex items-center gap-4">
+                      <span className="grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-700"><TransportModeIcon mode={option.mode} size={25} /></span>
+                      <div><h3 className="font-black text-slate-950">{option.provider}</h3><p className="mt-1 text-sm font-semibold text-slate-500">{option.className}</p><div className="mt-2 flex gap-4 text-xs font-bold text-slate-500"><span>{option.duration}</span><span>{option.stopLabel}</span></div></div>
+                    </div>
+                    <div className="text-right"><b className="text-2xl text-slate-950">{formatTicketPrice(option)}</b><div className="text-xs font-semibold text-slate-500">par personne</div></div>
+                    <button type="button" onClick={() => switchTransportMode(option.mode)} className="h-11 rounded-lg border border-blue-100 px-5 font-black text-blue-700">Sélectionner</button>
+                  </article>
+                ))}
+              </div>
+              <button type="button" onClick={() => switchTransportMode('local')} className="mx-auto flex h-11 items-center gap-2 font-black text-blue-700">Voir plus d’options de transport <ChevronDown size={17} /></button>
+            </section>
+          </main>
+
+        </div>
+
+        <section className="grid gap-4 border-t border-slate-100 py-6 lg:grid-cols-4">
+          {[[Gift, 'Paiement en plusieurs fois', 'Réglez en 3x ou 4x sans frais'], [GraduationCap, 'Tarifs étudiants', 'Jusqu’à -10% sur vos billets'], [ShieldCheck, 'Assurance voyage', 'Voyagez en toute sérénité'], [SlidersHorizontal, 'Modification facile', 'Modifiez votre billet facilement']].map(([Icon, title, text]) => (
+            <div key={title} className="flex items-center gap-4 rounded-lg bg-slate-50 p-4"><span className="grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700"><Icon size={20} /></span><span><b className="block text-sm text-slate-950">{title}</b><span className="text-xs font-semibold text-slate-500">{text}</span></span></div>
+          ))}
+        </section>
       </div>
     </div>
   )
@@ -4534,16 +4469,31 @@ function BriefcaseIcon() {
 
 function TicketRow({ ticket, index, selected, onSelect }) {
   return (
-    <motion.article initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className={`grid items-center gap-5 p-6 lg:grid-cols-[1.25fr_0.9fr_1fr_0.9fr_0.9fr_auto] ${selected ? 'bg-blue-50/55' : ''}`}>
-      <div className="flex items-center gap-4">
-        <img src={ticket.logo} alt={ticket.provider} className="h-16 w-16 rounded-lg border border-slate-100 bg-white object-contain p-2" />
-        <div><div className="font-black">{ticket.provider}</div><div className="text-sm font-semibold text-slate-500">{ticket.code}</div><div className="mt-2 flex flex-wrap gap-2">{ticket.tags.slice(0, 2).map((tag) => <FilterChip key={tag} active>{tag}</FilterChip>)}</div></div>
+    <motion.article initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className={`overflow-hidden rounded-lg border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-100 ${selected ? 'border-blue-300 ring-1 ring-blue-100' : 'border-slate-200'}`}>
+      <div className="grid items-center gap-5 p-5 lg:grid-cols-[1.15fr_1.6fr_180px]">
+        <div className="flex items-center gap-4">
+          <img src={ticket.logo || logos.studyway} alt={ticket.provider} onError={(event) => { event.currentTarget.src = logos.studyway }} className="h-20 w-20 rounded-lg border border-slate-100 bg-white object-contain p-2 shadow-sm" />
+          <div>
+            {index === 0 && <span className="mb-2 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Meilleur choix</span>}
+            <div className="font-black text-slate-950">{ticket.provider}</div>
+            <div className="text-sm font-semibold text-slate-500">{ticket.code}</div>
+            <div className="mt-3 flex gap-3 text-slate-400">{[BriefcaseIcon, BriefcaseIcon, BriefcaseIcon].map((Icon, iconIndex) => <span key={iconIndex} className="grid h-5 w-5 place-items-center"><Icon /></span>)}</div>
+          </div>
+        </div>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div className="text-center lg:text-left"><div className="text-2xl font-black text-slate-950">{ticket.departure}</div><div className="text-sm font-black text-slate-700">{ticket.origin}</div></div>
+          <div className="min-w-[160px] text-center">
+            <div className="flex items-center gap-3"><span className="h-px flex-1 bg-slate-200" /><span className="text-xs font-black text-slate-500">{ticket.duration}</span><span className="h-px flex-1 bg-slate-200" /></div>
+            <div className={`mt-2 text-sm font-black ${ticket.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{ticket.stopLabel}</div>
+          </div>
+          <div className="text-center lg:text-left"><div className="text-2xl font-black text-slate-950">{ticket.arrival}</div><div className="text-sm font-black text-slate-700">{ticket.destination}</div></div>
+        </div>
+        <div className="border-t border-slate-100 pt-5 text-right lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+          <div className="whitespace-nowrap text-xl font-black leading-tight text-slate-950">{formatTicketPrice(ticket)}</div>
+          <div className="text-xs font-semibold text-slate-500">par passager</div>
+          <button type="button" onClick={onSelect} className="mt-5 h-11 rounded-lg bg-blue-700 px-7 font-black text-white shadow-lg shadow-blue-700/20">Voir les détails</button>
+        </div>
       </div>
-      <div><div className="text-2xl font-black">{ticket.departure}</div><div className="text-sm font-bold">{ticket.origin}</div></div>
-      <div className="text-center"><div className="font-bold">{ticket.duration}</div><div className={`mt-2 text-sm font-bold ${ticket.stops === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{ticket.stopLabel}</div></div>
-      <div><div className="text-2xl font-black">{ticket.arrival}</div><div className="text-sm font-bold">{ticket.destination}</div></div>
-      <div><div className="text-2xl font-black text-blue-800">{formatTicketPrice(ticket)}</div><div className="text-sm font-semibold text-slate-500">{ticket.className}</div></div>
-      <div className="space-y-3"><button type="button" onClick={onSelect} className={`h-11 rounded-lg px-8 font-black ${selected ? 'bg-slate-950 text-white' : 'bg-blue-700 text-white'}`}>{selected ? 'Sélectionné' : 'Choisir'}</button><button type="button" onClick={onSelect} className="block w-full text-sm font-black text-blue-800">Détails</button></div>
     </motion.article>
   )
 }
@@ -4556,6 +4506,15 @@ function TransportModeIcon({ mode, ...props }) {
 
 function formatTicketPrice(ticket) {
   return ticket.priceLabel || `${Number(ticket.price ?? 0).toLocaleString('fr-FR')} FCFA`
+}
+
+function mergeTransportOptions(...groups) {
+  const seen = new Set()
+  return groups.flat().filter((item) => {
+    if (!item?.id || seen.has(item.id)) return false
+    seen.add(item.id)
+    return true
+  })
 }
 
 function cabinClassLabel(value) {
