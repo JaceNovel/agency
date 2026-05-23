@@ -573,6 +573,26 @@ a:hover {
   --housing-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.housing-landing-replica {
+  align-items: stretch;
+}
+
+.housing-landing-replica .housing-landing-hero {
+  min-height: 520px;
+}
+
+.housing-landing-replica .housing-landing-hero::before {
+  animation: housing-blue-light-drift 9s ease-in-out infinite alternate;
+}
+
+.housing-landing-replica .housing-landing-hero::after {
+  opacity: 0.72;
+}
+
+.housing-choice-panel {
+  border-radius: 28px;
+}
+
 .housing-landing-shell,
 .housing-results-hero,
 .housing-search-surface,
@@ -851,6 +871,17 @@ a:hover {
   }
 }
 
+@keyframes housing-blue-light-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(-8%, 7%, 0) scale(1.14);
+    opacity: 1;
+  }
+}
+
 .housing-hero-proof,
 .housing-choice-card,
 .housing-card,
@@ -865,7 +896,35 @@ a:hover {
 }
 
 .housing-hero-proof {
+  min-height: 64px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  box-shadow:
+    0 14px 28px rgba(2, 8, 23, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(16px);
+}
+
+.housing-hero-proof b {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.2;
+  text-shadow: 0 1px 8px rgba(2, 8, 23, 0.35);
+}
+
+.housing-hero-proof small {
+  display: block;
+  margin-top: 3px;
+  color: rgba(239, 246, 255, 0.95);
+  font-size: 11px;
+  line-height: 1.25;
+  text-shadow: 0 1px 8px rgba(2, 8, 23, 0.32);
+}
+
+.housing-hero-proof span:first-child {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .housing-choice-panel {
@@ -1891,6 +1950,586 @@ main textarea:focus {
 .finance-quick-card:hover .finance-quick-arrow {
   animation: finance-arrow-click 920ms ease-in-out infinite;
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+}
+
+.airfrance-page {
+  --af-blue: #071333;
+  --af-action: #0055b8;
+  --af-border: #d9dce3;
+  --af-muted: #646b7d;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+.airfrance-page button,
+.airfrance-page a,
+.airfrance-page input {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.airfrance-header {
+  display: flex;
+  min-height: 88px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 26px 82px 0;
+  background: #ffffff;
+}
+
+.airfrance-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--af-blue);
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: 1.6px;
+  line-height: 1;
+}
+
+.airfrance-logo i {
+  display: block;
+  width: 28px;
+  height: 14px;
+  transform: skewX(-28deg);
+  background: #ee1b2f;
+}
+
+.airfrance-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  color: var(--af-blue);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.airfrance-language,
+.airfrance-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+}
+
+.airfrance-login {
+  position: relative;
+}
+
+.airfrance-login b {
+  position: absolute;
+  left: 17px;
+  top: 13px;
+  display: grid;
+  width: 13px;
+  height: 13px;
+  place-items: center;
+  border-radius: 999px;
+  background: #ef3340;
+  color: white;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.flag-france {
+  width: 18px;
+  height: 14px;
+  background: linear-gradient(90deg, #17358d 0 33%, #ffffff 33% 66%, #ef3340 66%);
+  box-shadow: 0 0 0 1px rgba(7, 19, 51, 0.08);
+}
+
+.airfrance-nav {
+  display: grid;
+  height: 72px;
+  place-items: center;
+  border-bottom: 1px solid var(--af-border);
+  background: #ffffff;
+  color: var(--af-blue);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.airfrance-hero {
+  position: relative;
+  min-height: 522px;
+  overflow: visible;
+  background: #8cc6ec;
+}
+
+.airfrance-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  animation: airfrance-banner-drift 14s ease-in-out infinite alternate;
+}
+
+.airfrance-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 45%);
+}
+
+.airfrance-booking-shell {
+  position: relative;
+  z-index: 2;
+  width: min(1332px, calc(100% - 164px));
+  margin: 0 auto;
+  padding-top: 46px;
+}
+
+.airfrance-tabs {
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(239, 241, 246, 0.95);
+  box-shadow: 0 16px 35px rgba(7, 19, 51, 0.12);
+}
+
+.airfrance-tabs button {
+  display: inline-flex;
+  min-width: 200px;
+  height: 66px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 25px;
+  color: #5d6475;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.airfrance-tabs button.is-active {
+  margin: 7px 0 7px 7px;
+  height: 54px;
+  border: 1px solid var(--af-border);
+  background: #ffffff;
+  color: var(--af-blue);
+  box-shadow: 0 10px 22px rgba(7, 19, 51, 0.08);
+}
+
+.airfrance-tabs button:hover,
+.airfrance-search-button:hover,
+.airfrance-floating button:hover {
+  transform: translateY(-2px);
+}
+
+.airfrance-search-card {
+  min-height: 270px;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 26px;
+  box-shadow: 0 20px 45px rgba(7, 19, 51, 0.18);
+  animation: airfrance-card-breathe 5.5s ease-in-out infinite;
+}
+
+.airfrance-select-row {
+  display: flex;
+  gap: 12px;
+}
+
+.airfrance-select-row button {
+  display: inline-flex;
+  height: 42px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--af-border);
+  padding: 0 11px;
+  background: #ffffff;
+  color: var(--af-blue);
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.airfrance-fields {
+  display: grid;
+  grid-template-columns: 1fr 46px 1fr 1.02fr 1fr;
+  gap: 12px;
+  margin-top: 26px;
+  align-items: center;
+}
+
+.airfrance-fields label {
+  display: grid;
+  min-height: 79px;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  column-gap: 12px;
+  border: 1px solid var(--af-border);
+  padding: 13px 16px;
+  background: #ffffff;
+}
+
+.airfrance-fields label:focus-within {
+  border-color: #83aee4;
+  box-shadow: 0 0 0 3px rgba(0, 85, 184, 0.1);
+}
+
+.airfrance-fields label span {
+  grid-column: 1 / -1;
+  color: var(--af-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.airfrance-fields input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--af-blue);
+  font-size: 18px;
+  font-weight: 800;
+  outline: 0;
+}
+
+.airfrance-fields b,
+.airfrance-fields svg {
+  align-self: center;
+  color: #6d7280;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.airfrance-fields svg {
+  color: var(--af-action);
+}
+
+.airfrance-swap {
+  display: grid;
+  width: 46px;
+  height: 42px;
+  place-items: center;
+  background: #f5f6f8;
+  color: var(--af-action);
+}
+
+.airfrance-swap:hover {
+  transform: rotate(180deg);
+}
+
+.airfrance-options {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  margin-top: 25px;
+  align-items: center;
+}
+
+.airfrance-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--af-blue);
+  font-size: 17px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.airfrance-toggle > span {
+  position: relative;
+  width: 43px;
+  height: 25px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #858b96;
+  box-shadow: inset 0 1px 3px rgba(7, 19, 51, 0.26);
+}
+
+.airfrance-toggle > span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 220ms ease;
+}
+
+.airfrance-toggle.is-on > span {
+  background: var(--af-action);
+}
+
+.airfrance-toggle.is-on > span::after {
+  transform: translateX(18px);
+}
+
+.airfrance-search-button {
+  min-width: 195px;
+  height: 51px;
+  justify-self: end;
+  background: var(--af-action);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(0, 85, 184, 0.24);
+}
+
+.airfrance-car-notice {
+  position: absolute;
+  right: min(9vw, 86px);
+  top: 72px;
+  z-index: 5;
+  display: flex;
+  max-width: 330px;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 15px 17px;
+  color: var(--af-blue);
+  box-shadow: 0 22px 50px rgba(7, 19, 51, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.airfrance-car-notice > span {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #0759c7;
+}
+
+.airfrance-car-notice b,
+.airfrance-car-notice small {
+  display: block;
+}
+
+.airfrance-car-notice b {
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.airfrance-car-notice small {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.airfrance-info {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 82px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 46px 0 44px;
+}
+
+.airfrance-info h2 {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: var(--af-blue);
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.airfrance-info p,
+.airfrance-info a {
+  color: var(--af-blue);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.airfrance-info p {
+  margin-top: 10px;
+}
+
+.airfrance-info a {
+  display: block;
+  margin-top: 4px;
+  color: #004f9f;
+  text-decoration: underline;
+}
+
+.airfrance-info p svg {
+  display: inline;
+  vertical-align: middle;
+}
+
+.airfrance-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+  padding: 18px 24px 26px;
+  color: #727783;
+}
+
+.airfrance-footer a {
+  border-right: 1px solid #d9dce3;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.airfrance-footer a:last-child {
+  border-right: 0;
+}
+
+.airfrance-floating {
+  position: fixed;
+  right: 28px;
+  bottom: 24px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.airfrance-floating button:first-child {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 50%;
+  background: #2b2b2b;
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(7, 19, 51, 0.22);
+}
+
+.airfrance-floating button:last-child {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #7c3aed;
+  box-shadow: 0 8px 20px rgba(7, 19, 51, 0.15);
+}
+
+@keyframes airfrance-banner-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.045) translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes airfrance-card-breathe {
+  0%, 100% {
+    box-shadow: 0 20px 45px rgba(7, 19, 51, 0.18);
+  }
+  50% {
+    box-shadow: 0 26px 58px rgba(7, 19, 51, 0.23);
+  }
+}
+
+@media (max-width: 1100px) {
+  .airfrance-header {
+    padding: 22px 26px 0;
+  }
+
+  .airfrance-booking-shell {
+    width: calc(100% - 32px);
+  }
+
+  .airfrance-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .airfrance-swap {
+    width: 100%;
+  }
+
+  .airfrance-options,
+  .airfrance-info {
+    grid-template-columns: 1fr;
+  }
+
+  .airfrance-search-button {
+    justify-self: stretch;
+  }
+
+  .airfrance-info {
+    max-width: none;
+    padding: 36px 24px;
+    gap: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .airfrance-header {
+    min-height: 78px;
+    align-items: center;
+    padding: 18px 18px 0;
+  }
+
+  .airfrance-logo {
+    font-size: 18px;
+  }
+
+  .airfrance-logo i {
+    width: 19px;
+    height: 10px;
+  }
+
+  .airfrance-top-actions {
+    gap: 10px;
+    font-size: 0;
+  }
+
+  .airfrance-language,
+  .airfrance-login {
+    font-size: 0;
+  }
+
+  .airfrance-nav {
+    height: 56px;
+    font-size: 17px;
+  }
+
+  .airfrance-hero {
+    min-height: 735px;
+  }
+
+  .airfrance-booking-shell {
+    padding-top: 26px;
+  }
+
+  .airfrance-tabs {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .airfrance-tabs button {
+    width: 100%;
+  }
+
+  .airfrance-search-card {
+    padding: 18px;
+  }
+
+  .airfrance-select-row {
+    flex-wrap: wrap;
+  }
+
+  .airfrance-select-row button {
+    flex: 1 1 145px;
+  }
+
+  .airfrance-footer {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .airfrance-footer a {
+    border-right: 0;
+    padding: 0;
+  }
 }
 
 .finance-bank-card {

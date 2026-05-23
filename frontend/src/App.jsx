@@ -251,6 +251,7 @@ function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [sidebarHover, setSidebarHover] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const isSettingsPage = location.pathname.startsWith('/parametres') || location.pathname.startsWith('/settings')
   const isSettingsRoute = location.pathname.startsWith('/settings')
   const sidebarOpen = sidebarHover
@@ -343,7 +344,7 @@ function Shell() {
             <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
             <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
             <div className="relative z-50">
-              <button type="button" onClick={() => setSettingsOpen(true)} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute || settingsOpen ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
+              <button type="button" onClick={() => navigate('/settings/profile')} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
             </div>
           </div>
         </header>
@@ -561,6 +562,40 @@ function BillingSettings() {
 }
 
 function PaymentSettings() {
+  const [openMethod, setOpenMethod] = useState('bank')
+  const countryDialOptions = [
+    ['🇹🇬', '+228', 'Togo'],
+    ['🇫🇷', '+33', 'France'],
+    ['🇧🇯', '+229', 'Bénin'],
+    ['🇨🇮', '+225', "Côte d'Ivoire"],
+    ['🇸🇳', '+221', 'Sénégal'],
+    ['🇨🇲', '+237', 'Cameroun'],
+    ['🇬🇭', '+233', 'Ghana'],
+    ['🇳🇬', '+234', 'Nigeria'],
+    ['🇲🇱', '+223', 'Mali'],
+    ['🇧🇫', '+226', 'Burkina Faso'],
+    ['🇳🇪', '+227', 'Niger'],
+    ['🇬🇳', '+224', 'Guinée'],
+    ['🇨🇩', '+243', 'RDC'],
+    ['🇨🇬', '+242', 'Congo'],
+    ['🇬🇦', '+241', 'Gabon'],
+    ['🇲🇦', '+212', 'Maroc'],
+    ['🇹🇳', '+216', 'Tunisie'],
+    ['🇩🇿', '+213', 'Algérie'],
+    ['🇧🇪', '+32', 'Belgique'],
+    ['🇨🇦', '+1', 'Canada'],
+    ['🇺🇸', '+1', 'États-Unis'],
+    ['🇬🇧', '+44', 'Royaume-Uni'],
+    ['🇩🇪', '+49', 'Allemagne'],
+    ['🇪🇸', '+34', 'Espagne'],
+    ['🇮🇹', '+39', 'Italie'],
+    ['🇨🇭', '+41', 'Suisse'],
+  ]
+  const mobileMoneyNumbers = [
+    ['🇹🇬', 'Flooz', '+228 90 12 34 56', 'Christelle Komi'],
+    ['🇹🇬', 'TMoney', '+228 99 45 67 10', 'Koffi Lucas'],
+  ]
+
   return (
     <SettingsPageFrame title="Méthodes de paiement">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -568,8 +603,43 @@ function PaymentSettings() {
         <p className="mt-3 font-semibold text-slate-500">Gérez vos méthodes de paiement.</p>
       </motion.div>
       <div className="grid gap-7 xl:grid-cols-2">
-        <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} />
-        <PaymentMethodCard icon={ZapIcon} title="Portefeuille crypto" text="Entrez les détails de votre portefeuille crypto." tone="orange" index={1} />
+        <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} open={openMethod === 'bank'} onToggle={() => setOpenMethod((value) => value === 'bank' ? '' : 'bank')}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <PaymentField label="Nom" placeholder="KOMI" />
+            <PaymentField label="Prénom" placeholder="Christelle" />
+            <PaymentField label="IBAN" placeholder="FR76 3000 6000 0112 3456 7890 189" className="md:col-span-2" />
+          </div>
+          <button type="button" className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-700 px-5 font-black text-white">
+            <Plus size={19} />Enregistrer le compte bancaire
+          </button>
+        </PaymentMethodCard>
+        <PaymentMethodCard icon={Smartphone} title="Mobile money" text="Ajoutez les numéros autorisés pour les paiements." tone="orange" index={1} open={openMethod === 'mobile'} onToggle={() => setOpenMethod((value) => value === 'mobile' ? '' : 'mobile')}>
+          <div className="space-y-3">
+            {mobileMoneyNumbers.map(([flag, provider, phone, owner]) => (
+              <div key={`${provider}-${phone}`} className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{flag}</span>
+                  <span><b className="block text-slate-950">{provider}</b><span className="text-sm font-semibold text-slate-500">{owner}</span></span>
+                </div>
+                <b className="text-sm text-blue-800">{phone}</b>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <PaymentField label="Nom" placeholder="AMAH" />
+            <PaymentField label="Prénom" placeholder="Jonadab" />
+            <label className="block text-sm font-black text-slate-700">
+              Code du pays
+              <select className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 font-bold text-slate-800 outline-none focus:border-blue-500">
+                {countryDialOptions.map(([flag, code, country]) => <option key={`${country}-${code}`} value={code}>{flag} {country} {code}</option>)}
+              </select>
+            </label>
+            <PaymentField label="Numéro" placeholder="90 12 34 56" />
+          </div>
+          <button type="button" className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-orange-500 px-5 font-black text-white">
+            <Plus size={19} />Ajouter le numéro
+          </button>
+        </PaymentMethodCard>
       </div>
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }} className="mt-8 rounded-xl border border-blue-200 bg-blue-50 p-7">
         <div className="flex gap-5">
@@ -582,17 +652,33 @@ function PaymentSettings() {
   )
 }
 
-function ZapIcon(props) {
-  return <Send {...props} />
+function PaymentField({ label, placeholder, className = '' }) {
+  return (
+    <label className={`block text-sm font-black text-slate-700 ${className}`}>
+      {label}
+      <input className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 font-bold text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500" placeholder={placeholder} />
+    </label>
+  )
 }
 
-function PaymentMethodCard({ icon: Icon, title, text, tone, index = 0 }) {
+function PaymentMethodCard({ icon: Icon, title, text, tone, index = 0, open = false, onToggle, children }) {
   const toneClass = tone === 'orange' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-amber-500'
   return (
-    <motion.button initial={{ opacity: 0, y: 28, scale: 0.97, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }} whileHover={{ y: -4 }} transition={{ delay: 0.1 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="flex min-h-28 items-center justify-between rounded-xl border border-slate-200 bg-white p-7 text-left shadow-sm">
-      <span className="flex items-center gap-4"><span className={`grid h-[60px] w-[60px] shrink-0 place-items-center rounded-lg ${toneClass}`}><Icon size={24} /></span><span><b className="text-2xl">{title}</b><span className="mt-2 block font-semibold text-slate-500">{text}</span></span></span>
-      {tone !== 'orange' && <ChevronDown size={24} className="text-slate-400" />}
-    </motion.button>
+    <motion.section initial={{ opacity: 0, y: 28, scale: 0.97, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }} transition={{ delay: 0.1 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <button type="button" onClick={onToggle} className="flex min-h-28 w-full items-center justify-between gap-5 p-7 text-left">
+        <span className="flex items-center gap-4"><span className={`grid h-[60px] w-[60px] shrink-0 place-items-center rounded-lg ${toneClass}`}><Icon size={24} /></span><span><b className="text-2xl">{title}</b><span className="mt-2 block font-semibold text-slate-500">{text}</span></span></span>
+        <ChevronDown size={24} className={`shrink-0 text-slate-400 transition ${open ? 'rotate-180 text-blue-700' : ''}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+            <div className="border-t border-slate-100 p-7 pt-6">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.section>
   )
 }
 
@@ -1391,7 +1477,84 @@ function Housing() {
 
   if (!housingMode) {
     return (
-      <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
+      <div className="housing-page -mx-5 space-y-8 px-5 lg:-mx-8 lg:px-8">
+        <motion.section
+          initial={{ opacity: 0, y: 34, scale: 0.985, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+          transition={{ duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+          className="housing-landing-replica grid gap-7 xl:grid-cols-[1.85fr_.9fr]"
+        >
+          <div className="housing-landing-hero relative rounded-[28px] bg-[#102c85] p-8 text-white lg:p-10">
+            <div className="relative z-10 grid min-h-[480px] gap-8 lg:grid-cols-[1.25fr_.72fr]">
+              <motion.div initial={{ opacity: 0, x: -26 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12, duration: 0.48, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col justify-between">
+                <div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-blue-500/70 px-5 py-3 text-sm font-black text-blue-50 shadow-lg shadow-blue-950/20 ring-1 ring-white/10">
+                    <Home size={16} />Logement étudiant
+                  </span>
+                  <h1 className="mt-8 max-w-[560px] text-[44px] font-black leading-[1.1] tracking-tight text-white lg:text-[54px]">Choisissez votre solution d’hébergement</h1>
+                  <p className="mt-6 max-w-[650px] text-lg font-semibold leading-8 text-blue-50/90">StudyWay vous accompagne pour réserver une adresse fiable, que ce soit pour une installation étudiante ou un séjour hôtelier à l’arrivée.</p>
+                </div>
+                <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                  {[[ShieldCheck, 'Logements vérifiés', 'Qualité garantie'], [MessageCircle, 'Accompagnement', 'À chaque étape'], [Lock, 'Paiement sécurisé', '100% sécurisé']].map(([Icon, title, text], index) => (
+                    <motion.div
+                      key={title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.32 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                    className="housing-hero-proof flex items-center gap-3 rounded-2xl p-4"
+                  >
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/12 text-white"><Icon size={21} /></span>
+                      <span><b className="block text-sm">{title}</b><small className="text-xs font-semibold text-blue-50/80">{text}</small></span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, x: 34, rotate: 1.2 }} animate={{ opacity: 1, x: 0, rotate: 0 }} transition={{ delay: 0.2, duration: 0.58, ease: [0.22, 1, 0.36, 1] }} className="housing-hero-photo-stage">
+                <span className="housing-hero-image-glow" />
+                <img src={housingImages[0]} alt="Appartement étudiant lumineux" className="housing-hero-slide housing-hero-slide-student" />
+                <img src={hotelImages[0]} alt="Chambre d’hôtel confortable" className="housing-hero-slide housing-hero-slide-hotel" />
+                <div className="housing-hero-rating-card">
+                  <Star className="fill-amber-400 text-amber-400" size={18} />
+                  <b>4.8/5</b>
+                  <small>+1200 avis positif</small>
+                </div>
+                <div className="housing-hero-social-card">
+                  <span className="housing-avatar-stack"><i /><i /><i /></span>
+                  <b>+1200 étudiants</b>
+                  <small>logés avec succès</small>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="housing-choice-panel grid gap-7">
+            {[
+              ['student', Home, 'Logements étudiants', 'Résidences, studios, chambres et colocations pour une installation durable près du campus.', ['Bail étudiant', 'Dossier accompagné', 'Quartiers vérifiés'], 'blue'],
+              ['hotel', Building2, 'Hôtels', 'Hôtels disponibles pour arrivée, rendez-vous visa, séjour court ou transition avant le logement final.', ['Réservation rapide', 'Avantages inclus', 'Détails transparents'], 'emerald'],
+            ].map(([mode, Icon, title, text, chips, tone], index) => (
+              <motion.button
+                key={mode}
+                type="button"
+                onClick={() => setHousingMode(mode)}
+                initial={{ opacity: 0, x: 38, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ delay: 0.22 + index * 0.1, duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
+                className="housing-choice-card group flex min-h-[236px] flex-col items-start justify-between rounded-[26px] border border-slate-200 bg-white p-7 text-left shadow-sm"
+              >
+                <span className={`grid h-14 w-14 place-items-center rounded-2xl ${tone === 'blue' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}><Icon size={27} /></span>
+                <span>
+                  <span className="block text-2xl font-black text-slate-950">{title}</span>
+                  <span className="mt-3 block max-w-[360px] text-sm font-semibold leading-6 text-slate-500">{text}</span>
+                  <span className="mt-5 flex flex-wrap gap-2">
+                    {chips.map((chip) => <span key={chip} className={`housing-choice-chip rounded-full px-3 py-2 text-xs font-black ${tone === 'blue' ? 'housing-choice-chip-blue' : 'housing-choice-chip-emerald'}`}>{chip}</span>)}
+                  </span>
+                </span>
+                <span className={`absolute right-7 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-xl text-white shadow-lg transition group-hover:translate-x-1 ${tone === 'blue' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-500 shadow-emerald-200'}`}><ArrowRight size={23} /></span>
+              </motion.button>
+            ))}
+          </div>
+        </motion.section>
+        <div className="hidden">
         <div className="px-5 lg:px-8">
           <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="grid min-h-[520px] lg:grid-cols-[0.92fr_1.08fr]">
@@ -1436,6 +1599,7 @@ function Housing() {
               </div>
             </div>
           </section>
+        </div>
         </div>
       </div>
     )
@@ -3937,132 +4101,27 @@ function Transport() {
   const location = useLocation()
   const paymentSearchParams = new URLSearchParams(location.search)
   const isPaymentReturn = paymentSearchParams.get('payment') === 'moneroo' || paymentSearchParams.has('paymentStatus')
-  const formatCfa = (amount) => `${amount.toLocaleString('fr-FR')} FCFA`
-  const transportModes = [
-    ['flight', 'Avion', Plane],
-    ['train', 'Train', Train],
-    ['bus', 'Bus', Bus],
-    ['local', 'Tram / Métro', Train],
-    ['driver', 'Chauffeur', Car],
-  ]
-  const flightLocationOptions = [
-    ['Lomé (LFW)', 'LFW'],
-    ['Paris (CDG)', 'CDG'],
-    ['Paris (ORY)', 'ORY'],
-    ['Bruxelles (BRU)', 'BRU'],
-    ['Montréal (YUL)', 'YUL'],
-    ['Toronto (YYZ)', 'YYZ'],
-  ]
-  const localTransportOptions = [
-    { id: 'tgv-1', mode: 'train', provider: 'SNCF Connect', code: 'TGV INOUI 8421', logo: logos.france, origin: 'Paris Gare de Lyon', destination: 'Lyon Part-Dieu', departure: '08:56', arrival: '10:58', duration: '2h 02m', stops: 0, stopLabel: 'Direct', baggage: 'Bagages libres', className: '2nde classe', price: 41400, date: '2026-06-26', comfort: 'Rapide', refundable: true, tags: ['E-billet', 'Prise', 'Wi-Fi'] },
-    { id: 'tgv-2', mode: 'train', provider: 'SNCF Connect', code: 'OUIGO 7863', logo: logos.france, origin: 'Paris Montparnasse', destination: 'Bordeaux Saint-Jean', departure: '11:08', arrival: '13:19', duration: '2h 11m', stops: 0, stopLabel: 'Direct', baggage: 'Option bagage possible', className: 'Standard', price: 28750, date: '2026-06-26', comfort: 'Budget', refundable: false, tags: ['Petit prix', 'E-billet'] },
-    { id: 'bus-1', mode: 'bus', provider: 'FlixBus', code: 'FB 421', logo: 'https://logo.clearbit.com/flixbus.com', origin: 'Paris Bercy', destination: 'Lille Europe', departure: '07:30', arrival: '10:45', duration: '3h 15m', stops: 0, stopLabel: 'Direct', baggage: '1 bagage soute', className: 'Standard', price: 13800, date: '2026-06-26', comfort: 'Budget', refundable: false, tags: ['Wi-Fi', 'Prise', 'Bagage'] },
-    { id: 'bus-2', mode: 'bus', provider: 'BlaBlaCar Bus', code: 'BBC 208', logo: 'https://logo.clearbit.com/blablacar.com', origin: 'Paris Bercy', destination: 'Nantes', departure: '14:20', arrival: '19:35', duration: '5h 15m', stops: 1, stopLabel: '1 arrêt', baggage: '1 bagage soute', className: 'Standard', price: 18400, date: '2026-06-26', comfort: 'Budget', refundable: true, tags: ['Flexible', 'Bagage'] },
-    { id: 'rer-b', mode: 'local', provider: 'Île-de-France Mobilités', code: 'RER B', logo: logos.france, origin: 'Aéroport CDG', destination: 'Paris Gare du Nord', departure: 'Toutes les 12 min', arrival: '35 min', duration: '35 min', stops: 8, stopLabel: 'RER direct centre', baggage: 'Bagages autorisés', className: 'Ticket local', price: 6900, date: '2026-06-25', comfort: 'Pratique', refundable: false, tags: ['Rapide', 'Centre-ville'] },
-    { id: 'metro-pass', mode: 'local', provider: 'Navigo Easy', code: 'Pass journée', logo: logos.france, origin: 'Paris', destination: 'Paris zones 1-2', departure: 'Toute la journée', arrival: 'Illimité', duration: '24h', stops: 0, stopLabel: 'Métro / Tram / Bus', baggage: 'Non applicable', className: 'Pass mobilité', price: 8050, date: '2026-06-25', comfort: 'Illimité', refundable: false, tags: ['Métro', 'Tram', 'Bus'] },
-    { id: 'driver-cdg', mode: 'driver', provider: 'Chauffeur privé', code: 'CDG-PARIS', logo: logos.studyway, origin: 'Aéroport CDG', destination: 'Paris centre', departure: 'À votre arrivée', arrival: '50 min', duration: '45-60 min', stops: 0, stopLabel: 'Trajet privé', baggage: '2 bagages', className: 'Berline', price: 62100, date: '2026-06-25', comfort: 'Confort', refundable: true, tags: ['Accueil aéroport', 'Privé', 'Bagages'] },
-    { id: 'driver-student', mode: 'driver', provider: 'Chauffeur étudiant', code: 'ARRIVÉE CAMPUS', logo: logos.studyway, origin: 'Aéroport CDG', destination: 'Résidence étudiante', departure: 'À planifier', arrival: 'Selon adresse', duration: 'Sur mesure', stops: 0, stopLabel: 'Porte à porte', baggage: '3 bagages', className: 'Van', price: 80500, date: '2026-06-25', comfort: 'Installation', refundable: true, tags: ['Porte à porte', 'Van', 'Assistance'] },
-  ]
-  const [activeMode, setActiveMode] = useState('flight')
-  const [origin, setOrigin] = useState('Lomé (LFW)')
-  const [destination, setDestination] = useState('Paris (CDG)')
-  const [date, setDate] = useState('2026-06-25')
-  const [returnDate, setReturnDate] = useState('')
-  const [multiDestination, setMultiDestination] = useState(false)
-  const [extraDestination, setExtraDestination] = useState('Bruxelles (BRU)')
-  const [extraDate, setExtraDate] = useState('2026-07-02')
-  const [cabinClass, setCabinClass] = useState('economy')
-  const [selectedId, setSelectedId] = useState(null)
-  const [reservationOpen, setReservationOpen] = useState(false)
-  const [driverBookingOpen, setDriverBookingOpen] = useState(false)
-  const flightOriginCode = getTransportIata(origin, 'LFW')
-  const flightDestinationCode = getTransportIata(destination, 'CDG')
-  const extraDestinationCode = getTransportIata(extraDestination, 'BRU')
-  const returnDateParam = returnDate ? `&return_date=${returnDate}` : ''
-  const multiDestinationParam = multiDestination ? `&extra_destination=${extraDestinationCode}&extra_departure_date=${extraDate}` : ''
-  const flightQuery = useQuery({
-    queryKey: ['duffel-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, multiDestination, extraDestinationCode, extraDate, cabinClass],
-    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}${multiDestinationParam}&adults=1&cabin_class=${cabinClass}&max_connections=2`),
-    enabled: activeMode === 'flight' || activeMode === 'all',
-    staleTime: 1000 * 60 * 8,
-    retry: 1,
-  })
-  const directFlightQuery = useQuery({
-    queryKey: ['direct-flight-offers', flightOriginCode, flightDestinationCode, date, returnDate, multiDestination, extraDestinationCode, extraDate, cabinClass],
-    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${flightOriginCode}&destination=${flightDestinationCode}&departure_date=${date}${returnDateParam}${multiDestinationParam}&adults=1&cabin_class=${cabinClass}&max_connections=0`),
-    enabled: activeMode === 'flight' || activeMode === 'all',
-    staleTime: 1000 * 60 * 8,
-    retry: 1,
-  })
-  const flightOptions = mergeTransportOptions(directFlightQuery.data?.data ?? [], flightQuery.data?.data ?? [])
-  const transportOptions = activeMode === 'flight'
-    ? flightOptions
-    : activeMode === 'all'
-      ? [...flightOptions, ...localTransportOptions]
-      : localTransportOptions
-  const currentOriginOptions = activeMode === 'flight' || activeMode === 'all'
-    ? flightLocationOptions.map(([label]) => label)
-    : Array.from(new Set(localTransportOptions.map((item) => item.origin)))
-  const currentDestinationOptions = activeMode === 'flight' || activeMode === 'all'
-    ? flightLocationOptions.map(([label]) => label)
-    : Array.from(new Set(localTransportOptions.map((item) => item.destination)))
-  const filteredOptions = transportOptions
-    .filter((item) => activeMode === 'all' || item.mode === activeMode)
-    .filter((item) => item.mode === 'flight' || origin === 'all' || item.origin === origin)
-    .filter((item) => item.mode === 'flight' || destination === 'all' || item.destination === destination)
-    .sort((a, b) => parseDuration(a.duration) - parseDuration(b.duration) || a.price - b.price)
-  const selectedTicket = filteredOptions.find((item) => item.id === selectedId) ?? filteredOptions[0] ?? transportOptions.find((item) => item.id === selectedId)
+  const [tripType] = useState('Aller simple')
+  const [cabinClass] = useState('Economy')
+  const [origin, setOrigin] = useState('Paris')
+  const [destination, setDestination] = useState('Lome')
+  const [departureDate, setDepartureDate] = useState('mai 25')
+  const [useMiles, setUseMiles] = useState(false)
+  const [bluebiz, setBluebiz] = useState(false)
+  const [carNoticeOpen, setCarNoticeOpen] = useState(false)
 
-  // When no specific ticket is selected, show a helpful trip title
-  // based on the chosen origin/destination instead of always showing
-  // "Aucun billet sélectionné".
-  const tripTitle = selectedTicket?.provider ?? ((origin && destination && origin !== 'all' && destination !== 'all') ? `${origin} → ${destination}` : 'Aucun billet sélectionné')
-  function resetFilters() {
-    setActiveMode('flight')
-    setOrigin('Lomé (LFW)')
-    setDestination('Paris (CDG)')
-    setDate('2026-06-25')
-    setReturnDate('')
-    setMultiDestination(false)
-    setExtraDestination('Bruxelles (BRU)')
-    setExtraDate('2026-07-02')
-    setCabinClass('economy')
-    setReservationOpen(false)
+  function swapCities() {
+    setOrigin(destination)
+    setDestination(origin)
   }
 
-  function switchTransportMode(mode) {
-    setActiveMode(mode)
-    setSelectedId(null)
-    setReservationOpen(false)
-
-    if (mode === 'flight' || mode === 'all') {
-      setOrigin('Lomé (LFW)')
-      setDestination('Paris (CDG)')
-      return
-    }
-
-    setOrigin('all')
-    setDestination('all')
-  }
-
-  function runTransportSearch() {
-    setSelectedId(null)
-    if (activeMode === 'flight' || activeMode === 'all') {
-      flightQuery.refetch()
-      directFlightQuery.refetch()
-    }
-  }
-
-  if (reservationOpen && selectedTicket) {
-    return <TransportReservationPanel ticket={selectedTicket} onClose={() => setReservationOpen(false)} />
-  }
-
-  if (driverBookingOpen && selectedTicket) {
-    return <DriverTransferBookingPanel ticket={selectedTicket} onClose={() => setDriverBookingOpen(false)} />
+  function showCarNotice() {
+    setCarNoticeOpen(true)
+    window.setTimeout(() => setCarNoticeOpen(false), 2600)
   }
 
   return (
-    <div className="transport-page -mx-5 bg-white px-5 pb-10 lg:-mx-8 lg:px-8">
+    <div className="airfrance-page min-h-screen bg-white text-[#071333]">
       {isPaymentReturn && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4">
           <motion.div initial={{ opacity: 0, y: 18, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-7 shadow-2xl">
@@ -4076,122 +4135,106 @@ function Transport() {
         </div>
       )}
 
-      <div className="mx-auto max-w-[1420px] space-y-8">
-        <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-6 pt-5">
-            <div className="flex gap-7">
-              <button type="button" onClick={() => switchTransportMode('flight')} className={`flex h-14 items-center gap-3 border-b-2 px-1 font-black ${activeMode === 'flight' ? 'border-blue-700 text-blue-700' : 'border-transparent text-slate-600'}`}><Plane size={18} />Billets d’avion</button>
-              <button type="button" onClick={() => switchTransportMode('local')} className={`flex h-14 items-center gap-3 border-b-2 px-1 font-black ${activeMode !== 'flight' ? 'border-blue-700 text-blue-700' : 'border-transparent text-slate-600'}`}><Train size={18} />Transport</button>
-            </div>
-            <div className="flex flex-wrap items-center gap-6 text-sm font-black text-slate-700">
-              <span className="flex items-center gap-2">1 Passager <ChevronDown size={16} /></span>
-              <select value={cabinClass} onChange={(event) => setCabinClass(event.target.value)} className="rounded-lg border-0 bg-transparent font-black outline-none">
-                <option value="economy">Économique</option>
-                <option value="premium_economy">Premium économie</option>
-                <option value="business">Business</option>
-                <option value="first">Première</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid gap-4 p-6 lg:grid-cols-[1fr_1fr_1fr_1fr_190px] lg:items-stretch">
-            <div className="relative">
-              <TransportSelect label="De" value={origin} onChange={setOrigin} options={activeMode === 'flight' ? currentOriginOptions.map((item) => [item, item]) : [['all', 'Tous les départs'], ...currentOriginOptions.map((item) => [item, item])]} />
-              <button type="button" aria-label="Inverser départ et arrivée" onClick={() => { const previousOrigin = origin; setOrigin(destination); setDestination(previousOrigin) }} className="absolute -right-5 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-slate-200 bg-white text-blue-700 shadow-sm transition hover:rotate-180 hover:bg-blue-50 lg:grid"><ArrowLeftRight size={18} /></button>
-            </div>
-            <TransportSelect label="À" value={destination} onChange={setDestination} options={activeMode === 'flight' ? currentDestinationOptions.map((item) => [item, item]) : [['all', 'Toutes les arrivées'], ...currentDestinationOptions.map((item) => [item, item])]} />
-            <label className="block rounded-lg border border-slate-200 px-4 py-4">
-              <span className="text-xs font-bold text-slate-500">Départ</span>
-              <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-2 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
-            </label>
-            <label className="block rounded-lg border border-slate-200 px-4 py-4">
-              <span className="text-xs font-bold text-slate-500">Retour</span>
-              <input type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} className="mt-2 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
-            </label>
-            <button type="button" onClick={runTransportSearch} className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-blue-700 px-8 font-black text-white shadow-lg shadow-blue-700/20">Rechercher <Search size={18} /></button>
-          </div>
-          {multiDestination && (
-            <div className="mx-6 mb-4 grid gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-4 md:grid-cols-[1fr_1fr_auto]">
-              <TransportSelect label="Puis vers" value={extraDestination} onChange={setExtraDestination} options={flightLocationOptions.map(([label]) => [label, label])} />
-              <label className="block rounded-lg border border-slate-200 bg-white px-4 py-3">
-                <span className="text-xs font-bold text-slate-500">Date du second trajet</span>
-                <input type="date" value={extraDate} onChange={(event) => setExtraDate(event.target.value)} className="mt-1 w-full border-0 bg-transparent p-0 font-black text-slate-950 outline-none" />
-              </label>
-              <button type="button" onClick={() => setMultiDestination(false)} className="h-full min-h-12 rounded-lg border border-blue-100 bg-white px-5 font-black text-blue-700">Retirer</button>
-            </div>
-          )}
-          <button type="button" onClick={() => setMultiDestination((value) => !value)} className="mx-auto mb-5 flex items-center gap-2 text-sm font-black text-blue-700"><Globe2 size={16} />{multiDestination ? 'Masquer la recherche multi-destinations' : 'Recherche multi-destinations'}</button>
-        </section>
+      <main>
+        <section className="airfrance-hero">
+          <motion.img initial={{ opacity: 0, scale: 1.08, y: 18 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} src="/airplane-banner.png" alt="Avion en vol au-dessus des nuages" className="airfrance-hero-image" />
 
-        <section className="grid gap-4 rounded-lg bg-slate-50 p-4 lg:grid-cols-4">
-          {[[ShieldCheck, 'Meilleurs prix garantis', 'Nous vous trouvons le meilleur prix', 'text-emerald-600 bg-emerald-50'], [Lock, 'Paiement sécurisé', 'Vos données sont protégées', 'text-blue-700 bg-blue-50'], [CheckCircle2, 'Annulation flexible', 'Annulez sans frais sous 24h', 'text-emerald-600 bg-emerald-50'], [MessageCircle, 'Support 24/7', 'Nous sommes là pour vous aider', 'text-rose-600 bg-rose-50']].map(([Icon, title, text, tone]) => (
-            <div key={title} className="flex items-center gap-4 rounded-lg bg-white p-4">
-              <span className={`grid h-11 w-11 place-items-center rounded-full ${tone}`}><Icon size={20} /></span>
-              <span><b className="block text-sm text-slate-950">{title}</b><span className="mt-1 block text-xs font-semibold text-slate-500">{text}</span></span>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="airfrance-booking-shell">
+            <div className="airfrance-tabs">
+              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.36 }} type="button" className="is-active"><Plane size={20} />Acheter un billet</motion.button>
+              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.26, duration: 0.36 }} type="button" onClick={showCarNotice}><Car size={20} />Voiture</motion.button>
             </div>
-          ))}
-        </section>
 
-        <div className="space-y-8">
-          <main className="space-y-6">
-            <section className="space-y-4">
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-950">{activeMode === 'flight' ? 'Vols recommandés' : 'Options disponibles'}</h2>
-                  <p className="mt-1 text-sm font-semibold text-slate-500">{filteredOptions.length} résultat{filteredOptions.length > 1 ? 's' : ''} trouvé{filteredOptions.length > 1 ? 's' : ''}</p>
-                </div>
-                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-800">Durée la plus courte en premier</span>
+            <motion.div initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.54, ease: [0.22, 1, 0.36, 1] }} className="airfrance-search-card">
+              <div className="airfrance-select-row">
+                <button type="button">{tripType} <ChevronDown size={16} /></button>
+                <button type="button">{cabinClass} <ChevronDown size={16} /></button>
               </div>
 
-              {filteredOptions.length ? (
-                <div className="space-y-3">
-                  {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => { setSelectedId(ticket.id); if (ticket.mode === 'flight') setReservationOpen(true); if (ticket.mode === 'driver') setDriverBookingOpen(true) }} />)}
-                </div>
-              ) : (flightQuery.isLoading || directFlightQuery.isLoading) && (activeMode === 'flight' || activeMode === 'all') ? (
-                <div className="rounded-lg border border-slate-200 bg-white p-10 text-center shadow-sm">
-                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-800"><Plane size={28} /></div>
-                  <h3 className="mt-5 text-xl font-black text-slate-950">Recherche en cours</h3>
-                  <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-slate-500">Nous récupérons les offres de vols réelles disponibles pour cet itinéraire.</p>
-                </div>
-              ) : (flightQuery.isError && directFlightQuery.isError) && activeMode === 'flight' ? (
-                <TransportEmptyState title="Billets indisponibles" text={flightQuery.error?.message || directFlightQuery.error?.message || 'Les billets ne peuvent pas être chargés pour le moment. Changez votre recherche ou réessayez plus tard.'} onReset={resetFilters} />
-              ) : (
-                <TransportEmptyState title="Aucun billet disponible" text="Changez l’itinéraire, la date ou la cabine puis relancez la recherche." onReset={resetFilters} />
-              )}
-            </section>
-
-            <section className="grid items-center gap-5 rounded-lg border border-blue-100 bg-blue-50 p-5 md:grid-cols-[auto_1fr_auto]">
-              <img src={parisPackBackground} alt="" className="h-20 w-28 rounded-lg object-contain" />
-              <div><h3 className="text-lg font-black text-blue-950">Besoin d’un logement à votre arrivée ?</h3><p className="mt-1 text-sm font-semibold text-slate-600">Réservez votre logement temporaire en même temps que votre billet.</p></div>
-              <Link to="/logement" className="flex h-11 items-center justify-center rounded-lg border border-blue-200 bg-white px-6 font-black text-blue-800">Voir les logements</Link>
-            </section>
-
-            <section className="space-y-4">
-              <div><h2 className="text-xl font-black text-slate-950">Options de transport</h2><p className="mt-1 text-sm font-semibold text-slate-500">Sélectionnez votre moyen de transport à votre arrivée.</p></div>
-              <div className="space-y-3">
-                {localTransportOptions.slice(4, 7).map((option) => (
-                  <article key={option.id} className="grid items-center gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[1fr_auto_auto]">
-                    <div className="flex items-center gap-4">
-                      <span className="grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-700"><TransportModeIcon mode={option.mode} size={25} /></span>
-                      <div><h3 className="font-black text-slate-950">{option.provider}</h3><p className="mt-1 text-sm font-semibold text-slate-500">{option.className}</p><div className="mt-2 flex gap-4 text-xs font-bold text-slate-500"><span>{option.duration}</span><span>{option.stopLabel}</span></div></div>
-                    </div>
-                    <div className="text-right"><b className="text-2xl text-slate-950">{formatTicketPrice(option)}</b><div className="text-xs font-semibold text-slate-500">par personne</div></div>
-                    <button type="button" onClick={() => switchTransportMode(option.mode)} className="h-11 rounded-lg border border-blue-100 px-5 font-black text-blue-700">Sélectionner</button>
-                  </article>
-                ))}
+              <div className="airfrance-fields">
+                <label>
+                  <span>À partir de</span>
+                  <input value={origin} onChange={(event) => setOrigin(event.target.value)} />
+                  <b>PAR</b>
+                </label>
+                <button type="button" className="airfrance-swap" onClick={swapCities} aria-label="Inverser départ et arrivée"><ArrowLeftRight size={23} /></button>
+                <label>
+                  <span>À</span>
+                  <input value={destination} onChange={(event) => setDestination(event.target.value)} />
+                  <b>LFW</b>
+                </label>
+                <label>
+                  <span>Date de départ</span>
+                  <input value={departureDate} onChange={(event) => setDepartureDate(event.target.value)} />
+                  <CalendarDays size={23} />
+                </label>
+                <label>
+                  <span />
+                  <input value="1 adulte" readOnly />
+                  <UserRound size={24} />
+                </label>
               </div>
-              <button type="button" onClick={() => switchTransportMode('local')} className="mx-auto flex h-11 items-center gap-2 font-black text-blue-700">Voir plus d’options de transport <ChevronDown size={17} /></button>
-            </section>
-          </main>
 
-        </div>
-
-        <section className="grid gap-4 border-t border-slate-100 py-6 lg:grid-cols-4">
-          {[[Gift, 'Paiement en plusieurs fois', 'Réglez en 3x ou 4x sans frais'], [GraduationCap, 'Tarifs étudiants', 'Jusqu’à -10% sur vos billets'], [ShieldCheck, 'Assurance voyage', 'Voyagez en toute sérénité'], [SlidersHorizontal, 'Modification facile', 'Modifiez votre billet facilement']].map(([Icon, title, text]) => (
-            <div key={title} className="flex items-center gap-4 rounded-lg bg-slate-50 p-4"><span className="grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700"><Icon size={20} /></span><span><b className="block text-sm text-slate-950">{title}</b><span className="text-xs font-semibold text-slate-500">{text}</span></span></div>
-          ))}
+              <div className="airfrance-options">
+                <AirFranceToggle checked={useMiles} onClick={() => setUseMiles((value) => !value)} label="Utiliser des Miles" />
+                <AirFranceToggle checked={bluebiz} onClick={() => setBluebiz((value) => !value)} label="Je veux réserver avec bluebiz ou un accord d'entreprise" />
+                <button type="button" className="airfrance-search-button">Rechercher les vols</button>
+              </div>
+            </motion.div>
+          </motion.div>
+          <AnimatePresence>
+            {carNoticeOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 22, scale: 0.92, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: 12, scale: 0.96, filter: 'blur(6px)' }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="airfrance-car-notice"
+              >
+                <span><Car size={22} /></span>
+                <div><b>Voiture bientôt disponible</b><small>La réservation de voiture arrive prochainement.</small></div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
+
+        <section className="airfrance-info">
+          <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="airfrance-help">
+            <h2><Phone size={20} />BESOIN D'AIDE POUR VOTRE RÉSERVATION ?</h2>
+            <p>Air France Service Line: <strong>+33 9 69 39 36 54</strong></p>
+            <a href="#frais">Frais d'émission et de service plus élevés par téléphone, en savoir plus</a>
+            <p>Prix d'un appel local vers : France</p>
+            <p><strong>Langues parlées :</strong> Français - Anglais</p>
+            <p><strong>Horaires d'ouverture :</strong> Aujourd'hui (08:00 - 22:00) <ChevronDown size={15} /></p>
+            <a href="#contact">Voir les autres manières de nous contacter</a>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08, duration: 0.45 }} className="airfrance-security">
+            <h2><Lock size={21} />SÉCURITÉ ET CONFIDENTIALITÉ</h2>
+            <p>Nous mettons tout en œuvre pour garantir la sécurité et la confidentialité de vos données personnelles.</p>
+            <a href="#confidentialite">Politique de confidentialité d'Air France</a>
+          </motion.div>
+        </section>
+
+        <footer className="airfrance-footer">
+          {['Plan du site', 'Informations légales', 'Politique de confidentialité', 'Accessibilité : non conforme', 'Gestion des cookies'].map((item) => <a key={item} href={`#${item}`}>{item}</a>)}
+        </footer>
+      </main>
+
+      <div className="airfrance-floating">
+        <button type="button" aria-label="Chat"><MessageCircle size={30} /></button>
+        <button type="button" aria-label="Assistant"><Smile size={23} /></button>
       </div>
     </div>
+  )
+}
+
+function AirFranceToggle({ checked, onClick, label }) {
+  return (
+    <button type="button" onClick={onClick} className={`airfrance-toggle ${checked ? 'is-on' : ''}`}>
+      <span />
+      {label}
+    </button>
   )
 }
 
