@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\CalendarController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\DuffelFlightController;
@@ -42,6 +43,13 @@ Route::prefix('v1')->middleware('throttle:api')->group(function (): void {
         Route::post('initialize', [MonerooPaymentController::class, 'initialize']);
         Route::get('{paymentId}/verify', [MonerooPaymentController::class, 'verify']);
         Route::post('webhook', [MonerooPaymentController::class, 'webhook']);
+    });
+
+    Route::prefix('calendar')->group(function (): void {
+        Route::get('slots', [CalendarController::class, 'slots']);
+        Route::post('appointments', [CalendarController::class, 'store']);
+        Route::get('auth', [CalendarController::class, 'authUrl']);
+        Route::get('callback', [CalendarController::class, 'callback']);
     });
 
     Route::prefix('flight-reservations')->group(function (): void {

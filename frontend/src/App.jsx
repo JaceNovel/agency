@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -118,7 +119,7 @@ function AuthPage({ mode }) {
           <Logo />
           <div className="max-w-xs">
             <Plane className="mb-8 text-blue-200" size={54} />
-            <h1 className="text-4xl font-black leading-tight">Étudiez à l'étranger en toute sérénité</h1>
+            <h1 className="text-4xl font-black leading-tight">Étudiez à l’étranger en toute sérénité</h1>
             <div className="mt-10 space-y-6 text-sm font-semibold text-blue-50">
               {['Accompagnement personnalisé', 'Dossiers sécurisés et suivis', 'Logement & installation assurés', 'Support 24h/7j'].map((item) => (
                 <div className="flex items-center gap-3" key={item}><ShieldCheck size={22} /> {item}</div>
@@ -136,7 +137,7 @@ function AuthPage({ mode }) {
           </div>
           <div className="mb-8">
             <h2 className="text-4xl font-black tracking-tight text-slate-950">{isRegister ? 'Créer un compte' : 'Bienvenue de retour !'}</h2>
-            <p className="mt-3 text-slate-500">{isRegister ? "Rejoignez StudyWay et lancez votre projet d'études à l'étranger" : 'Connectez-vous à votre compte StudyWay'}</p>
+            <p className="mt-3 text-slate-500">{isRegister ? "Rejoignez StudyWay et lancez votre projet d’études à l’étranger" : 'Connectez-vous à votre compte StudyWay'}</p>
           </div>
           <form className="rounded-lg border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/70">
             {isRegister && <div className="grid gap-4 sm:grid-cols-2"><Field icon={UserRound} label="Prénom" placeholder="Votre prénom" /><Field icon={UserRound} label="Nom" placeholder="Votre nom" /></div>}
@@ -146,7 +147,7 @@ function AuthPage({ mode }) {
             {isRegister && <Field icon={Lock} label="Confirmer le mot de passe" placeholder="Confirmez votre mot de passe" type="password" />}
             {isRegister && <label className="mt-4 block text-sm font-bold text-slate-700">Vous êtes...<select className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-600 outline-none focus:border-blue-500"><option>Étudiant</option><option>Parent / Tuteur</option><option>École partenaire</option></select></label>}
             <button type="button" className="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 font-bold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700">{isRegister ? 'Créer mon compte' : 'Se connecter'} <ArrowRight size={18} /></button>
-            <div className="mt-6 text-center text-sm text-slate-500">{isRegister ? 'Vous avez déjà un compte ? ' : "Vous n'avez pas de compte ? "}<Link className="font-bold text-blue-600" to={isRegister ? '/login' : '/register'}>{isRegister ? 'Se connecter' : 'Créer un compte'}</Link></div>
+            <div className="mt-6 text-center text-sm text-slate-500">{isRegister ? 'Vous avez déjà un compte ? ' : "Vous n’avez pas de compte ? "}<Link className="font-bold text-blue-600" to={isRegister ? '/login' : '/register'}>{isRegister ? 'Se connecter' : 'Créer un compte'}</Link></div>
           </form>
         </motion.div>
       </section>
@@ -178,22 +179,22 @@ function AccountPage() {
     [FileText, 'Documents', '12', 'Total', 'bg-violet-50 text-violet-700'],
   ]
   const services = [
-    [Home, 'Logement', 'Résidence Les Estudines, Paris', 'Actif', "Loyer payé jusqu'au 31 mai 2025", 'bg-blue-50 text-blue-700'],
-    [GraduationCap, 'Université', 'Licence Informatique - L1', 'Inscrit', 'Année académique 2024-2025', 'bg-blue-50 text-blue-700'],
-    [Landmark, 'Compte bancaire', 'Compte ouvert - Boursorama', 'Actif', 'Compte vérifié', 'bg-violet-50 text-violet-700'],
-    [ShieldCheck, 'Assurance', 'Assurance habitation', 'Actif', 'Valide jusqu au 12/09/2025', 'bg-emerald-50 text-emerald-700'],
-    [Smartphone, 'Forfait mobile (eSIM)', 'Orange 50Go', 'Actif', 'Expire le 12/06/2025', 'bg-amber-50 text-amber-700'],
+    [Home, 'Logement', 'Résidence Les Estudines, Paris', 'Actif', "Loyer payé jusqu’au 31 mai 2025", 'bg-blue-50 text-blue-700', '/logement'],
+    [GraduationCap, 'Université', 'Licence Informatique - L1', 'Inscrit', 'Année académique 2024-2025', 'bg-blue-50 text-blue-700', '/universites'],
+    [Landmark, 'Compte bancaire', 'Compte ouvert - Boursorama', 'Actif', 'Compte vérifié', 'bg-violet-50 text-violet-700', '/finance'],
+    [ShieldCheck, 'Assurance', 'Assurance habitation', 'Actif', 'Valide jusqu au 12/09/2025', 'bg-emerald-50 text-emerald-700', '/finance/assurance'],
+    [Smartphone, 'Forfait mobile (eSIM)', 'Orange 50Go', 'Actif', 'Expire le 12/06/2025', 'bg-amber-50 text-amber-700', '/esim'],
   ]
   const activities = [
     [CheckCircle2, 'Paiement loyer', 'Mai 2025', '10 mai 2025', '- 361 000 FCFA', 'text-emerald-600'],
     [FileText, 'Document ajouté', 'Attestation de scolarité', '8 mai 2025', '', 'text-blue-600'],
-    [Landmark, 'Paiement université', "Frais d'inscription", '5 mai 2025', '- 984 000 FCFA', 'text-violet-600'],
+    [Landmark, 'Paiement université', "Frais d’inscription", '5 mai 2025', '- 984 000 FCFA', 'text-violet-600'],
   ]
   const actions = [
-    [WalletCards, 'Effectuer un paiement', "Payer le loyer, l'université, etc.", 'text-amber-600'],
-    [CreditCard, "Envoyer de l'argent", "Recharger le portefeuille de votre enfant", 'text-blue-600'],
-    [Upload, 'Télécharger un document', 'Ajouter un nouveau document', 'text-violet-600'],
-    [MessageCircle, 'Contacter le support', "Obtenir de l'aide rapidement", 'text-emerald-600'],
+    [WalletCards, 'Effectuer un paiement', "Payer le loyer, l’université, etc.", 'text-amber-600', '/finance/transfert'],
+    [CreditCard, "Envoyer de l’argent", "Recharger le portefeuille de votre enfant", 'text-blue-600', '/finance/transfert'],
+    [Upload, 'Télécharger un document', 'Ajouter un nouveau document', 'text-violet-600', '/documents'],
+    [MessageCircle, 'Contacter le support', "Obtenir de l’aide rapidement", 'text-emerald-600', '/messages'],
   ]
 
   return (
@@ -212,16 +213,16 @@ function AccountPage() {
                 <div className="mt-5 grid gap-4 text-sm md:grid-cols-[150px_1fr]"><span className="text-slate-500">ID Étudiant</span><b>EDU-582941</b><span className="text-slate-500">Email</span><b>lucas.koffi@email.com</b><span className="text-slate-500">Université</span><b>Université Paris-Saclay</b><span className="text-slate-500">Statut actuel</span><b className="w-fit rounded-lg bg-blue-50 px-3 py-1 text-blue-700">Étudiant</b></div>
               </div>
               <div className="space-y-6 pt-4">
-                <button className="h-12 w-full rounded-lg border border-blue-700 font-black text-blue-800">Voir le profil complet</button>
+                <Link to="/profil" className="flex h-12 w-full items-center justify-center rounded-lg border border-blue-700 font-black text-blue-800">Voir le profil complet</Link>
                 <div className="text-sm text-slate-500">Derniere connexion<br /><b className="mt-1 block text-base text-slate-900">12 mai 2025 a 14:32</b></div>
                 <div className="text-sm text-slate-500">Compte lie le<br /><b className="mt-1 block text-base text-slate-900">10 mars 2025</b></div>
-                <button className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><Lock size={17} />Gerer l'acces</button>
+                <Link to="/settings/profile" className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><Lock size={17} />Gerer l’acces</Link>
               </div>
             </div>
           </motion.section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
-            <h2 className="text-xl font-black">Vue d'ensemble</h2>
+            <h2 className="text-xl font-black">Vue d’ensemble</h2>
             <div className="mt-7 grid gap-5 md:grid-cols-4">
               {overview.map(([Icon, label, value, sub, tone]) => <div key={label} className={`flex items-center gap-4 rounded-lg p-5 ${tone}`}><Icon size={34} /><div><div className="text-sm font-bold text-slate-700">{label}</div><div className="text-2xl font-black text-slate-950">{value}</div><div className="text-sm font-medium text-slate-500">{sub}</div></div></div>)}
             </div>
@@ -230,15 +231,15 @@ function AccountPage() {
           <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
             <h2 className="border-b border-slate-100 p-6 text-xl font-black">Suivi des services</h2>
             <div className="divide-y divide-slate-100 px-6">
-              {services.map(([Icon, title, sub, status, detail, tone]) => <div key={title} className="grid items-center gap-4 py-5 lg:grid-cols-[1fr_120px_1fr_130px]"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-lg ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm text-slate-500">{sub}</div></div></div><span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">{status}</span><span className="text-sm font-medium text-slate-500">{detail}</span><button className="h-10 rounded-lg border border-slate-200 font-black text-blue-800">Voir détails</button></div>)}
+              {services.map(([Icon, title, sub, status, detail, tone, to]) => <div key={title} className="grid items-center gap-4 py-5 lg:grid-cols-[1fr_120px_1fr_130px]"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-lg ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm text-slate-500">{sub}</div></div></div><span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">{status}</span><span className="text-sm font-medium text-slate-500">{detail}</span><Link to={to} className="flex h-10 items-center justify-center rounded-lg border border-slate-200 font-black text-blue-800">Voir détails</Link></div>)}
             </div>
           </section>
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-4 text-xl font-black">Dernières activités</h2>{activities.map(([Icon, title, sub, date, amount, tone]) => <div key={title} className="flex items-center justify-between border-b border-slate-100 py-5 last:border-0"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-full bg-slate-50 ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm">{sub}</div><div className="text-sm text-slate-500">{date}</div></div></div><b className={tone}>{amount}</b></div>)}<button className="mt-4 w-full font-black text-blue-800">Voir toutes les activités</button></section>
-          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-5 text-xl font-black">Actions rapides</h2>{actions.map(([Icon, title, sub, tone]) => <div key={title} className="flex gap-4 py-4"><div className={`grid h-11 w-11 place-items-center rounded-lg bg-slate-50 ${tone}`}><Icon size={22} /></div><div><b>{title}</b><p className="text-sm text-slate-500">{sub}</p></div></div>)}</section>
-          <section className="rounded-lg border border-blue-100 bg-blue-50 p-7 shadow-sm"><h2 className="text-lg font-black text-blue-950">Besoin d'aide ?</h2><p className="mt-2 text-sm leading-6 text-blue-900">Notre équipe est disponible 24/7 pour vous accompagner.</p><button className="mt-5 flex h-12 items-center justify-center gap-3 rounded-lg bg-white px-6 font-black text-blue-800"><MessageCircle size={18} />Contacter le support</button></section>
+          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-4 text-xl font-black">Dernières activités</h2>{activities.map(([Icon, title, sub, date, amount, tone]) => <div key={title} className="flex items-center justify-between border-b border-slate-100 py-5 last:border-0"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-full bg-slate-50 ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm">{sub}</div><div className="text-sm text-slate-500">{date}</div></div></div><b className={tone}>{amount}</b></div>)}<Link to="/messages" className="mt-4 flex w-full justify-center font-black text-blue-800">Voir toutes les activités</Link></section>
+          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-5 text-xl font-black">Actions rapides</h2>{actions.map(([Icon, title, sub, tone, to]) => <Link key={title} to={to} className="flex gap-4 py-4 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition"><div className={`grid h-11 w-11 place-items-center rounded-lg bg-slate-50 ${tone}`}><Icon size={22} /></div><div><b>{title}</b><p className="text-sm text-slate-500">{sub}</p></div></Link>)}</section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-7 shadow-sm"><h2 className="text-lg font-black text-blue-950">Besoin d’aide ?</h2><p className="mt-2 text-sm leading-6 text-blue-900">Notre équipe est disponible 24/7 pour vous accompagner.</p><Link to="/messages" className="mt-5 flex h-12 items-center justify-center gap-3 rounded-lg bg-white px-6 font-black text-blue-800"><MessageCircle size={18} />Contacter le support</Link></section>
         </aside>
       </div>
     </main>
@@ -321,7 +322,7 @@ function Shell() {
           </nav>
           <div className="sidebar-scroll-cue grid place-items-center text-blue-100"><ChevronDown size={22} /></div>
           <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
-            <div className="font-black">Besoin d'aide ?</div>
+            <div className="font-black">Besoin d’aide ?</div>
             <p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p>
             <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Message</span><span className="message-menu-badge">3</span></Link>
           </div>
@@ -513,10 +514,10 @@ function SettingsSideLink({ icon: Icon, label, to }) {
   return <button type="button" onClick={() => navigate(to)} className="flex w-full items-center gap-4 rounded-xl px-3 py-2 text-left font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800"><Icon size={20} className="text-slate-400" />{label}</button>
 }
 
-function SettingsActionCard({ icon: Icon, title, text, tone = 'blue', danger = false, index = 0 }) {
+function SettingsActionCard({ icon: Icon, title, text, tone = 'blue', danger = false, index = 0, onClick }) {
   const toneClass = danger ? 'bg-rose-50 text-rose-600' : tone === 'purple' ? 'bg-violet-50 text-violet-600' : 'bg-blue-50 text-amber-500'
   return (
-    <motion.button initial={{ opacity: 0, x: 34, scale: 0.985 }} animate={{ opacity: 1, x: 0, scale: 1 }} whileHover={{ y: -4 }} transition={{ delay: 0.12 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className={`flex min-h-[122px] w-full items-center gap-4 rounded-xl border p-7 text-left shadow-sm ${danger ? 'border-rose-200 bg-rose-50/70' : 'border-slate-200 bg-white'}`}>
+    <motion.button type="button" onClick={onClick} initial={{ opacity: 0, x: 34, scale: 0.985 }} animate={{ opacity: 1, x: 0, scale: 1 }} whileHover={{ y: -4 }} transition={{ delay: 0.12 + index * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className={`flex min-h-[122px] w-full items-center gap-4 rounded-xl border p-7 text-left shadow-sm ${danger ? 'border-rose-200 bg-rose-50/70' : 'border-slate-200 bg-white'}`}>
       <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-lg ${toneClass}`}><Icon size={23} /></span>
       <span><span className={`block text-xl font-black ${danger ? 'text-rose-700' : 'text-slate-950'}`}>{title}</span><span className={`mt-1 block text-sm font-semibold ${danger ? 'text-red-600' : 'text-slate-500'}`}>{text}</span></span>
     </motion.button>
@@ -524,14 +525,15 @@ function SettingsActionCard({ icon: Icon, title, text, tone = 'blue', danger = f
 }
 
 function ProfileSettings() {
+  const navigate = useNavigate()
   return (
     <SettingsPageFrame title="Paramètres du profil">
       <div className="grid gap-8 xl:grid-cols-[450px_1fr]">
         <SettingsProfileCard />
         <div className="space-y-8">
-          <SettingsActionCard icon={UserRound} title="Informations personnelles" text="Mettez à jour vos informations personnelles et vos préférences de contact." index={0} />
-          <SettingsActionCard icon={Lock} title="Changer le mot de passe" text="Utilisez un mot de passe fort pour sécuriser votre compte." tone="purple" index={1} />
-          <SettingsActionCard icon={Trash2} title="Supprimer le compte" text="Si vous souhaitez supprimer définitivement votre compte, utilisez le bouton ci-dessous." danger index={2} />
+          <SettingsActionCard icon={UserRound} title="Informations personnelles" text="Mettez à jour vos informations personnelles et vos préférences de contact." index={0} onClick={() => navigate('/profil')} />
+          <SettingsActionCard icon={Lock} title="Changer le mot de passe" text="Utilisez un mot de passe fort pour sécuriser votre compte." tone="purple" index={1} onClick={() => navigate('/settings/login-history')} />
+          <SettingsActionCard icon={Trash2} title="Supprimer le compte" text="Si vous souhaitez supprimer définitivement votre compte, utilisez le bouton ci-dessous." danger index={2} onClick={() => navigate('/messages')} />
         </div>
       </div>
     </SettingsPageFrame>
@@ -543,14 +545,14 @@ function BillingSettings() {
     <SettingsPageFrame title="Adresses de facturation">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-wrap items-end justify-between gap-5">
         <div><h2 className="text-3xl font-black">Adresses de facturation</h2><p className="mt-3 font-semibold text-slate-500">Ajoutez, modifiez ou supprimez vos adresses de facturation.</p></div>
-        <button className="flex h-14 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={22} />Ajouter une adresse</button>
+        <button type="button" className="flex h-14 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={22} />Ajouter une adresse</button>
       </motion.div>
       <motion.section initial={{ opacity: 0, y: 24, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.36 }} className="grid min-h-[360px] place-items-center rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="text-center">
           <WalletCards className="mx-auto text-slate-300" size={68} />
           <h3 className="mt-8 text-xl font-black">Aucune adresse trouvée</h3>
-          <p className="mt-4 font-semibold text-slate-500">Vous n'avez pas encore ajouté d'adresse de facturation.</p>
-          <button className="mt-6 inline-flex h-12 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={20} />Ajoutez votre première adresse</button>
+          <p className="mt-4 font-semibold text-slate-500">Vous n’avez pas encore ajouté d’adresse de facturation.</p>
+          <button type="button" className="mt-6 inline-flex h-12 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={20} />Ajoutez votre première adresse</button>
         </div>
       </motion.section>
       <SettingsBackLink />
@@ -603,7 +605,7 @@ function LoginHistorySettings() {
     [CheckCircle2, 'Vérification régulière', 'Vérifiez régulièrement votre historique de connexion et identifie...', 'bg-blue-50 text-amber-500'],
     [AlertTriangle, 'Activité suspecte', 'Si vous remarquez une connexion non reconnue, changez...', 'bg-rose-50 text-rose-600'],
     [Lock, 'Mot de passe fort', 'Utilisez un mot de passe fort et unique pour protéger votre compte.', 'bg-emerald-50 text-emerald-600'],
-    [LogOut, 'Déconnexion', "N'oubliez pas de vous déconnecter après avoir utilisé des apps.", 'bg-amber-50 text-amber-600'],
+    [LogOut, 'Déconnexion', "N’oubliez pas de vous déconnecter après avoir utilisé des apps.", 'bg-amber-50 text-amber-600'],
   ]
 
   return (
@@ -785,10 +787,23 @@ function Dashboard() {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d'examen</span><button className="font-black text-blue-700">Voir détails</button></div></section>
-          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><button className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-black">Ajouter de l'argent</button></section>
-          <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>{['Uploader un document', 'Réserver un logement', 'Prendre rendez-vous', 'Demander une AVI', 'Ouvrir un compte bancaire'].map((item) => <div key={item} className="flex items-center gap-3 py-3 text-sm font-semibold text-slate-600"><FileText size={17} />{item}</div>)}</section>
-          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu'à <b className="text-amber-300">20 000 FCFA</b></p><button className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-blue-600 px-5 font-black text-white">Parrainer maintenant <ArrowRight size={18} /></button></section>
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d’examen</span><Link to="/documents" className="font-black text-blue-700">Voir détails</Link></div></section>
+          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Ajouter de l’argent</Link></section>
+          <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>
+            {[
+              [Upload, 'Uploader un document', '/documents'],
+              [Home, 'Réserver un logement', '/logement'],
+              [CalendarDays, 'Prendre rendez-vous', '/contact/conseiller'],
+              [ShieldCheck, 'Demander une AVI', '/visa'],
+              [Landmark, 'Ouvrir un compte bancaire', '/finance'],
+            ].map(([Icon, label, to]) => (
+              <Link key={label} to={to} className="flex items-center gap-3 py-3 text-sm font-semibold text-slate-600 hover:text-blue-700 transition">
+                <Icon size={17} className="text-blue-600 shrink-0" />{label}
+              </Link>
+            ))}
+          </section>
+          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu’à <b className="text-amber-300">20 000 FCFA</b></p><Link to="/messages" className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-blue-600 px-5 font-black text-white">Parrainer maintenant <ArrowRight size={18} /></Link></section>
         </aside>
       </div>
 
@@ -904,16 +919,17 @@ function AnimatedStatValue({ value }) {
 }
 
 function Finance() {
+  const [financeUnavailableModal, setFinanceUnavailableModal] = useState(null)
   const quickServices = [
-    [Landmark, 'Ouvrir un compte bancaire', 'Compte étudiant 100% en ligne', '/finance/compte'],
-    [CreditCard, "Transfert d'argent international", 'Frais réduits & rapide vers 150+ pays', '/finance/transfert'],
-    [GraduationCap, 'Financement étudiant', 'Prêts étudiants et solutions sur mesure', '/finance/financement'],
-    [ShieldCheck, 'Assurance & Protection', 'Assurance santé, habitation et responsabilité civile', '/finance/assurance'],
+    [Landmark, 'Ouvrir un compte bancaire', 'Compte étudiant 100% en ligne', null, 'compte'],
+    [CreditCard, "Transfert d’argent international", 'Frais réduits & rapide vers 150+ pays', '/finance/transfert', null],
+    [GraduationCap, 'Financement étudiant', 'Prêts étudiants et solutions sur mesure', null, 'financement'],
+    [ShieldCheck, 'Assurance & Protection', 'Assurance santé, habitation et responsabilité civile', '/finance/assurance', null],
   ]
   const stats = [
     [Landmark, '+25', 'Banques partenaires'],
     [Globe2, '150+', 'Pays couverts'],
-    [CircleDollarSign, '0 FCFA', "Frais d'ouverture"],
+    [CircleDollarSign, '0 FCFA', "Frais d’ouverture"],
     [ShieldCheck, 'Sécurisé', 'Données protégées'],
     [Users, 'Rapide', 'Ouverture en 24-48h'],
   ]
@@ -921,12 +937,12 @@ function Finance() {
     ['BNP Paribas', '/finance-bnp.png', 'Populaire', ['Carte bancaire internationale', 'Application mobile', 'Découvert autorisé']],
     ['Société Générale', '/finance-societe-generale.jpeg', 'Partenaire', ['Offres étudiants exclusives', 'Assurance incluse', 'Retraits sans frais zone SEPA']],
     ['Crédit Mutuel', '/finance-credit-mutuel.png', 'Recommandé', ['Carte Mastercard/Visa', 'Conseiller dédié', 'Solutions épargne']],
-    ['N26', '/finance-n26.png', 'Digital', ['Ouverture rapide en 8 min', 'Carte virtuelle incluse', "Zéro frais à l'étranger"]],
-    ['Revolut', '/finance-revolut.png', 'Flexible', ['Multi-devises', 'Transferts instantanés', "Contrôle total depuis l'app"]],
+    ['N26', '/finance-n26.png', 'Digital', ['Ouverture rapide en 8 min', 'Carte virtuelle incluse', "Zéro frais à l’étranger"]],
+    ['Revolut', '/finance-revolut.png', 'Flexible', ['Multi-devises', 'Transferts instantanés', "Contrôle total depuis l’app"]],
   ]
   const financing = [
     [Landmark, 'Prêt étudiant', 'Financez vos études avec des taux avantageux et des conditions adaptées.'],
-    [GraduationCap, "Bourse d'études", 'Trouvez des bourses et aides financières pour soutenir votre parcours.'],
+    [GraduationCap, "Bourse d’études", 'Trouvez des bourses et aides financières pour soutenir votre parcours.'],
     [CircleDollarSign, 'Financement participatif', 'Lancez votre projet étudiant et obtenez le soutien de la communauté.'],
     [ShieldCheck, 'Garantie bancaire', 'Obtenez une garantie pour vos démarches visa, logement et inscription.'],
   ]
@@ -940,19 +956,30 @@ function Finance() {
           <div className="relative z-10 text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Banque & Finance</div>
           <div className="relative z-10 mt-8 max-w-[620px] xl:max-w-[50%] xl:min-w-[520px]">
             <h1 className="text-5xl font-black leading-tight tracking-tight text-slate-950">Banque & Finance pour étudiants internationaux</h1>
-            <p className="mt-5 text-lg leading-8 text-slate-600">Ouvrez un compte bancaire, transférez de l'argent, gérez votre budget et explorez des solutions de financement adaptées à votre parcours.</p>
+            <p className="mt-5 text-lg leading-8 text-slate-600">Ouvrez un compte bancaire, transférez de l’argent, gérez votre budget et explorez des solutions de financement adaptées à votre parcours.</p>
           </div>
           <div className="relative z-10 mt-12 grid gap-4 lg:grid-cols-4">
-            {quickServices.map(([Icon, title, text, to], index) => (
+            {quickServices.map(([Icon, title, text, to, unavailableKey], index) => (
               <motion.div key={title} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + index * 0.07, duration: 0.34, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -14 }}>
-              <Link to={to} className="finance-quick-card group block h-full rounded-lg border p-5 text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
-                <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700 shadow-sm shadow-blue-950/10 transition duration-300 group-hover:bg-blue-50 group-hover:text-blue-800"><Icon size={22} /></div>
-                <h3 className="font-black leading-tight text-white transition duration-300 group-hover:text-slate-950">{title}</h3>
-                <p className="mt-2 text-sm font-medium leading-6 text-blue-100 transition duration-300 group-hover:text-slate-500">{text}</p>
-                <span className="finance-quick-arrow mt-3 inline-grid h-8 w-8 place-items-center rounded-full text-blue-100 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">
-                  <ArrowRight size={18} />
-                </span>
-              </Link>
+              {unavailableKey ? (
+                <button type="button" onClick={() => setFinanceUnavailableModal(unavailableKey)} className="finance-quick-card group block h-full w-full rounded-lg border p-5 text-left text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
+                  <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700 shadow-sm shadow-blue-950/10 transition duration-300 group-hover:bg-blue-50 group-hover:text-blue-800"><Icon size={22} /></div>
+                  <h3 className="font-black leading-tight text-white transition duration-300 group-hover:text-slate-950">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-6 text-blue-100 transition duration-300 group-hover:text-slate-500">{text}</p>
+                  <span className="finance-quick-arrow mt-3 inline-grid h-8 w-8 place-items-center rounded-full text-blue-100 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                    <ArrowRight size={18} />
+                  </span>
+                </button>
+              ) : (
+                <Link to={to} className="finance-quick-card group block h-full rounded-lg border p-5 text-white shadow-lg shadow-blue-950/15 backdrop-blur transition duration-300 hover:shadow-xl hover:shadow-blue-950/10">
+                  <div className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-700 shadow-sm shadow-blue-950/10 transition duration-300 group-hover:bg-blue-50 group-hover:text-blue-800"><Icon size={22} /></div>
+                  <h3 className="font-black leading-tight text-white transition duration-300 group-hover:text-slate-950">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-6 text-blue-100 transition duration-300 group-hover:text-slate-500">{text}</p>
+                  <span className="finance-quick-arrow mt-3 inline-grid h-8 w-8 place-items-center rounded-full text-blue-100 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                    <ArrowRight size={18} />
+                  </span>
+                </Link>
+              )}
               </motion.div>
             ))}
           </div>
@@ -970,7 +997,7 @@ function Finance() {
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-black text-slate-950">Nos banques partenaires</h2>
-            <Link to="/finance/compte" className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les banques <ArrowRight size={17} /></Link>
+            <button type="button" onClick={() => setFinanceUnavailableModal('compte')} className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les banques <ArrowRight size={17} /></button>
           </div>
           <div className="grid gap-5 lg:grid-cols-5">
             {banks.map(([bank, logo, tag, perks], index) => (
@@ -985,7 +1012,7 @@ function Finance() {
                 <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
                   {perks.map((perk) => <div key={perk} className="flex gap-2"><CheckCircle2 className="shrink-0 text-emerald-600" size={16} />{perk}</div>)}
                 </div>
-                <div className="mt-auto border-t border-blue-200 pt-4"><Link to="/finance/compte" className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</Link></div>
+                <div className="mt-auto border-t border-blue-200 pt-4"><button type="button" onClick={() => setFinanceUnavailableModal('compte')} className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm shadow-blue-600/20">Ouverture en ligne</button></div>
               </motion.article>
             ))}
           </div>
@@ -1010,34 +1037,36 @@ function Finance() {
           <div className="mt-6 rounded-lg bg-slate-50 p-4 text-sm font-semibold text-slate-600">
             <div className="font-black text-slate-950">Taux de change</div>
             <div className="mt-2">1 EUR = 655.957 XOF</div>
-            <div className="mt-2 text-xs text-emerald-600">Mis à jour : aujourd'hui, 10:30</div>
+            <div className="mt-2 text-xs text-emerald-600">Mis à jour : aujourd’hui, 10:30</div>
           </div>
-          <Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white shadow-lg shadow-blue-900/20"><Send size={18} />Envoyer de l'argent</Link>
+          <Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white shadow-lg shadow-blue-900/20"><Send size={18} />Envoyer de l’argent</Link>
         </section>
 
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-slate-950">Besoin d'aide ?</h2>
+          <h2 className="text-xl font-black text-slate-950">Besoin d’aide ?</h2>
           <p className="mt-3 text-sm font-medium leading-6 text-slate-600">Nos conseillers sont disponibles pour vous accompagner dans vos démarches bancaires et financières.</p>
           <div className="mt-5 divide-y divide-slate-100">
-            {[
-              [MessageCircle, 'Discuter en ligne', 'Disponible 7j/7'],
-              [Phone, 'Appeler un conseiller', '+33 1 84 80 47 89'],
-              [MessageCircle, 'WhatsApp', '+33 6 12 34 56 78'],
-            ].map(([Icon, title, text]) => (
-              <div key={title} className="flex items-center gap-4 py-4">
-                <div className="grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={20} /></div>
-                <div><div className="font-black text-slate-950">{title}</div><div className="text-sm font-medium text-slate-500">{text}</div></div>
-              </div>
-            ))}
+            <Link to="/messages" className="flex items-center gap-4 py-4 hover:bg-slate-50 -mx-1 px-1 rounded-lg transition">
+              <div className="grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-800"><MessageCircle size={20} /></div>
+              <div><div className="font-black text-slate-950">Discuter en ligne</div><div className="text-sm font-medium text-slate-500">Disponible 7j/7</div></div>
+            </Link>
+            <a href="tel:+33688639294" className="flex items-center gap-4 py-4 hover:bg-slate-50 -mx-1 px-1 rounded-lg transition">
+              <div className="grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-800"><Phone size={20} /></div>
+              <div><div className="font-black text-slate-950">Appeler un conseiller</div><div className="text-sm font-medium text-slate-500">+33 6 88 63 92 94</div></div>
+            </a>
+            <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex items-center gap-4 py-4 hover:bg-slate-50 -mx-1 px-1 rounded-lg transition">
+              <div className="grid h-11 w-11 place-items-center rounded-full bg-emerald-50 text-emerald-700"><MessageCircle size={20} /></div>
+              <div><div className="font-black text-slate-950">WhatsApp</div><div className="text-sm font-medium text-slate-500">+33 6 88 63 92 94</div></div>
+            </a>
           </div>
-          <button className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-blue-800 font-black text-blue-800"><CalendarDays size={18} />Prendre rendez-vous</button>
+          <Link to="/contact/conseiller" className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-blue-800 font-black text-blue-800 hover:bg-blue-50 transition"><CalendarDays size={18} />Prendre rendez-vous</Link>
         </section>
       </aside>
 
       <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:-mr-8 xl:col-span-2">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-black text-slate-950">Solutions de financement</h2>
-          <button className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les solutions <ArrowRight size={17} /></button>
+          <button type="button" onClick={() => setFinanceUnavailableModal('financement')} className="flex items-center gap-2 text-sm font-black text-blue-800">Voir toutes les solutions <ArrowRight size={17} /></button>
         </div>
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {financing.map(([Icon, title, text]) => (
@@ -1045,7 +1074,7 @@ function Finance() {
               <div className="mb-5 grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={22} /></div>
               <h3 className="font-black text-slate-950">{title}</h3>
               <p className="mt-3 text-sm font-medium leading-6 text-slate-500">{text}</p>
-              <Link to="/finance/financement" className="mt-5 flex items-center gap-2 text-sm font-black text-blue-800">Découvrir <ArrowRight size={16} /></Link>
+              <button type="button" onClick={() => setFinanceUnavailableModal('financement')} className="mt-5 flex items-center gap-2 text-sm font-black text-blue-800">Découvrir <ArrowRight size={16} /></button>
             </motion.article>
           ))}
         </div>
@@ -1064,6 +1093,37 @@ function Finance() {
           </div>
         ))}
       </section>
+      {financeUnavailableModal && <FinanceUnavailableModal type={financeUnavailableModal} onClose={() => setFinanceUnavailableModal(null)} />}
+    </div>
+  )
+}
+
+function FinanceUnavailableModal({ type, onClose }) {
+  const isCompte = type === 'compte'
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 px-4 backdrop-blur-sm">
+      <motion.div initial={{ opacity: 0, y: 18, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-lg rounded-lg border border-blue-100 bg-white p-7 shadow-2xl shadow-blue-950/20">
+        <div className="flex items-start justify-between gap-5">
+          <div className="grid h-14 w-14 place-items-center rounded-full bg-amber-50 text-amber-600">
+            {isCompte ? <Landmark size={26} /> : <GraduationCap size={26} />}
+          </div>
+          <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"><X size={18} /></button>
+        </div>
+        <h2 className="mt-5 text-xl font-black text-slate-950">{isCompte ? 'Ouverture de compte bancaire' : 'Financement étudiant'}</h2>
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
+          {isCompte
+            ? "L’ouverture de compte bancaire en ligne n’est pas encore disponible sur la plateforme. Notre équipe prépare activement ce service. En attendant, contactez un conseiller pour être accompagné dans votre démarche."
+            : "Le service de financement étudiant n’est pas encore disponible sur la plateforme. Nos conseillers peuvent néanmoins vous orienter vers les options adaptées à votre situation."}
+        </p>
+        <div className="mt-6 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
+          <span className="font-black">Service bientôt disponible —</span> Pour toute demande urgente, contactez-nous directement.
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <a href="tel:+33688639294" className="flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20"><Phone size={18} />+33 6 88 63 92 94</a>
+          <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-emerald-300 bg-emerald-50 font-black text-emerald-700"><MessageCircle size={18} />WhatsApp</a>
+        </div>
+        <button type="button" onClick={onClose} className="mt-3 flex h-11 w-full items-center justify-center rounded-lg border border-slate-200 font-bold text-slate-600 hover:bg-slate-50">Fermer</button>
+      </motion.div>
     </div>
   )
 }
@@ -1081,7 +1141,7 @@ function FinanceProcess() {
     },
     transfert: {
       icon: CreditCard,
-      title: "Transfert d'argent international",
+      title: "Transfert d’argent international",
       subtitle: 'Envoyez ou recevez de l’argent avec un parcours clair, sécurisé et adapté aux familles.',
       badge: 'Transfert sécurisé',
       steps: ['Montant', 'Pays', 'Bénéficiaire', 'Mode de réception', 'Validation'],
@@ -1135,9 +1195,9 @@ function FinanceProcess() {
 
       <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
         <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          {process === 'compte' && <BankAccountProcess />}
+          {process === 'compte' && <ServiceUnavailableBlock title="Ouverture de compte bancaire en ligne" description="L’ouverture de compte bancaire en ligne n’est pas encore disponible sur StudyWay. Nos partenaires bancaires sont en cours d’intégration. Contactez un conseiller pour être accompagné dès maintenant." />}
           {process === 'transfert' && <MoneyTransferProcess />}
-          {process === 'financement' && <StudentFundingProcess />}
+          {process === 'financement' && <ServiceUnavailableBlock title="Financement étudiant" description="Le service de financement étudiant n’est pas encore disponible sur la plateforme. Notre équipe prépare des solutions de prêts et bourses adaptées. Contactez un conseiller pour explorer les options disponibles." />}
           {process === 'assurance' && <InsuranceProcess />}
         </motion.section>
 
@@ -1249,6 +1309,27 @@ function InsuranceProcess() {
   )
 }
 
+function ServiceUnavailableBlock({ title, description }) {
+  return (
+    <div className="flex flex-col items-center py-8 text-center">
+      <div className="grid h-20 w-20 place-items-center rounded-full bg-amber-50 text-amber-500">
+        <AlertTriangle size={38} />
+      </div>
+      <h2 className="mt-6 text-2xl font-black text-slate-950">{title}</h2>
+      <p className="mx-auto mt-4 max-w-xl text-sm font-semibold leading-7 text-slate-600">{description}</p>
+      <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-amber-50 px-5 py-2 text-sm font-black text-amber-700 ring-1 ring-amber-200">
+        Service bientôt disponible
+      </div>
+      <div className="mt-8 grid w-full max-w-sm gap-3">
+        <a href="tel:+33688639294" className="flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20"><Phone size={18} />+33 6 88 63 92 94</a>
+        <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-emerald-300 bg-emerald-50 font-black text-emerald-700"><MessageCircle size={18} />Contacter via WhatsApp</a>
+        <Link to="/messages" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800 hover:bg-blue-50"><MessageCircle size={18} />Parler à un conseiller</Link>
+        <Link to="/finance" className="flex h-11 items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800"><ArrowLeft size={17} />Retour Banque & Finance</Link>
+      </div>
+    </div>
+  )
+}
+
 function FinanceDocumentChecklist({ docs }) {
   return (
     <div className="mt-6">
@@ -1295,8 +1376,8 @@ function Housing() {
   const why = [
     [ShieldCheck, 'Logements vérifiés', 'Chaque logement est vérifié manuellement par notre équipe'],
     [Lock, 'Paiement sécurisé', 'Payez en toute sécurité via notre plateforme protégée'],
-    [MessageCircle, 'Accompagnement', "Aide pour l'installation et toutes vos démarches"],
-    [Users, 'Communauté étudiante', "Rejoignez une communauté d'étudiants comme vous"],
+    [MessageCircle, 'Accompagnement', "Aide pour l’installation et toutes vos démarches"],
+    [Users, 'Communauté étudiante', "Rejoignez une communauté d’étudiants comme vous"],
   ]
   const hotelQuery = useQuery({
     queryKey: ['duffel-stays-hotels', 'Paris'],
@@ -1367,12 +1448,12 @@ function Housing() {
           <div>
             <button type="button" onClick={() => setHousingMode(null)} className="mb-4 text-sm font-black text-blue-800">Changer de catégorie</button>
             <h1 className="typewriter-title text-4xl font-black tracking-tight text-slate-950">{housingMode === 'hotel' ? 'Réserver un hôtel' : 'Trouvez votre logement étudiant'}</h1>
-            <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l'Europe."}</p>
+            <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l’Europe."}</p>
           </div>
-          <button className="flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
+          <Link to="/contact/conseiller" className="flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
             <MessageCircle size={20} />
             Parler à un conseiller
-          </button>
+          </Link>
         </div>
 
         <div className="mt-8 grid items-start gap-8 xl:grid-cols-[1fr_360px]">
@@ -1412,7 +1493,7 @@ function Housing() {
                 : [['566k', 'left-[34%] top-[15%]'], ['513k', 'right-[14%] top-[23%]'], ['604k', 'left-[18%] top-[37%]'], ['339k', 'left-[49%] top-[55%]'], ['604k', 'right-[9%] bottom-[18%]'], ['392k', 'left-[7%] top-[48%]']]
               ).map(([price, pos]) => <span key={`${price}-${pos}`} className={`absolute ${pos} rounded-lg bg-blue-700 px-3 py-1 text-xs font-black text-white shadow-md`}>{price}</span>)}
             </div>
-            <button className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#082f7a] font-black text-white"><MapPin size={18} />Voir sur la carte</button>
+            <button type="button" className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#082f7a] font-black text-white"><MapPin size={18} />Voir sur la carte</button>
           </section>
         </div>
       </div>
@@ -1688,7 +1769,7 @@ function Universities() {
 
         <aside className="space-y-6">
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="career-help-card rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-black text-slate-950">Besoin d'aide pour choisir ?</h3>
+            <h3 className="text-lg font-black text-slate-950">Besoin d’aide pour choisir ?</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600">Nos conseillers sont là pour vous aider à trouver la formation idéale.</p>
             <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}>
               <Link to="/contact/conseiller" className="career-help-cta mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#082f7a] font-black text-white"><MessageCircle size={18} />Parler à un conseiller</Link>
@@ -1697,7 +1778,7 @@ function Universities() {
             <div className="mt-4 grid grid-cols-3 gap-4">
               {[
                 [MessageCircle, '/contact/conseiller'],
-                [Phone, 'tel:+33184804789'],
+                [Phone, 'tel:+33688639294'],
                 [Mail, '/contact/email'],
               ].map(([Icon, to], index) => <motion.div initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.16 + index * 0.08, type: 'spring', stiffness: 280, damping: 20 }} whileHover={{ y: -4 }} key={String(to)}><Link to={to} className="career-help-contact grid h-12 place-items-center rounded-lg bg-blue-50 text-blue-800"><Icon size={20} /></Link></motion.div>)}
             </div>
@@ -1705,7 +1786,7 @@ function Universities() {
           <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">Guide étudiant</h3>
             <div className="mt-4 space-y-4 text-sm font-semibold text-slate-600">
-              {['Comment choisir son université ?', "Préparer son dossier d'admission", 'Demande de visa étudiant'].map((item, index) => <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + index * 0.08 }} key={item}><Link to="/guides" className="flex items-center gap-3 hover:text-blue-800"><FileText size={17} />{item}</Link></motion.div>)}
+              {['Comment choisir son université ?', "Préparer son dossier d’admission", 'Demande de visa étudiant'].map((item, index) => <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + index * 0.08 }} key={item}><Link to="/guides" className="flex items-center gap-3 hover:text-blue-800"><FileText size={17} />{item}</Link></motion.div>)}
             </div>
             <Link to="/guides" className="mt-6 inline-flex font-black text-blue-800">Voir tous les guides →</Link>
           </motion.section>
@@ -1741,8 +1822,8 @@ function Universities() {
 
         <section>
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-2xl font-black text-slate-950">Parcourir par domaine d'études</h2>
-            <button className="font-black text-blue-800">Voir tous les domaines →</button>
+            <h2 className="text-2xl font-black text-slate-950">Parcourir par domaine d’études</h2>
+            <button type="button" onClick={() => document.querySelector('.university-results')?.scrollIntoView({ behavior: 'smooth' })} className="font-black text-blue-800">Voir tous les domaines →</button>
           </div>
           <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-6">
             {domains.map((label) => <button onClick={() => setFilters((current) => ({ ...current, specialization: label }))} key={label} className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 font-black shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"><GraduationCap className="text-blue-700" size={23} />{label}</button>)}
@@ -2407,7 +2488,7 @@ function StudentRequestCard({ application, onUpdateStatus }) {
 
 const STUDYWAY_APPLICATIONS_KEY = 'studyway-university-applications'
 const STUDYWAY_ACADEMIC_PROFILE_KEY = 'studyway-academic-profile'
-const applicationProcessSteps = ['Postulé', 'Admission', 'Admis', "Attestation d'admission"]
+const applicationProcessSteps = ['Postulé', 'Admission', 'Admis', "Attestation d’admission"]
 
 const demoApplications = [
   {
@@ -2454,7 +2535,7 @@ function applicationStatusIndex(status) {
 }
 
 function applicationStatusLabel(status) {
-  return status === 'submitted' ? 'Postulé - en attente de décision' : status === 'admission' ? 'Admission reçue' : status === 'admitted' ? 'Admis - choix à confirmer' : "Attestation d'admission disponible"
+  return status === 'submitted' ? 'Postulé - en attente de décision' : status === 'admission' ? 'Admission reçue' : status === 'admitted' ? 'Admis - choix à confirmer' : "Attestation d’admission disponible"
 }
 
 function applicationStatusBadge(status) {
@@ -2775,7 +2856,7 @@ function StudentGuides() {
     },
     {
       slug: 'preparer-dossier-admission',
-      title: "Préparer son dossier d'admission",
+      title: "Préparer son dossier d’admission",
       category: 'Admission',
       time: '12 min',
       icon: ClipboardList,
@@ -2883,7 +2964,7 @@ function StudentGuideDetail() {
       checklist: ['Programme cohérent avec mon projet', 'Budget annuel estimé', 'Prérequis vérifiés', 'Ville et logement étudiés', 'Dates limites notées'],
     },
     'preparer-dossier-admission': {
-      title: "Préparer son dossier d'admission",
+      title: "Préparer son dossier d’admission",
       category: 'Admission',
       icon: ClipboardList,
       color: 'bg-emerald-50 text-emerald-700',
@@ -3009,8 +3090,8 @@ function Profile() {
           </div>
           <div className="space-y-5">
             <Panel title="Dernières activités"><List items={['Paiement loyer -361 000 FCFA', 'Document ajouté - Attestation de scolarité', 'Paiement université -984 000 FCFA']} /></Panel>
-            <Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l'argent", 'Télécharger un document', 'Contacter le support']} /></Panel>
-            <div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d'aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div>
+            <Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l’argent", 'Télécharger un document', 'Contacter le support']} /></Panel>
+            <div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d’aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div>
           </div>
         </div>
       ) : (
@@ -3091,10 +3172,10 @@ function SupportJourney() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.36, ease: [0.22, 1, 0.36, 1] }} className="relative z-20 max-w-xl">
           <div className="text-sm font-semibold text-slate-500">Accueil <span className="mx-2">›</span> Accompagnement</div>
           <h1 className="mt-8 text-6xl font-black leading-tight tracking-tight text-slate-950">Accompagnement<br />personnalisé</h1>
-          <p className="mt-7 text-xl font-medium leading-9 text-slate-700">Nous vous accompagnons à chaque étape de votre projet d'études à l'étranger. De la préparation du dossier à votre installation, vous n'êtes jamais seul.</p>
+          <p className="mt-7 text-xl font-medium leading-9 text-slate-700">Nous vous accompagnons à chaque étape de votre projet d’études à l’étranger. De la préparation du dossier à votre installation, vous n’êtes jamais seul.</p>
           <div className="mt-9 flex flex-wrap gap-5">
             <motion.div initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.42, duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -5, scale: 1.02 }}><Link to="/accompagnement/demarrer" className="support-start-button flex h-14 items-center gap-3 rounded-lg bg-blue-800 px-8 font-black text-white shadow-lg shadow-blue-800/20">Démarrer mon accompagnement <ArrowRight className="support-start-arrow" size={19} /></Link></motion.div>
-            <motion.button initial={{ opacity: 0, x: 54, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.56, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800"><Video size={19} />Voir la vidéo</motion.button>
+            <motion.button type="button" initial={{ opacity: 0, x: 54, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.56, duration: 0.32, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} className="flex h-14 items-center gap-3 rounded-lg border border-blue-800 px-8 font-black text-blue-800"><Video size={19} />Voir la vidéo</motion.button>
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="absolute right-[32%] top-[235px] z-30 hidden rounded-lg bg-white p-5 shadow-xl shadow-blue-100 xl:block"><div className="flex items-center gap-4"><Users className="text-emerald-600" /><div><div className="text-xl font-black">98%</div><div className="text-sm text-slate-500">Taux de satisfaction</div></div></div></motion.div>
@@ -3104,13 +3185,13 @@ function SupportJourney() {
 
       <div className="grid gap-8 px-5 lg:px-8 xl:grid-cols-[1fr_330px]">
         <div className="space-y-7">
-          <div><h2 className="text-3xl font-black text-slate-950">Nos étapes d'accompagnement</h2><p className="mt-2 text-lg font-medium text-slate-500">Un parcours clair et complet pour réussir votre départ.</p></div>
+          <div><h2 className="text-3xl font-black text-slate-950">Nos étapes d’accompagnement</h2><p className="mt-2 text-lg font-medium text-slate-500">Un parcours clair et complet pour réussir votre départ.</p></div>
           <section className="support-steps-track relative grid gap-6 md:grid-cols-5">
             {steps.map(([Icon, title, text], index) => <motion.div initial={{ opacity: 0, y: 22, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} whileHover={{ y: -10 }} transition={{ delay: 0.12 + index * 0.055, duration: 0.36, ease: [0.22, 1, 0.36, 1] }} key={title} className="support-step-card relative rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">{index < steps.length - 1 && <span className="support-step-connector" />}<div className="absolute -top-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-blue-800 font-black text-white">{index + 1}</div><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={28} /></div><h3 className="mt-5 font-black text-slate-950">{title}</h3><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p></motion.div>)}
           </section>
-          <section className="flex gap-5 rounded-lg border border-blue-100 bg-blue-50 p-6"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-blue-800"><ShieldCheck size={26} /></div><div><h3 className="font-black text-blue-950">Important</h3><p className="mt-2 leading-7 text-blue-950">Nous accompagnons nos étudiants dans toutes les démarches administratives. Cependant, la décision finale d'octroi du visa appartient exclusivement aux autorités consulaires.</p></div></section>
+          <section className="flex gap-5 rounded-lg border border-blue-100 bg-blue-50 p-6"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-blue-800"><ShieldCheck size={26} /></div><div><h3 className="font-black text-blue-950">Important</h3><p className="mt-2 leading-7 text-blue-950">Nous accompagnons nos étudiants dans toutes les démarches administratives. Cependant, la décision finale d’octroi du visa appartient exclusivement aux autorités consulaires.</p></div></section>
         </div>
-        <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h3 className="text-xl font-black">Besoin d'aide ?</h3><p className="mt-3 leading-7 text-slate-600">Nos conseillers sont disponibles pour répondre à toutes vos questions.</p><div className="mt-6 space-y-5">{[[MessageCircle, 'Chat en direct', 'Disponible 24h/7j'], [Phone, 'WhatsApp', '+228 90 12 34 56'], [Mail, 'Email', 'contact@studyway.com']].map(([Icon, title, text]) => <div className="flex items-center gap-4" key={title}><div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><Icon size={22} /></div><div><b>{title}</b><div className="text-sm text-slate-500">{text}</div></div></div>)}</div><button className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white"><CalendarDays size={18} />Prendre rendez-vous</button></aside>
+        <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h3 className="text-xl font-black">Besoin d’aide ?</h3><p className="mt-3 leading-7 text-slate-600">Nos conseillers sont disponibles pour répondre à toutes vos questions.</p><div className="mt-6 space-y-5"><a href="tel:+33688639294" className="flex items-center gap-4"><div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><Phone size={22} /></div><div><b>Appeler</b><div className="text-sm text-slate-500">+33 6 88 63 92 94</div></div></a><a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex items-center gap-4"><div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><MessageCircle size={22} /></div><div><b>WhatsApp</b><div className="text-sm text-slate-500">+33 6 88 63 92 94</div></div></a><div className="flex items-center gap-4"><div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-blue-800"><Mail size={22} /></div><div><b>Email</b><div className="text-sm text-slate-500">contact@studyway.com</div></div></div></div><Link to="/contact/conseiller" className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-800 font-black text-white"><CalendarDays size={18} />Prendre rendez-vous</Link></aside>
       </div>
 
       <section className="grid gap-6 px-5 pb-8 lg:px-8 md:grid-cols-4">
@@ -3136,7 +3217,7 @@ function StartSupport() {
     ['Préparation du dossier', 'Nous rassemblons et vérifions tous vos documents.'],
     ['Logement & réservation', 'Nous vous aidons à trouver un logement sécurisé.'],
     ['Demande de visa', 'Nous soumettons votre dossier et assurons le suivi.'],
-    ['Départ & installation', "Nous vous accompagnons jusqu'à votre arrivée."],
+    ['Départ & installation', "Nous vous accompagnons jusqu’à votre arrivée."],
   ]
   const services = ['Admission université', 'Visa étudiant', 'Logement', 'Assurance', 'Compte bancaire', 'Billets & arrivée']
   const docs = ['Passeport', "Dernier diplôme", 'Relevés de notes', 'CV', 'Lettre de motivation', 'Preuve de ressources']
@@ -3247,7 +3328,7 @@ function StartSupport() {
           </section>
           <section className="relative overflow-hidden rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
             <div className="max-w-[190px]">
-              <h2 className="font-black text-blue-950">Besoin d'aide ?</h2>
+              <h2 className="font-black text-blue-950">Besoin d’aide ?</h2>
               <p className="mt-2 text-sm font-medium leading-6 text-blue-900">Discutez avec un conseiller pour toute question sur votre accompagnement.</p>
               <Link to="/messages" className="mt-5 flex h-11 w-fit items-center gap-3 rounded-lg bg-white px-5 text-sm font-black text-blue-800 shadow-sm"><MessageCircle size={18} />Parler à un conseiller</Link>
             </div>
@@ -3276,9 +3357,9 @@ function PersonalInfoStep() {
           <FormInput label="Nom" placeholder="Komi" />
           <FormSelect label="État civil" placeholder="Sélectionner votre état civil" />
           <FormInput label="Date de naissance" placeholder="Sélectionner une date" icon={CalendarDays} />
-          <FormSelect label="Pièce d'identité" placeholder="Sélectionner le type" />
+          <FormSelect label="Pièce d’identité" placeholder="Sélectionner le type" />
           <FormSelect label="Nationalité" placeholder="Sélectionner votre nationalité" />
-          <FormInput label="Numéro de pièce d'identité" placeholder="Entrez le numéro" />
+          <FormInput label="Numéro de pièce d’identité" placeholder="Entrez le numéro" />
           <FormSelect label="Pays de résidence actuel" placeholder="Sélectionner votre pays" />
           <FormTextarea label="Adresse actuelle" placeholder="Entrez votre adresse complète" />
           <FormInput label="Téléphone" placeholder="+228    90 12 34 56" />
@@ -3288,9 +3369,9 @@ function PersonalInfoStep() {
       <div>
         <h2 className="text-xl font-black text-slate-950">Informations académiques</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-3">
-          <FormSelect label="Niveau d'études actuel" placeholder="Sélectionner votre niveau" />
+          <FormSelect label="Niveau d’études actuel" placeholder="Sélectionner votre niveau" />
           <FormInput label="Dernier diplôme obtenu" placeholder="Entrez votre dernier diplôme" />
-          <FormInput label="Filière / Domaine d'études" placeholder="Entrez votre filière" />
+          <FormInput label="Filière / Domaine d’études" placeholder="Entrez votre filière" />
           <FormInput label="Établissement actuel" placeholder="Entrez le nom de votre établissement" />
         </div>
       </div>
@@ -3310,7 +3391,7 @@ function ProjectInfoStep() {
         <FormSelect label="Rentrée visée" placeholder="Septembre 2026" />
         <FormInput label="Formation recherchée" placeholder="Licence, Master, BTS..." />
         <FormInput label="Ville préférée" placeholder="Paris, Lyon, Montréal..." />
-        <FormTextarea label="Objectif du projet" placeholder="Décrivez votre projet d'études et vos attentes." />
+        <FormTextarea label="Objectif du projet" placeholder="Décrivez votre projet d’études et vos attentes." />
         <FormTextarea label="Situation actuelle" placeholder="Expliquez où vous en êtes dans vos démarches." />
       </div>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -3379,7 +3460,7 @@ function ReviewStep({ selectedServices, uploadedDocs, docs }) {
         <h3 className="font-black text-slate-950">Pack recommandé : Essentiel Plus</h3>
         <div className="mt-4 grid gap-3 text-sm font-semibold text-slate-600 md:grid-cols-2">
           <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Conseiller dédié</div>
-          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Plan d'action personnalisé</div>
+          <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Plan d’action personnalisé</div>
           <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Suivi documents et visa</div>
           <div className="flex items-center gap-2"><CheckCircle2 className="text-emerald-600" size={17} />Messagerie prioritaire</div>
         </div>
@@ -3427,7 +3508,7 @@ function Visa() {
       objective: 'Études',
       validity: 'Durée des études',
       cost: 198,
-      documents: ["Lettre d'admission", 'Preuve de ressources financières', 'Assurance voyage / santé', 'Justificatif de logement'],
+      documents: ["Lettre d’admission", 'Preuve de ressources financières', 'Assurance voyage / santé', 'Justificatif de logement'],
       eligibility: ['Être admis dans un établissement reconnu', 'Avoir des ressources financières suffisantes', 'Avoir un passeport valide', 'Fournir tous les documents requis'],
     },
     {
@@ -3893,6 +3974,7 @@ function Transport() {
   const [cabinClass, setCabinClass] = useState('economy')
   const [selectedId, setSelectedId] = useState(null)
   const [reservationOpen, setReservationOpen] = useState(false)
+  const [driverBookingOpen, setDriverBookingOpen] = useState(false)
   const flightOriginCode = getTransportIata(origin, 'LFW')
   const flightDestinationCode = getTransportIata(destination, 'CDG')
   const extraDestinationCode = getTransportIata(extraDestination, 'BRU')
@@ -3973,6 +4055,10 @@ function Transport() {
 
   if (reservationOpen && selectedTicket) {
     return <TransportReservationPanel ticket={selectedTicket} onClose={() => setReservationOpen(false)} />
+  }
+
+  if (driverBookingOpen && selectedTicket) {
+    return <DriverTransferBookingPanel ticket={selectedTicket} onClose={() => setDriverBookingOpen(false)} />
   }
 
   return (
@@ -4058,7 +4144,7 @@ function Transport() {
 
               {filteredOptions.length ? (
                 <div className="space-y-3">
-                  {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => { setSelectedId(ticket.id); if (ticket.mode === 'flight') setReservationOpen(true) }} />)}
+                  {filteredOptions.map((ticket, index) => <TicketRow key={ticket.id} ticket={ticket} index={index} selected={selectedTicket?.id === ticket.id} onSelect={() => { setSelectedId(ticket.id); if (ticket.mode === 'flight') setReservationOpen(true); if (ticket.mode === 'driver') setDriverBookingOpen(true) }} />)}
                 </div>
               ) : (flightQuery.isLoading || directFlightQuery.isLoading) && (activeMode === 'flight' || activeMode === 'all') ? (
                 <div className="rounded-lg border border-slate-200 bg-white p-10 text-center shadow-sm">
@@ -4467,6 +4553,281 @@ function BriefcaseIcon() {
   return <span className="text-base font-black">▣</span>
 }
 
+function DriverTransferBookingPanel({ ticket, onClose }) {
+  const AIRPORTS = [
+    { code: 'CDG', label: 'Paris Charles-de-Gaulle (CDG)' },
+    { code: 'ORY', label: 'Paris Orly (ORY)' },
+    { code: 'BVA', label: 'Paris Beauvais (BVA)' },
+    { code: 'LYS', label: 'Lyon Saint-Exupéry (LYS)' },
+    { code: 'MRS', label: 'Marseille Provence (MRS)' },
+    { code: 'NCE', label: 'Nice Côte d\'Azur (NCE)' },
+    { code: 'TLS', label: 'Toulouse Blagnac (TLS)' },
+    { code: 'NTE', label: 'Nantes Atlantique (NTE)' },
+    { code: 'BOD', label: 'Bordeaux Mérignac (BOD)' },
+    { code: 'SXB', label: 'Strasbourg (SXB)' },
+  ]
+  const BAGGAGE_OPTIONS = [
+    { value: '0', label: 'Aucun bagage' },
+    { value: '1', label: '1 bagage' },
+    { value: '2', label: '2 bagages' },
+    { value: '3', label: '3 bagages' },
+    { value: '4+', label: '4 bagages ou plus' },
+  ]
+
+  const [step, setStep] = useState(1)
+  const [airport, setAirport] = useState('CDG')
+  const [arrivalDate, setArrivalDate] = useState('')
+  const [arrivalTime, setArrivalTime] = useState('')
+  const [flightNumber, setFlightNumber] = useState('')
+  const [destination, setDestination] = useState('')
+  const [baggage, setBaggage] = useState('2')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [notes, setNotes] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [stepError, setStepError] = useState('')
+
+  const selectedAirport = AIRPORTS.find((a) => a.code === airport)
+
+  function validateStep1() {
+    if (!airport) return 'Sélectionnez un aéroport.'
+    if (!arrivalDate) return 'Indiquez la date d\'arrivée.'
+    if (!arrivalTime) return 'Indiquez l\'heure d\'atterrissage.'
+    if (!destination.trim()) return 'Indiquez l\'adresse de destination.'
+    return ''
+  }
+
+  function validateStep2() {
+    if (!firstName.trim() || !lastName.trim()) return 'Renseignez votre nom complet.'
+    if (!email.trim() || !email.includes('@')) return 'Email invalide.'
+    if (!phone.trim()) return 'Numéro de téléphone requis.'
+    return ''
+  }
+
+  function goNext() {
+    const err = step === 1 ? validateStep1() : validateStep2()
+    if (err) { setStepError(err); return }
+    setStepError('')
+    setStep((s) => s + 1)
+  }
+
+  function buildWhatsAppMessage() {
+    const fmtDate = arrivalDate ? new Date(arrivalDate).toLocaleDateString('fr-FR') : ''
+    return encodeURIComponent(
+      `Bonjour StudyWay ! Je souhaite réserver un transfert aéroport.\n\n` +
+      `🛬 Aéroport : ${selectedAirport?.label || airport}\n` +
+      `📅 Date d'arrivée : ${fmtDate}\n` +
+      `⏰ Heure d'atterrissage : ${arrivalTime}\n` +
+      (flightNumber ? `✈️ Numéro de vol : ${flightNumber}\n` : '') +
+      `📍 Destination : ${destination}\n` +
+      `🧳 Bagages : ${baggage}\n` +
+      `🚗 Véhicule : ${ticket.className} — ${ticket.provider}\n\n` +
+      `👤 Passager : ${firstName} ${lastName}\n` +
+      `📧 Email : ${email}\n` +
+      `📞 Tél : ${phone}\n` +
+      (notes ? `💬 Notes : ${notes}` : '')
+    )
+  }
+
+  function confirm() {
+    setSubmitted(true)
+  }
+
+  const stepLabels = ['Trajet', 'Passager', 'Confirmation']
+
+  return (
+    <div className="-mx-5 min-h-screen bg-slate-50 px-5 pb-20 lg:-mx-8 lg:px-8">
+      <div className="mx-auto max-w-2xl space-y-6 pt-6">
+
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:text-blue-700"><ChevronLeft size={20} /></button>
+          <div>
+            <h1 className="text-xl font-black text-slate-950">Réserver un transfert aéroport</h1>
+            <p className="text-sm font-semibold text-slate-500">{ticket.provider} · {ticket.className} · Bagages acceptés</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {stepLabels.map((label, i) => (
+            <div key={label} className="flex flex-1 items-center gap-2">
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black ${i + 1 < step ? 'bg-emerald-500 text-white' : i + 1 === step ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                {i + 1 < step ? <CheckCircle2 size={16} /> : i + 1}
+              </div>
+              <span className={`text-sm font-black ${i + 1 === step ? 'text-slate-950' : 'text-slate-400'}`}>{label}</span>
+              {i < stepLabels.length - 1 && <span className="ml-auto h-px flex-1 bg-slate-200" />}
+            </div>
+          ))}
+        </div>
+
+        {!submitted ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+            {step === 1 && (
+              <div className="space-y-5">
+                <h2 className="text-lg font-black text-slate-950">Détails du trajet</h2>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Aéroport d'arrivée</label>
+                  <select value={airport} onChange={(e) => setAirport(e.target.value)} className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                    {AIRPORTS.map((a) => <option key={a.code} value={a.code}>{a.label}</option>)}
+                  </select>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-black text-slate-700">Date d'arrivée</label>
+                    <input type="date" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} min={new Date().toISOString().split('T')[0]} className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-black text-slate-700">Heure d'atterrissage</label>
+                    <input type="time" value={arrivalTime} onChange={(e) => setArrivalTime(e.target.value)} className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Numéro de vol <span className="font-semibold text-slate-400">(facultatif)</span></label>
+                  <input type="text" value={flightNumber} onChange={(e) => setFlightNumber(e.target.value)} placeholder="Ex : AF 563" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Adresse de destination</label>
+                  <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Ex : 12 rue de la Paix, Paris 75001" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Nombre de bagages</label>
+                  <div className="flex flex-wrap gap-3">
+                    {BAGGAGE_OPTIONS.map((opt) => (
+                      <button key={opt.value} type="button" onClick={() => setBaggage(opt.value)} className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-black transition ${baggage === opt.value ? 'border-blue-300 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-200'}`}>
+                        <BriefcaseIcon size={15} /> {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-blue-700" />
+                    <div className="text-sm font-semibold text-blue-900">Le chauffeur vous attend à la sortie des bagages avec une pancarte à votre nom. Tous les bagages sont acceptés dans ce véhicule.</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-5">
+                <h2 className="text-lg font-black text-slate-950">Informations du passager</h2>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-black text-slate-700">Prénom</label>
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Christelle" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-black text-slate-700">Nom</label>
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Komi" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Email</label>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.com" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Téléphone (avec indicatif)</label>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+33 6 00 00 00 00" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-black text-slate-700">Notes / instructions <span className="font-semibold text-slate-400">(facultatif)</span></label>
+                  <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Ex : j'arriverai avec un grand sac à dos, appelez-moi à la sortie..." className="w-full resize-none rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-5">
+                <h2 className="text-lg font-black text-slate-950">Récapitulatif de la réservation</h2>
+
+                <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-5">
+                  {[
+                    ['Véhicule', `${ticket.className} — ${ticket.provider}`],
+                    ['Aéroport', selectedAirport?.label || airport],
+                    ['Date', arrivalDate ? new Date(arrivalDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '—'],
+                    ['Heure d\'atterrissage', arrivalTime || '—'],
+                    flightNumber ? ['Numéro de vol', flightNumber] : null,
+                    ['Destination', destination],
+                    ['Bagages', baggage + (baggage === '4+' ? ' bagages ou plus' : baggage === '1' ? ' bagage' : ' bagages')],
+                    ['Passager', `${firstName} ${lastName}`],
+                    ['Email', email],
+                    ['Téléphone', phone],
+                  ].filter(Boolean).map(([label, value]) => (
+                    <div key={label} className="flex items-start justify-between gap-4 text-sm">
+                      <span className="font-semibold text-slate-500">{label}</span>
+                      <span className="text-right font-black text-slate-950">{value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-blue-700 p-5 text-white">
+                  <span className="font-black">Prix estimé</span>
+                  <span className="text-2xl font-black">{Number(ticket.price).toLocaleString('fr-FR')} FCFA</span>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <a
+                    href={`https://wa.me/33688639294?text=${buildWhatsAppMessage()}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-500 font-black text-white shadow-lg shadow-emerald-500/30"
+                  >
+                    <MessageCircle size={18} /> Confirmer via WhatsApp
+                  </a>
+                  <button type="button" onClick={confirm} className="flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20">
+                    <CheckCircle2 size={18} /> Envoyer la demande
+                  </button>
+                </div>
+
+                <p className="text-center text-xs font-semibold text-slate-400">Un conseiller StudyWay vous contactera dans les 2h pour confirmer votre transfert.</p>
+              </div>
+            )}
+
+            {stepError && (
+              <div className="mt-4 rounded-lg border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-black text-rose-700">{stepError}</div>
+            )}
+
+            <div className="mt-6 flex gap-3">
+              {step > 1 && (
+                <button type="button" onClick={() => { setStep((s) => s - 1); setStepError('') }} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white font-black text-slate-700">
+                  <ChevronLeft size={18} /> Retour
+                </button>
+              )}
+              {step < 3 && (
+                <button type="button" onClick={goNext} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-700 font-black text-white shadow-lg shadow-blue-700/20">
+                  Suivant <ChevronRight size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-emerald-100 bg-white p-8 shadow-sm text-center">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={32} /></div>
+            <h2 className="mt-5 text-2xl font-black text-slate-950">Demande envoyée !</h2>
+            <p className="mx-auto mt-3 max-w-sm text-sm font-semibold leading-6 text-slate-600">Votre demande de transfert a bien été reçue. Un conseiller StudyWay vous contacte sous 2h pour confirmer votre chauffeur.</p>
+            <div className="mt-6 space-y-3">
+              <a href={`https://wa.me/33688639294?text=${buildWhatsAppMessage()}`} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-500 font-black text-white shadow-lg shadow-emerald-500/30"><MessageCircle size={18} /> Suivre sur WhatsApp</a>
+              <button type="button" onClick={onClose} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white font-black text-slate-700">Retour au transport</button>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function TicketRow({ ticket, index, selected, onSelect }) {
   return (
     <motion.article initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className={`overflow-hidden rounded-lg border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-100 ${selected ? 'border-blue-300 ring-1 ring-blue-100' : 'border-slate-200'}`}>
@@ -4546,12 +4907,12 @@ function Esim() {
     ['Monde', '20 Go', '30 jours', '40 000 FCFA', 'https://flagcdn.com/w80/un.png'],
   ]
   const esimRows = [
-    [logos.europe, 'Europe 10 Go', 'Active', "Valable jusqu'au 25 juin 2024", '10 Go / 10 Go', '100%', 'bg-emerald-50 text-emerald-600'],
+    [logos.europe, 'Europe 10 Go', 'Active', "Valable jusqu’au 25 juin 2024", '10 Go / 10 Go', '100%', 'bg-emerald-50 text-emerald-600'],
     ['https://flagcdn.com/w80/us.png', 'USA 5 Go', 'Expirée', 'Expirée le 10 mai 2024', '5 Go / 5 Go', '100%', 'bg-slate-100 text-slate-500'],
   ]
   const advantages = [
     [Wifi, 'Activation instantanée', 'Recevez votre eSIM en quelques secondes.'],
-    [Plane, "Aucun frais d'itinérance", "Évitez les frais élevés à l'étranger."],
+    [Plane, "Aucun frais d’itinérance", "Évitez les frais élevés à l’étranger."],
     [ShieldCheck, 'Réseaux de qualité', 'Connexion rapide et sécurisée partout.'],
     [MessageCircle, 'Support 24h/7j', 'Notre équipe vous accompagne à chaque étape.'],
   ]
@@ -4560,7 +4921,7 @@ function Esim() {
     <div className="esim-page space-y-7">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-4xl font-black tracking-tight text-slate-950">eSIM & Forfait</h1>
-        <p className="mt-2 text-lg font-medium text-slate-500">Restez connecté dès votre arrivée à l'étranger</p>
+        <p className="mt-2 text-lg font-medium text-slate-500">Restez connecté dès votre arrivée à l’étranger</p>
       </motion.div>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
@@ -4583,7 +4944,7 @@ function Esim() {
 
         <section className="current-esim-card rounded-lg bg-[#061b47] p-6 text-white shadow-sm">
           <div className="flex items-center justify-between"><h2 className="text-lg font-black">Mon eSIM actuelle</h2><span className="esim-active-pill rounded-full bg-emerald-500 px-3 py-1 text-xs font-black">Active</span></div>
-          <div className="mt-7 flex items-center gap-4"><img src={logos.europe} alt="Europe" className="h-12 w-12 rounded-full" /><div><div className="text-xl font-black">Europe 10 Go</div><div className="text-sm text-blue-100">Valable jusqu'au 25 juin 2024</div></div></div>
+          <div className="mt-7 flex items-center gap-4"><img src={logos.europe} alt="Europe" className="h-12 w-12 rounded-full" /><div><div className="text-xl font-black">Europe 10 Go</div><div className="text-sm text-blue-100">Valable jusqu’au 25 juin 2024</div></div></div>
           <div className="mt-7 flex items-end justify-between"><div><div className="text-xl font-black">10 Go / 10 Go</div><div className="text-sm text-blue-100">Consommation</div></div><span className="text-sm font-bold">100%</span></div>
           <div className="mt-3 h-2 rounded-full bg-white/20"><motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1 }} className="h-2 rounded-full bg-cyan-300" /></div>
           <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto]"><div><div className="text-sm text-blue-100">Numéro</div><div className="font-black">+33 7 12 34 56 78</div></div><button className="rounded-lg bg-white px-6 py-3 font-black text-[#061b47] shadow-lg shadow-blue-950/20">Voir les détails</button></div>
@@ -4603,15 +4964,15 @@ function Esim() {
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black">Comment ça marche ?</h2>
           <div className="mt-6 space-y-6">
-            {['Choisissez votre forfait', 'Achetez et recevez votre eSIM', 'Scannez le QR code', "Profitez d'internet"].map((step, index) => <div key={step} className="grid grid-cols-[34px_1fr] gap-4"><div className="grid h-8 w-8 place-items-center rounded-full border-2 border-blue-600 text-sm font-black text-blue-700">{index + 1}</div><div><div className="font-black">{step}</div><p className="mt-1 text-sm text-slate-500">{['Sélectionnez le forfait adapté à votre destination.', 'Vous recevez un QR code par email.', 'Scannez le QR code dans les réglages.', 'Vous êtes connecté dès votre arrivée !'][index]}</p></div></div>)}
+            {['Choisissez votre forfait', 'Achetez et recevez votre eSIM', 'Scannez le QR code', "Profitez d’internet"].map((step, index) => <div key={step} className="grid grid-cols-[34px_1fr] gap-4"><div className="grid h-8 w-8 place-items-center rounded-full border-2 border-blue-600 text-sm font-black text-blue-700">{index + 1}</div><div><div className="font-black">{step}</div><p className="mt-1 text-sm text-slate-500">{['Sélectionnez le forfait adapté à votre destination.', 'Vous recevez un QR code par email.', 'Scannez le QR code dans les réglages.', 'Vous êtes connecté dès votre arrivée !'][index]}</p></div></div>)}
           </div>
-          <button className="mt-7 flex h-12 w-full items-center justify-between rounded-lg bg-slate-50 px-5 font-black text-blue-900"><span className="flex items-center gap-3"><FileText size={18} />Voir le guide d'installation</span>→</button>
+          <Link to="/guides" className="mt-7 flex h-12 w-full items-center justify-between rounded-lg bg-slate-50 px-5 font-black text-blue-900"><span className="flex items-center gap-3"><FileText size={18} />Voir le guide d’installation</span>→</Link>
         </section>
       </div>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-black">Mes eSIM</h2><button className="font-black text-blue-800">Voir toutes mes eSIM →</button></div>
+          <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-black">Mes eSIM</h2><Link to="/esim" className="font-black text-blue-800">Voir toutes mes eSIM →</Link></div>
           <div className="space-y-5">
             {esimRows.map(([flag, name, status, sub, usage, percent, tone]) => <div key={name} className="grid items-center gap-4 rounded-lg border border-slate-100 p-4 md:grid-cols-[1fr_170px_1fr_auto]"><div className="flex items-center gap-4"><img src={flag} alt="" className="h-10 w-10 rounded-full" /><div><b>{name}</b> <span className={`ml-2 rounded-full px-3 py-1 text-xs font-black ${tone}`}>{status}</span><div className="text-sm text-slate-500">{sub}</div></div></div><div className="font-bold">{usage}</div><div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-emerald-500" style={{ width: percent }} /></div><ChevronDown className="-rotate-90 text-slate-400" /></div>)}
           </div>
@@ -4621,7 +4982,7 @@ function Esim() {
           <h2 className="text-xl font-black">Parrainez un ami</h2>
           <p className="mt-3 text-blue-50">Gagnez 2 000 FCFA pour chaque ami parrainé.</p>
           <div className="mt-7 flex items-end justify-between gap-4">
-            <button className="rounded-lg bg-white px-6 py-3 font-black text-blue-800">Parrainer maintenant</button>
+            <Link to="/messages" className="rounded-lg bg-white px-6 py-3 font-black text-blue-800">Parrainer maintenant</Link>
             <div className="relative grid h-24 w-32 place-items-center">
               <div className="absolute h-20 w-24 rounded-lg bg-violet-400 shadow-2xl shadow-blue-950/20" />
               <div className="absolute h-20 w-5 rounded-md bg-pink-300" />
@@ -4642,7 +5003,7 @@ function Esim() {
           </div>
         </section>
         <section className="rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-lg font-black">Besoin d'aide pour choisir votre forfait ?</h2><p className="mt-1 text-sm text-slate-500">Notre équipe est disponible pour vous conseiller le meilleur forfait selon votre destination.</p></div><div className="flex gap-3"><button className="rounded-lg border border-emerald-200 px-5 py-3 font-black text-emerald-700">Discuter sur WhatsApp</button><button className="rounded-lg border border-blue-200 px-5 py-3 font-black text-blue-800">Contacter le support</button></div></div>
+          <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-lg font-black">Besoin d’aide pour choisir votre forfait ?</h2><p className="mt-1 text-sm text-slate-500">Notre équipe est disponible pour vous conseiller le meilleur forfait selon votre destination.</p></div><div className="flex gap-3"><a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="rounded-lg border border-emerald-200 px-5 py-3 font-black text-emerald-700">Discuter sur WhatsApp</a><Link to="/messages" className="rounded-lg border border-blue-200 px-5 py-3 font-black text-blue-800">Contacter le support</Link></div></div>
         </section>
       </div>
     </div>
@@ -4657,79 +5018,323 @@ function EsimPlan({ plan, index }) {
       <div className="mt-4 text-2xl font-black">{data}</div>
       <div className="mt-4 space-y-2 text-sm font-medium text-slate-500"><div>{duration}</div><div>Appels illimités</div><div>SMS illimités</div></div>
       <div className="mt-5 text-lg font-black">{price}</div>
-      <button className="mt-4 h-11 w-full rounded-lg bg-blue-50 font-black text-blue-800 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">Choisir</button>
+      <button type="button" className="mt-4 h-11 w-full rounded-lg bg-blue-50 font-black text-blue-800 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">Choisir</button>
     </motion.article>
   )
 }
 
 function AdvisorContact() {
-  const automaticMessage = "Bonjour StudyWay, j’ai besoin d’aide pour choisir une formation adaptée à mon profil et préparer ma candidature."
-  const advisorReply = "Bonjour Christelle, nous avons bien reçu votre demande. Un conseiller StudyWay peut analyser votre profil, vous proposer des formations cohérentes et vous guider pour le dépôt de candidature."
-  const [draft, setDraft] = useState(automaticMessage)
-  const [messages, setMessages] = useState([
-    { id: 1, side: 'right', text: automaticMessage },
-    { id: 2, side: 'left', text: advisorReply },
-  ])
+  const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
+  const DAY_LABELS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"]
+  const SUBJECTS = ["Admission universitaire","Visa étudiant","Logement étudiant","Financement & bourses","Compte bancaire","Assurance","Autre demande"]
 
-  function sendAdvisorMessage() {
-    const text = draft.trim()
-    if (!text) return
+  const [step, setStep] = useState(1)
+  const [calMonth, setCalMonth] = useState(() => { const d = new Date(); d.setDate(1); return d })
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedTime, setSelectedTime] = useState(null)
+  const [slots, setSlots] = useState([])
+  const [slotsLoading, setSlotsLoading] = useState(false)
+  const [booking, setBooking] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState(null)
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" })
 
-    setMessages((current) => [
-      ...current,
-      { id: Date.now(), side: 'right', text },
-      { id: Date.now() + 1, side: 'left', text: "Message reçu. Un conseiller StudyWay revient vers vous avec une réponse personnalisée." },
-    ])
-    setDraft('')
+  const today = new Date(); today.setHours(0,0,0,0)
+
+  function calCells(year, month) {
+    const first = new Date(year, month, 1)
+    const last  = new Date(year, month + 1, 0)
+    let dow = first.getDay(); dow = dow === 0 ? 6 : dow - 1
+    const cells = Array(dow).fill(null)
+    for (let d = 1; d <= last.getDate(); d++) cells.push(new Date(year, month, d))
+    return cells
   }
+
+  const cells = calCells(calMonth.getFullYear(), calMonth.getMonth())
+
+  function isDisabled(d) {
+    if (!d) return true
+    return d < today || d.getDay() === 0 || d.getDay() === 6
+  }
+
+  function sameDay(a, b) {
+    return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  }
+
+  function fmtDate(d) {
+    return d ? d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) : ''
+  }
+
+  function isoDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+  }
+
+  function mockSlots() {
+    return ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map((time, i) => ({ time, available: ![2,5].includes(i) }))
+  }
+
+  async function pickDate(d) {
+    if (isDisabled(d)) return
+    setSelectedDate(d); setSelectedTime(null); setSlotsLoading(true); setFormError(null)
+    try {
+      const res = await axios.get(`/api/v1/calendar/slots?date=${isoDate(d)}`)
+      setSlots(res.data.slots?.length ? res.data.slots : mockSlots())
+    } catch {
+      setSlots(mockSlots())
+    } finally {
+      setSlotsLoading(false)
+    }
+    setStep(2)
+  }
+
+  function pickTime(time) { setSelectedTime(time); setStep(3) }
+
+  async function submitForm(e) {
+    e.preventDefault(); setSubmitting(true); setFormError(null)
+    try {
+      const res = await axios.post('/api/v1/calendar/appointments', { date: isoDate(selectedDate), time: selectedTime, ...form })
+      setBooking(res.data); setStep(4)
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        const msgs = Object.values(err.response.data.errors).flat()
+        setFormError(msgs.join(' '))
+      } else {
+        setBooking({ success: true, date: isoDate(selectedDate), time: selectedTime, name: form.name, email: form.email })
+        setStep(4)
+      }
+    } finally {
+      setSubmitting(false) }
+  }
+
+  const stepLabels = ['Date', 'Heure', 'Informations', 'Confirmation']
 
   return (
     <div className="space-y-7">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-          <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Parler à un conseiller StudyWay</h1>
-          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Un message automatique est préparé pour lancer la conversation. Vous pouvez ensuite contacter directement l’agence.</p>
+          <Link to="/" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Accueil</Link>
+          <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Prendre un rendez-vous</h1>
+          <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-500">Choisissez une date et un créneau pour échanger avec un conseiller StudyWay.</p>
         </div>
-        <Link to="/contact/email" className="flex h-11 items-center gap-3 rounded-lg border border-blue-200 bg-white px-5 font-black text-blue-800"><Mail size={17} />Envoyer un email</Link>
+        <div className="flex flex-wrap gap-3">
+          <a href="tel:+33688639294" className="flex h-11 items-center gap-3 rounded-lg border border-blue-200 bg-white px-5 font-black text-blue-800"><Phone size={17} />+33 6 88 63 92 94</a>
+          <Link to="/contact/email" className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 font-black text-slate-700"><Mail size={17} />Email</Link>
+        </div>
       </div>
 
-      <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-7 xl:grid-cols-[1fr_310px]">
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 bg-slate-50 px-6 py-5">
-            <div className="flex items-center gap-4">
-              <ThreadAvatar thread={{ title: 'Conseiller StudyWay', tone: 'blue', icon: MessageCircle, online: true }} />
-              <div><h2 className="font-black text-slate-950">Conseiller admission</h2><p className="text-sm font-semibold text-emerald-600">Disponible maintenant</p></div>
+
+          {step < 4 && (
+            <div className="border-b border-slate-100 bg-slate-50 px-6 py-4">
+              <div className="flex items-center">
+                {stepLabels.map((label, i) => (
+                  <span key={label} className="contents">
+                    <button
+                      type="button"
+                      onClick={() => i + 1 < step && setStep(i + 1)}
+                      className={`flex items-center gap-2 ${i + 1 < step ? 'cursor-pointer' : 'cursor-default'}`}
+                    >
+                      <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-black transition ${i + 1 <= step ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                        {i + 1 < step ? <CheckCircle2 size={14} /> : i + 1}
+                      </span>
+                      <span className={`hidden text-sm font-black sm:block ${i + 1 === step ? 'text-blue-700' : i + 1 < step ? 'text-blue-500' : 'text-slate-400'}`}>{label}</span>
+                    </button>
+                    {i < stepLabels.length - 1 && <span className={`mx-2 h-px flex-1 ${i + 1 < step ? 'bg-blue-300' : 'bg-slate-200'}`} />}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="space-y-4 bg-white p-6">
-            <div className="max-h-[360px] space-y-4 overflow-y-auto pr-2">
-              {messages.map((message) => (
-                <motion.div key={message.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`${message.side === 'right' ? 'ml-auto bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'} max-w-[82%] rounded-lg px-5 py-4 text-sm font-semibold leading-6 shadow-sm`}>
-                  {message.text}
+          )}
+
+          <div className="p-6 lg:p-8">
+            <AnimatePresence mode="wait">
+
+              {step === 1 && (
+                <motion.div key="cal" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+                  <div className="mb-6 flex items-center justify-between">
+                    <h2 className="text-lg font-black text-slate-950">Choisissez une date</h2>
+                    <div className="flex items-center gap-2">
+                      <button type="button" onClick={() => setCalMonth(m => new Date(m.getFullYear(), m.getMonth()-1,1))} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition"><ChevronDown className="rotate-90" size={17} /></button>
+                      <span className="min-w-[160px] text-center text-sm font-black text-slate-950">{MONTHS[calMonth.getMonth()]} {calMonth.getFullYear()}</span>
+                      <button type="button" onClick={() => setCalMonth(m => new Date(m.getFullYear(), m.getMonth()+1,1))} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition"><ChevronDown className="-rotate-90" size={17} /></button>
+                    </div>
+                  </div>
+                  <div className="mb-2 grid grid-cols-7 text-center text-xs font-black text-slate-400">
+                    {DAY_LABELS.map(d => <div key={d} className="py-1">{d}</div>)}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {cells.map((d, i) => {
+                      if (!d) return <div key={`x${i}`} />
+                      const disabled = isDisabled(d)
+                      const selected = sameDay(d, selectedDate)
+                      const isToday  = sameDay(d, today)
+                      return (
+                        <button key={d.toISOString()} type="button" disabled={disabled} onClick={() => pickDate(d)}
+                          className={`aspect-square rounded-lg text-sm font-bold transition
+                            ${selected ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : ''}
+                            ${isToday && !selected ? 'border-2 border-blue-500 font-black text-blue-700' : ''}
+                            ${!disabled && !selected ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' : ''}
+                            ${disabled ? 'cursor-not-allowed text-slate-300' : 'cursor-pointer'}`}>
+                          {d.getDate()}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-5 text-xs font-semibold text-slate-500">
+                    <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-blue-600 inline-block" />Sélectionné</span>
+                    <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full border-2 border-blue-500 inline-block" />Aujourd’hui</span>
+                    <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-slate-200 inline-block" />Indisponible / Week-end</span>
+                  </div>
                 </motion.div>
-              ))}
-            </div>
-            <textarea value={draft} onChange={(event) => setDraft(event.target.value)} className="mt-4 min-h-28 w-full resize-none rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder="Écrivez votre message..." />
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={sendAdvisorMessage} className="flex h-11 items-center gap-3 rounded-lg bg-blue-600 px-6 font-black text-white"><Send size={17} />Envoyer le message</button>
-              <a href="https://wa.me/33184804789" target="_blank" rel="noreferrer" className="flex h-11 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-6 font-black text-emerald-700"><MessageCircle size={17} />WhatsApp</a>
-            </div>
+              )}
+
+              {step === 2 && (
+                <motion.div key="slots" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+                  <div className="mb-6 flex items-center gap-3">
+                    <button type="button" onClick={() => setStep(1)} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-200 hover:bg-slate-50 transition"><ArrowLeft size={17} /></button>
+                    <div>
+                      <h2 className="text-lg font-black text-slate-950">Choisissez un créneau</h2>
+                      <p className="text-sm font-semibold capitalize text-blue-700">{fmtDate(selectedDate)}</p>
+                    </div>
+                  </div>
+                  {slotsLoading ? (
+                    <div className="flex h-44 items-center justify-center gap-3 text-slate-400">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+                      Chargement des créneaux disponibles…
+                    </div>
+                  ) : slots.length === 0 ? (
+                    <div className="flex h-44 flex-col items-center justify-center gap-3 text-slate-400">
+                      <CalendarDays size={44} className="text-slate-300" />
+                      <p className="font-semibold">Aucun créneau disponible ce jour.</p>
+                      <button type="button" onClick={() => setStep(1)} className="text-sm font-black text-blue-700 hover:underline">Choisir une autre date</button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                      {slots.map(({ time, available }) => (
+                        <button key={time} type="button" disabled={!available} onClick={() => available && pickTime(time)}
+                          className={`flex h-12 items-center justify-center gap-1.5 rounded-lg text-sm font-black transition
+                            ${available ? 'border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-200 hover:border-blue-600' : 'border border-slate-100 bg-slate-50 text-slate-300 line-through cursor-not-allowed'}`}>
+                          <Clock3 size={13} className="shrink-0" />{time}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {step === 3 && (
+                <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+                  <div className="mb-6 flex items-center gap-3">
+                    <button type="button" onClick={() => setStep(2)} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-200 hover:bg-slate-50 transition"><ArrowLeft size={17} /></button>
+                    <div>
+                      <h2 className="text-lg font-black text-slate-950">Vos informations</h2>
+                      <p className="text-sm font-semibold capitalize text-blue-700">{fmtDate(selectedDate)} · {selectedTime}</p>
+                    </div>
+                  </div>
+                  <form onSubmit={submitForm} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="block text-sm font-black text-slate-700">
+                        Nom complet *
+                        <input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="Prénom Nom" className="mt-2 h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
+                      </label>
+                      <label className="block text-sm font-black text-slate-700">
+                        Adresse email *
+                        <input required type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} placeholder="vous@email.com" className="mt-2 h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
+                      </label>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="block text-sm font-black text-slate-700">
+                        Téléphone *
+                        <input required value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} placeholder="+228 90 12 34 56" className="mt-2 h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
+                      </label>
+                      <label className="block text-sm font-black text-slate-700">
+                        Objet du rendez-vous *
+                        <select required value={form.subject} onChange={e => setForm(f => ({...f, subject: e.target.value}))} className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition">
+                          <option value="">Choisir un objet</option>
+                          {SUBJECTS.map(s => <option key={s}>{s}</option>)}
+                        </select>
+                      </label>
+                    </div>
+                    <label className="block text-sm font-black text-slate-700">
+                      Message (optionnel)
+                      <textarea value={form.message} onChange={e => setForm(f => ({...f, message: e.target.value}))} placeholder="Décrivez brièvement votre situation et vos questions…" rows={3} className="mt-2 w-full resize-none rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
+                    </label>
+                    {formError && (
+                      <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-700">{formError}</div>
+                    )}
+                    <button type="submit" disabled={submitting} className="flex h-13 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:opacity-60">
+                      {submitting
+                        ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Réservation en cours…</>
+                        : <><CalendarDays size={18} />Confirmer le rendez-vous</>}
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+
+              {step === 4 && booking && (
+                <motion.div key="confirm" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-8 text-center">
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 260, damping: 20 }} className="grid h-20 w-20 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+                    <CheckCircle2 size={44} />
+                  </motion.div>
+                  <h2 className="mt-6 text-2xl font-black text-slate-950">Rendez-vous confirmé !</h2>
+                  <p className="mt-2 text-sm font-semibold text-slate-500">Un conseiller vous contactera à l’heure prévue.</p>
+                  <div className="mt-8 w-full max-w-sm rounded-xl border border-emerald-100 bg-emerald-50 p-6 text-left">
+                    <div className="space-y-4 text-sm font-semibold text-slate-700">
+                      <div className="flex items-center gap-3">
+                        <CalendarDays size={17} className="shrink-0 text-emerald-600" />
+                        <span className="capitalize">{new Date(booking.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</span>
+                      </div>
+                      <div className="flex items-center gap-3"><Clock3 size={17} className="shrink-0 text-emerald-600" /><span>{booking.time} — heure de Paris</span></div>
+                      <div className="flex items-center gap-3"><UserRound size={17} className="shrink-0 text-emerald-600" /><span>{booking.name}</span></div>
+                      <div className="flex items-center gap-3"><Mail size={17} className="shrink-0 text-emerald-600" /><span>{booking.email}</span></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 w-full max-w-sm rounded-xl border border-blue-100 bg-blue-50 p-4 text-left text-sm font-semibold leading-6 text-blue-800">
+                    <span className="font-black">Confirmation par email — </span>un récapitulatif a été envoyé à <b>{booking.email}</b>.
+                  </div>
+                  <div className="mt-7 grid w-full max-w-sm gap-3">
+                    <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 font-black text-emerald-700 hover:bg-emerald-100 transition"><MessageCircle size={18} />Contacter sur WhatsApp</a>
+                    <button type="button" onClick={() => { setStep(1); setSelectedDate(null); setSelectedTime(null); setBooking(null); setForm({ name:'', email:'', phone:'', subject:'', message:'' }) }} className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 font-black text-slate-700 hover:bg-slate-50 transition"><CalendarDays size={17} />Nouveau rendez-vous</button>
+                    <Link to="/" className="flex h-11 items-center justify-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-700 transition"><ArrowLeft size={16} />Retour à l’accueil</Link>
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
           </div>
         </section>
 
         <aside className="space-y-5">
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="font-black text-slate-950">Contacter l’agence</h2>
-            <div className="mt-5 space-y-3">
-              <a href="tel:+33184804789" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><Phone className="text-blue-700" size={20} />+33 1 84 80 47 89</a>
-              <a href="https://wa.me/33184804789" target="_blank" rel="noreferrer" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><MessageCircle className="text-emerald-600" size={20} />WhatsApp agence</a>
-              <Link to="/contact/email" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800"><Mail className="text-blue-700" size={20} />contact@studyway.com</Link>
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 place-items-center rounded-full bg-blue-50 text-blue-800"><UserRound size={26} /></div>
+              <div><div className="font-black text-slate-950">Conseiller StudyWay</div><div className="text-sm font-semibold text-emerald-600">Disponible lun – ven</div></div>
+            </div>
+            <div className="mt-5 space-y-3 text-sm font-semibold text-slate-600">
+              <div className="flex items-center gap-3"><Clock3 size={15} className="text-blue-600 shrink-0" />9h00 – 18h00 (Paris)</div>
+              <div className="flex items-center gap-3"><CalendarDays size={15} className="text-blue-600 shrink-0" />Durée : 1 heure</div>
+              <div className="flex items-center gap-3"><Video size={15} className="text-blue-600 shrink-0" />Appel vidéo ou téléphonique</div>
             </div>
           </section>
-          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
-            <h2 className="font-black text-blue-950">Message envoyé automatiquement</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Le conseiller reçoit le contexte : choix de formation, profil étudiant et besoin d’accompagnement pour postuler.</p>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black text-slate-950">Contact direct</h2>
+            <div className="mt-4 space-y-2">
+              <a href="tel:+33688639294" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800 hover:bg-slate-50 transition"><Phone className="text-blue-700 shrink-0" size={18} />+33 6 88 63 92 94</a>
+              <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800 hover:bg-emerald-50 transition"><MessageCircle className="text-emerald-600 shrink-0" size={18} />WhatsApp agence</a>
+              <Link to="/contact/email" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800 hover:bg-slate-50 transition"><Mail className="text-blue-700 shrink-0" size={18} />contact@studyway.com</Link>
+              <Link to="/messages" className="flex items-center gap-4 rounded-lg border border-slate-200 p-4 font-black text-slate-800 hover:bg-blue-50 transition"><Send className="text-violet-600 shrink-0" size={18} />Chat en direct</Link>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6">
+            <h2 className="font-black text-blue-950">Préparez votre RDV</h2>
+            <ul className="mt-4 space-y-2 text-sm font-semibold leading-7 text-blue-900">
+              {['Votre projet d’études et destination visée','Vos relevés de notes et diplômes','Votre passeport (numéro et validité)','Vos questions sur le visa et les démarches'].map(item => (
+                <li key={item} className="flex gap-2"><CheckCircle2 size={15} className="mt-1 shrink-0 text-blue-600" />{item}</li>
+              ))}
+            </ul>
           </section>
         </aside>
       </div>
@@ -4762,8 +5367,8 @@ function EmailContact() {
           <h2 className="font-black text-blue-950">Coordonnées</h2>
           <div className="mt-5 space-y-4 text-sm font-semibold text-blue-900">
             <div className="flex items-center gap-3"><Mail size={18} />contact@studyway.com</div>
-            <div className="flex items-center gap-3"><Phone size={18} />+33 1 84 80 47 89</div>
-            <div className="flex items-center gap-3"><MessageCircle size={18} />WhatsApp disponible</div>
+            <a href="tel:+33688639294" className="flex items-center gap-3 hover:text-blue-900 transition"><Phone size={18} />+33 6 88 63 92 94</a>
+            <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-blue-900 transition"><MessageCircle size={18} />WhatsApp disponible</a>
           </div>
         </aside>
       </div>
@@ -4776,7 +5381,7 @@ function Messages() {
     {
       id: 'support',
       title: 'Support StudyWay',
-      preview: "N'hésitez pas si vous avez d'autres questions.",
+      preview: "N’hésitez pas si vous avez d’autres questions.",
       time: '10:33',
       unread: 2,
       avatar: 'SW',
@@ -4786,19 +5391,19 @@ function Messages() {
         {
           id: 1,
           side: 'left',
-          text: "Bonjour Christelle,\n\nNous avons bien reçu tous vos documents pour votre demande de visa étudiant.\n\nVotre dossier est en cours de vérification par notre équipe.\n\nNous reviendrons vers vous dans les prochaines 24h avec une réponse.\n\nCordialement,\nL'équipe StudyWay",
+          text: "Bonjour Christelle,\n\nNous avons bien reçu tous vos documents pour votre demande de visa étudiant.\n\nVotre dossier est en cours de vérification par notre équipe.\n\nNous reviendrons vers vous dans les prochaines 24h avec une réponse.\n\nCordialement,\nL’équipe StudyWay",
           time: '10:30',
         },
         {
           id: 2,
           side: 'right',
-          text: "Bonjour,\nMerci beaucoup pour l'information.\nJ'attends votre retour avec impatience.\nBonne journée 😊",
+          text: "Bonjour,\nMerci beaucoup pour l’information.\nJ’attends votre retour avec impatience.\nBonne journée 😊",
           time: '10:32',
         },
         {
           id: 3,
           side: 'left',
-          text: "Avec plaisir 😊\nN'hésitez pas si vous avez d'autres questions.",
+          text: "Avec plaisir 😊\nN’hésitez pas si vous avez d’autres questions.",
           time: '10:33',
         },
       ],
@@ -4862,7 +5467,7 @@ function Messages() {
       online: true,
       messages: [
         { id: 1, side: 'left', text: 'Prends bien soin de toi ma chérie.', time: 'Lun.' },
-        { id: 2, side: 'right', text: "Oui maman, je t'appelle ce soir ❤️", time: 'Lun.' },
+        { id: 2, side: 'right', text: "Oui maman, je t’appelle ce soir ❤️", time: 'Lun.' },
       ],
     },
     {
@@ -5019,7 +5624,7 @@ function Messages() {
           </header>
 
           <div ref={messagesListRef} className="messages-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 lg:px-20">
-            <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd'hui</div>
+            <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd’hui</div>
             <div className="space-y-7">
               {activeThread.messages.map((message, index) => (
                 <motion.div
@@ -5200,7 +5805,7 @@ function VerticalTimeline({ items, activeIndex = 0 }) {
 function Placeholder() {
   const location = useLocation()
   const title = useMemo(() => location.pathname.replace('/', '') || 'Module', [location.pathname])
-  return <><PageTitle title={title.charAt(0).toUpperCase() + title.slice(1)} subtitle="Module premium preparé dans l'architecture frontend StudyWay." /><Panel title="Interface en préparation"><p className="text-slate-500">La route est prête pour recevoir les composants métier et les données API.</p></Panel></>
+  return <><PageTitle title={title.charAt(0).toUpperCase() + title.slice(1)} subtitle="Module premium preparé dans l’architecture frontend StudyWay." /><Panel title="Interface en préparation"><p className="text-slate-500">La route est prête pour recevoir les composants métier et les données API.</p></Panel></>
 }
 
 export default App

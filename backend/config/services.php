@@ -53,4 +53,8 @@ return [
         'webhook_secret' => env('MONEROO_WEBHOOK_SECRET'),
     ],
 
+    'google' => [
+        'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
+    ],
+
 ];
