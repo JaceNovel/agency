@@ -18,6 +18,8 @@ import dashboardStudentHero from './assets/dashboard-african-student.png'
 import esimPhoneHero from './assets/esim-phone-hero.png'
 import financeHero from './assets/finance-student-hero.png'
 import parisPackBackground from './assets/paris-pack-background.png'
+import settingsPasswordHero from './assets/settings-password-hero.png'
+import settingsProfileHero from './assets/settings-profile-hero.png'
 
 const queryClient = new QueryClient()
 
@@ -382,10 +384,14 @@ function AnimatedRoutes() {
         <Route path="/guides" element={<StudentGuides />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/parametres" element={<ProfileSettings />} />
+        <Route path="/parametres/informations" element={<PersonalInformationSettings />} />
+        <Route path="/parametres/mot-de-passe" element={<PasswordSettings />} />
         <Route path="/parametres/facturation" element={<BillingSettings />} />
         <Route path="/parametres/paiement" element={<PaymentSettings />} />
         <Route path="/parametres/connexions" element={<LoginHistorySettings />} />
         <Route path="/settings/profile" element={<ProfileSettings />} />
+        <Route path="/settings/personal-info" element={<PersonalInformationSettings />} />
+        <Route path="/settings/password" element={<PasswordSettings />} />
         <Route path="/settings/billing" element={<BillingSettings />} />
         <Route path="/settings/payment-methods" element={<PaymentSettings />} />
         <Route path="/settings/login-history" element={<LoginHistorySettings />} />
@@ -533,12 +539,184 @@ function ProfileSettings() {
       <div className="grid gap-8 xl:grid-cols-[450px_1fr]">
         <SettingsProfileCard />
         <div className="space-y-8">
-          <SettingsActionCard icon={UserRound} title="Informations personnelles" text="Mettez à jour vos informations personnelles et vos préférences de contact." index={0} onClick={() => navigate('/profil')} />
-          <SettingsActionCard icon={Lock} title="Changer le mot de passe" text="Utilisez un mot de passe fort pour sécuriser votre compte." tone="purple" index={1} onClick={() => navigate('/settings/login-history')} />
+          <SettingsActionCard icon={UserRound} title="Informations personnelles" text="Mettez à jour votre identité, votre adresse, votre date de naissance et votre parcours." index={0} onClick={() => navigate('/settings/personal-info')} />
+          <SettingsActionCard icon={Lock} title="Changer le mot de passe" text="Modifiez votre mot de passe actuel et renforcez la sécurité de votre compte." tone="purple" index={1} onClick={() => navigate('/settings/password')} />
           <SettingsActionCard icon={Trash2} title="Supprimer le compte" text="Si vous souhaitez supprimer définitivement votre compte, utilisez le bouton ci-dessous." danger index={2} onClick={() => navigate('/messages')} />
         </div>
       </div>
     </SettingsPageFrame>
+  )
+}
+
+function PersonalInformationSettings() {
+  const profileFields = [
+    ['Nom complet', 'Lemouel jonadab AMAH-TCHTOUTCHOUI', UserRound],
+    ['Date de naissance', '14 février 2004', CalendarDays],
+    ['Email étudiant', 'jaceamah14@gmail.com', Mail],
+    ['Téléphone', '+228 90 12 34 56', Phone],
+    ['Adresse étudiant', '12 rue des Étudiants, 75013 Paris', MapPin],
+    ['Dernier diplôme', 'Baccalauréat série C - Mention Bien', Award],
+  ]
+  const timeline = [
+    ['Identité validée', 'Passeport et coordonnées principales confirmés.'],
+    ['Adresse à vérifier', 'Ajoutez votre justificatif dès que le bail est signé.'],
+    ['Parcours académique', 'Dernier diplôme renseigné pour les démarches université et visa.'],
+  ]
+
+  return (
+    <SettingsPageFrame title="Informations personnelles">
+      <div className="personal-settings-page space-y-8">
+        <motion.section initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }} className="personal-settings-hero overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+          <div className="grid min-h-[360px] lg:grid-cols-[1.05fr_.95fr]">
+            <div className="relative p-8 lg:p-10">
+              <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-xs font-black uppercase tracking-wide text-blue-700"><ShieldCheck size={16} />Profil vérifié</span>
+              <h2 className="mt-6 max-w-2xl text-4xl font-black tracking-tight text-slate-950">Gardez un dossier étudiant clair, complet et prêt pour vos démarches.</h2>
+              <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-slate-600">Ces informations alimentent vos demandes StudyWay : logement, visa, université, assurance et accompagnement administratif.</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {[
+                  ['6', 'infos clés'],
+                  ['92%', 'profil complété'],
+                  ['3', 'pièces à suivre'],
+                ].map(([value, label], index) => (
+                  <motion.div key={label} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 + index * 0.07 }} className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                    <b className="block text-2xl font-black text-blue-800">{value}</b>
+                    <span className="mt-1 block text-xs font-black uppercase tracking-wide text-slate-500">{label}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <div className="relative min-h-[300px] overflow-hidden">
+              <img src={settingsProfileHero} alt="Documents de profil étudiant" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/0 to-white/12" />
+            </div>
+          </div>
+        </motion.section>
+
+        <div className="grid items-start gap-8 xl:grid-cols-[1fr_360px]">
+          <motion.section initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.42 }} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
+              <div>
+                <h3 className="text-2xl font-black text-slate-950">Détails du profil</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-500">Modifiez les informations utilisées pour vos services.</p>
+              </div>
+              <button type="button" className="flex h-11 items-center gap-3 rounded-lg bg-blue-700 px-5 font-black text-white shadow-lg shadow-blue-700/20"><CheckCircle2 size={18} />Enregistrer</button>
+            </div>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              {profileFields.map(([label, value, Icon], index) => (
+                <motion.label key={label} initial={{ opacity: 0, x: index % 2 ? 18 : -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.14 + index * 0.045, duration: 0.32 }} className={label === 'Adresse étudiant' ? 'md:col-span-2' : ''}>
+                  <span className="mb-2 flex items-center gap-2 text-sm font-black text-slate-700"><Icon size={17} className="text-blue-700" />{label}</span>
+                  <input defaultValue={value} className="h-13 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-950 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100" />
+                </motion.label>
+              ))}
+            </div>
+          </motion.section>
+
+          <motion.aside initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.42 }} className="space-y-5">
+            <section className="rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
+              <h3 className="font-black text-blue-950">Suivi du dossier</h3>
+              <div className="mt-5 space-y-4">
+                {timeline.map(([title, text], index) => (
+                  <div key={title} className="flex gap-3">
+                    <span className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-blue-700 shadow-sm">{index + 1}</span>
+                    <span><b className="block text-sm text-slate-950">{title}</b><span className="mt-1 block text-sm font-semibold leading-5 text-blue-900/75">{text}</span></span>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm">
+              <h3 className="font-black text-emerald-950">Conseil StudyWay</h3>
+              <p className="mt-3 text-sm font-semibold leading-6 text-emerald-900">Gardez une adresse et un diplôme à jour : ce sont deux informations souvent demandées pour les réservations logement et les dossiers visa.</p>
+            </section>
+          </motion.aside>
+        </div>
+      </div>
+    </SettingsPageFrame>
+  )
+}
+
+function PasswordSettings() {
+  const passwordRules = [
+    ['8 caractères minimum', true],
+    ['Une majuscule et une minuscule', true],
+    ['Un chiffre ou symbole', false],
+    ['Différent de l’ancien mot de passe', false],
+  ]
+
+  return (
+    <SettingsPageFrame title="Changer le mot de passe">
+      <div className="password-settings-page grid min-h-[720px] gap-8 xl:grid-cols-[1fr_430px]">
+        <motion.section initial={{ opacity: 0, y: 28, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="password-settings-hero relative min-h-[260px] overflow-hidden">
+            <img src={settingsPasswordHero} alt="Sécurité du mot de passe" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-950/82 via-blue-900/48 to-transparent" />
+            <div className="relative z-10 max-w-xl p-8 text-white lg:p-10">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-4 py-2 text-xs font-black uppercase tracking-wide ring-1 ring-white/20"><Lock size={16} />Sécurité du compte</span>
+              <h2 className="mt-6 text-4xl font-black tracking-tight">Un mot de passe solide protège tout votre parcours.</h2>
+              <p className="mt-4 text-sm font-semibold leading-7 text-blue-50/88">Mettez à jour votre accès StudyWay et gardez vos documents, paiements et réservations sous contrôle.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-8 p-6 lg:grid-cols-[1fr_300px] lg:p-8">
+            <motion.form initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.38 }} className="space-y-5">
+              <PasswordField label="Mot de passe actuel" placeholder="Entrez votre mot de passe actuel" />
+              <button type="button" className="-mt-2 text-sm font-black text-blue-700 hover:text-blue-900">Mot de passe oublié ?</button>
+              <PasswordField label="Nouveau mot de passe" placeholder="Créez un nouveau mot de passe" />
+              <PasswordField label="Confirmer le nouveau mot de passe" placeholder="Confirmez le nouveau mot de passe" />
+              <div className="flex flex-wrap gap-3 pt-3">
+                <button type="button" className="flex h-12 items-center gap-3 rounded-lg bg-blue-700 px-6 font-black text-white shadow-lg shadow-blue-700/20"><ShieldCheck size={18} />Mettre à jour</button>
+                <button type="button" className="h-12 rounded-lg border border-slate-200 px-6 font-black text-slate-700 hover:bg-slate-50">Annuler</button>
+              </div>
+            </motion.form>
+
+            <motion.aside initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.22, duration: 0.38 }} className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+              <h3 className="font-black text-blue-950">Force recommandée</h3>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-white">
+                <span className="block h-full w-[64%] rounded-full bg-gradient-to-r from-amber-400 via-blue-500 to-emerald-500" />
+              </div>
+              <div className="mt-5 space-y-3">
+                {passwordRules.map(([rule, done]) => (
+                  <div key={rule} className="flex items-center gap-3 text-sm font-bold text-slate-700">
+                    <span className={`grid h-6 w-6 place-items-center rounded-full ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-white text-slate-400'}`}><CheckCircle2 size={14} /></span>
+                    {rule}
+                  </div>
+                ))}
+              </div>
+            </motion.aside>
+          </div>
+        </motion.section>
+
+        <motion.aside initial={{ opacity: 0, x: 34 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.16, duration: 0.44 }} className="space-y-5">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="font-black text-slate-950">Protection active</h3>
+            <div className="mt-5 space-y-4">
+              {[
+                [ShieldCheck, 'Connexion sécurisée', 'Votre session actuelle est protégée.'],
+                [Clock3, 'Dernier changement', 'Aucun changement récent enregistré.'],
+                [AlertTriangle, 'Rappel utile', 'Évitez de réutiliser un mot de passe bancaire ou email.'],
+              ].map(([Icon, title, text], index) => (
+                <motion.div key={title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 + index * 0.07 }} className="flex gap-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-blue-700 shadow-sm"><Icon size={21} /></span>
+                  <span><b className="block text-sm text-slate-950">{title}</b><span className="mt-1 block text-sm font-semibold leading-5 text-slate-500">{text}</span></span>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-violet-100 bg-violet-50 p-6 shadow-sm">
+            <h3 className="font-black text-violet-950">Astuce sécurité</h3>
+            <p className="mt-3 text-sm font-semibold leading-6 text-violet-900">Utilisez une phrase facile à retenir, avec des chiffres et symboles, puis gardez-la uniquement pour StudyWay.</p>
+          </section>
+        </motion.aside>
+      </div>
+    </SettingsPageFrame>
+  )
+}
+
+function PasswordField({ label, placeholder }) {
+  return (
+    <label className="block">
+      <span className="mb-2 flex items-center gap-2 text-sm font-black text-slate-700"><Lock size={17} className="text-blue-700" />{label}</span>
+      <input type="password" placeholder={placeholder} className="h-13 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100" />
+    </label>
   )
 }
 
@@ -1535,6 +1713,7 @@ function Housing() {
                 transition={{ delay: 0.22 + index * 0.1, duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
                 className="housing-choice-card group flex min-h-[236px] flex-col items-start justify-between rounded-[26px] border border-slate-200 bg-white p-7 text-left shadow-sm"
               >
+                <span className={`housing-choice-corner-arrow ${tone === 'blue' ? 'housing-choice-corner-arrow-blue' : 'housing-choice-corner-arrow-emerald'}`} aria-hidden="true"><ArrowRight size={22} /></span>
                 <span className={`grid h-14 w-14 place-items-center rounded-2xl ${tone === 'blue' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}><Icon size={27} /></span>
                 <span>
                   <span className="block text-2xl font-black text-slate-950">{title}</span>
@@ -1543,7 +1722,6 @@ function Housing() {
                     {chips.map((chip) => <span key={chip} className={`housing-choice-chip rounded-full px-3 py-2 text-xs font-black ${tone === 'blue' ? 'housing-choice-chip-blue' : 'housing-choice-chip-emerald'}`}>{chip}</span>)}
                   </span>
                 </span>
-                <span className={`housing-choice-arrow absolute right-7 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-xl text-white shadow-lg transition group-hover:translate-x-1 ${tone === 'blue' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-500 shadow-emerald-200'}`}><ArrowRight size={23} /></span>
               </motion.button>
             ))}
           </div>
@@ -1603,10 +1781,23 @@ function Housing() {
     <div className="housing-page -mx-5 space-y-8 lg:-mx-8">
       <div className="px-5 lg:px-8">
         <div className="flex flex-wrap items-start justify-between gap-5">
-          <div>
-            <button type="button" onClick={() => setHousingMode(null)} className="mb-4 text-sm font-black text-blue-800">Changer de catégorie</button>
-            <h1 className="typewriter-title text-4xl font-black tracking-tight text-slate-950">{housingMode === 'hotel' ? 'Réserver un hôtel' : 'Trouvez votre logement étudiant'}</h1>
-            <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l’Europe."}</p>
+          <div className="flex min-w-0 items-start gap-4">
+            <button type="button" onClick={() => setHousingMode(null)} className="mt-1 grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-blue-800 shadow-sm hover:bg-blue-50" aria-label="Retour aux catégories logement">
+              <ArrowLeft size={22} />
+            </button>
+            <div className="min-w-0">
+              <button type="button" onClick={() => setHousingMode(null)} className="mb-4 text-sm font-black text-blue-800">Changer de catégorie</button>
+              <h1
+                className="typewriter-title text-4xl font-black tracking-tight text-slate-950"
+                style={{
+                  '--typewriter-width': housingMode === 'hotel' ? '17ch' : '32ch',
+                  '--typewriter-steps': housingMode === 'hotel' ? 17 : 32,
+                }}
+              >
+                {housingMode === 'hotel' ? 'Réserver un hôtel' : 'Trouvez votre logement étudiant'}
+              </h1>
+              <p className="mt-3 text-base font-medium text-slate-500">{housingMode === 'hotel' ? 'Sélection d’hôtels disponibles, avantages inclus et confirmation accompagnée par StudyWay.' : "Des milliers de logements vérifiés pour étudiants dans toute l’Europe."}</p>
+            </div>
           </div>
           <Link to="/contact/conseiller" className="flex h-12 items-center gap-3 rounded-lg bg-blue-400 px-6 font-black text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-500">
             <MessageCircle size={20} />
@@ -3245,6 +3436,7 @@ function StudentGuideDetail() {
 
 function Profile() {
   const location = useLocation()
+  const navigate = useNavigate()
   const initialTab = new URLSearchParams(location.search).get('tab') === 'reservations' ? 'reservations' : 'overview'
   const [activeTab, setActiveTab] = useState(initialTab)
   const reservationsQuery = useQuery({
@@ -3258,13 +3450,18 @@ function Profile() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-950">Profil</h1>
-          <p className="mt-2 text-sm font-semibold text-slate-500">Identité, services, réservations et documents de voyage.</p>
+        <div className="flex items-start gap-4">
+          <button type="button" onClick={() => navigate(-1)} className="mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-blue-800 shadow-sm hover:bg-blue-50" aria-label="Retour à la page précédente">
+            <ArrowLeft size={21} />
+          </button>
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-slate-950">Profil</h1>
+            <p className="mt-2 text-sm font-semibold text-slate-500">Identité, services, réservations et documents de voyage.</p>
+          </div>
         </div>
-        <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-          <button type="button" onClick={() => setActiveTab('overview')} className={`h-10 rounded-lg px-5 text-sm font-black ${activeTab === 'overview' ? 'bg-blue-700 text-white' : 'text-slate-600'}`}>Résumé</button>
-          <button type="button" onClick={() => setActiveTab('reservations')} className={`h-10 rounded-lg px-5 text-sm font-black ${activeTab === 'reservations' ? 'bg-blue-700 text-white' : 'text-slate-600'}`}>Mes réservations</button>
+        <div className="profile-tab-buttons flex rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
+          <button type="button" onClick={() => setActiveTab('overview')} className={`profile-tab-button h-11 rounded-lg px-5 text-sm font-black ${activeTab === 'overview' ? 'profile-tab-button-active' : 'text-slate-600'}`}><FileText size={17} />Résumé</button>
+          <button type="button" onClick={() => setActiveTab('reservations')} className={`profile-tab-button h-11 rounded-lg px-5 text-sm font-black ${activeTab === 'reservations' ? 'profile-tab-button-active' : 'text-slate-600'}`}><Plane size={17} />Mes réservations</button>
         </div>
       </div>
 
@@ -3991,21 +4188,37 @@ function VisaApplication() {
 
   return (
     <div className="visa-application-page space-y-7">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: 22, filter: 'blur(8px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        className="flex flex-wrap items-end justify-between gap-4"
+      >
         <div>
           <div className="text-sm font-bold text-slate-500">Accueil <span className="mx-2">›</span> Visa & Immigration <span className="mx-2">›</span> Demande</div>
           <div className="mt-4 flex items-center gap-4"><img src={flag} alt="" className="h-10 w-14 rounded-lg object-cover" /><h1 className="text-3xl font-black tracking-tight text-slate-950">Démarrer ma demande - {visaTitle}</h1></div>
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Complétez votre dossier, choisissez le type d’accompagnement et préparez la réservation du rendez-vous Capago.</p>
         </div>
         <Link to={`/visa/${country}/${type}`} className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-black text-blue-800 shadow-sm">Retour fiche visa</Link>
-      </div>
+      </motion.div>
 
-      <section className="grid gap-4 lg:grid-cols-4">
-        {steps.map((label, index) => <button key={label} type="button" onClick={() => setStep(index)} className={`flex items-center gap-3 rounded-lg p-4 text-left transition ${step === index ? 'bg-blue-50 text-blue-800 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50'}`}><span className={`grid h-9 w-9 place-items-center rounded-full text-sm font-black ${step === index ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span><span className="font-black">{label}</span></button>)}
-      </section>
+      <motion.section initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.08 } } }} className="grid gap-4 lg:grid-cols-4">
+        {steps.map((label, index) => (
+          <motion.button
+            key={label}
+            type="button"
+            onClick={() => setStep(index)}
+            variants={{ hidden: { opacity: 0, y: 18, scale: 0.97 }, show: { opacity: 1, y: 0, scale: 1 } }}
+            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+            className={`flex items-center gap-3 rounded-lg p-4 text-left transition ${step === index ? 'bg-blue-50 text-blue-800 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+          >
+            <span className={`grid h-9 w-9 place-items-center rounded-full text-sm font-black ${step === index ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{index + 1}</span><span className="font-black">{label}</span>
+          </motion.button>
+        ))}
+      </motion.section>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_330px]">
-        <motion.section key={step} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <motion.section key={step} initial={{ opacity: 0, y: 26, scale: 0.985, filter: 'blur(8px)' }} animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }} transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           {step === 0 && (
             <div>
               <h2 className="text-xl font-black text-slate-950">Informations du demandeur principal</h2>
@@ -4098,8 +4311,8 @@ function VisaApplication() {
             <button type="button" disabled={step === steps.length - 1 && !acceptedTerms} onClick={step === steps.length - 1 ? () => setSubmitted(true) : nextStep} className="support-start-button flex h-11 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">{step === steps.length - 1 ? 'Soumettre la demande de rendez-vous' : 'Continuer'} <ArrowRight className="support-start-arrow" size={18} /></button>
           </div>
         </motion.section>
-        <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <motion.aside initial={{ opacity: 0, x: 28, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.42, ease: [0.22, 1, 0.36, 1] }} className="space-y-5">
+          <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26, duration: 0.34 }} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="font-black text-slate-950">Résumé demande</h2>
             <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
               <div className="flex justify-between"><span>Pays</span><b>{countryName}</b></div>
@@ -4109,12 +4322,12 @@ function VisaApplication() {
               <div className="flex justify-between"><span>Demandeurs</span><b>{applicants}</b></div>
               <div className="flex justify-between border-t border-slate-100 pt-4 text-blue-800"><span>Total</span><b>{formatCfa(studywayTotal)}</b></div>
             </div>
-          </section>
-          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
+          </motion.section>
+          <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34, duration: 0.34 }} className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
             <h2 className="font-black text-blue-950">Communication claire</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Les créneaux Capago vous seront envoyés après réservation du rendez-vous, car les disponibilités ne sont pas accessibles en temps réel.</p>
-          </section>
-        </aside>
+          </motion.section>
+        </motion.aside>
       </div>
     </div>
   )
@@ -5240,8 +5453,8 @@ function AdvisorContact() {
                           className={`aspect-square rounded-lg text-sm font-bold transition
                             ${selected ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : ''}
                             ${isToday && !selected ? 'border-2 border-blue-500 font-black text-blue-700' : ''}
-                            ${!disabled && !selected ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-700' : ''}
-                            ${disabled ? 'cursor-not-allowed text-slate-300' : 'cursor-pointer'}`}>
+                            ${!disabled && !selected ? 'font-black text-slate-950 opacity-100 hover:bg-blue-50 hover:text-blue-700' : ''}
+                            ${disabled ? 'cursor-not-allowed bg-slate-50 text-slate-600 opacity-100' : 'cursor-pointer'}`}>
                           {d.getDate()}
                         </button>
                       )

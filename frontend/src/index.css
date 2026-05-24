@@ -1000,29 +1000,74 @@ a:hover {
     0 12px 24px rgba(37, 99, 235, 0.085);
 }
 
-.housing-choice-arrow {
-  animation: housing-choice-arrow-pulse 1.8s ease-in-out infinite;
+.housing-choice-corner-arrow {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 3;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 1rem;
+  color: #ffffff;
+  box-shadow:
+    0 18px 34px rgba(15, 23, 42, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.housing-choice-card:hover .housing-choice-arrow {
+.housing-choice-corner-arrow::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  border-radius: 1.35rem;
+  border: 1px solid currentColor;
+  opacity: 0.22;
+}
+
+.housing-choice-corner-arrow-blue {
+  background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+}
+
+.housing-choice-corner-arrow-emerald {
+  background: linear-gradient(135deg, #059669, #34d399);
+}
+
+.housing-choice-card:hover .housing-choice-corner-arrow {
   animation: housing-choice-arrow-open 760ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.housing-choice-card:hover .housing-choice-corner-arrow::after {
+  animation: housing-choice-arrow-ring 760ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes housing-choice-arrow-pulse {
   0%, 100% {
-    transform: translateY(-50%) translateX(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translateY(-50%) translateX(4px) scale(1.08);
+    transform: translate3d(6px, 0, 0) scale(1.08);
   }
 }
 
 @keyframes housing-choice-arrow-open {
   0%, 100% {
-    transform: translateY(-50%) translateX(2px) rotate(0deg) scale(1.04);
+    transform: translate3d(3px, 0, 0) rotate(0deg) scale(1.04);
   }
   45% {
-    transform: translateY(-50%) translateX(10px) rotate(8deg) scale(1.14);
+    transform: translate3d(12px, 0, 0) rotate(8deg) scale(1.14);
+  }
+}
+
+@keyframes housing-choice-arrow-ring {
+  0%, 100% {
+    transform: scale(0.84);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0;
   }
 }
 
@@ -2344,11 +2389,18 @@ main textarea:focus {
 
 .airfrance-info {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 82px;
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 46px 0 44px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: clamp(48px, 8vw, 140px);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 54px clamp(28px, 7vw, 120px) 52px;
+  align-items: start;
+}
+
+.airfrance-help,
+.airfrance-security {
+  max-width: 760px;
 }
 
 .airfrance-info h2 {
@@ -2663,14 +2715,84 @@ main textarea:focus {
 }
 
 .typewriter-title {
-  width: 21ch;
+  width: var(--typewriter-width, 32ch);
+  max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   border-right: 3px solid #082f7a;
   animation:
-    typewriter 1.15s steps(21) both,
+    typewriter 1.2s steps(var(--typewriter-steps, 32)) both,
     caret-blink 720ms step-end 3,
     caret-hide 1ms linear 1.5s forwards;
+}
+
+.profile-tab-buttons {
+  gap: 0.35rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    0 14px 30px rgba(15, 23, 42, 0.07);
+}
+
+.profile-tab-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 118px;
+  justify-content: center;
+}
+
+.profile-tab-button-active {
+  background: linear-gradient(135deg, #0f3f9b, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24);
+}
+
+.personal-settings-page,
+.password-settings-page {
+  position: relative;
+}
+
+.personal-settings-page::before,
+.password-settings-page::before {
+  content: "";
+  position: absolute;
+  inset: -2rem -1rem auto;
+  height: 18rem;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 16% 32%, rgba(37, 99, 235, 0.12), transparent 18rem),
+    radial-gradient(circle at 84% 18%, rgba(16, 185, 129, 0.12), transparent 16rem);
+  z-index: -1;
+}
+
+.personal-settings-hero,
+.password-settings-hero {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+.personal-settings-hero img,
+.password-settings-hero img {
+  filter: saturate(1.08) contrast(1.02);
+  transform: scale(1.01);
+  animation: settings-hero-image-drift 9s ease-in-out infinite;
+}
+
+.personal-settings-page input,
+.password-settings-page input {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 22px rgba(15, 23, 42, 0.035);
+}
+
+@keyframes settings-hero-image-drift {
+  0%, 100% {
+    transform: scale(1.01) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.045) translate3d(-1.2%, -1%, 0);
+  }
 }
 
 .university-title {
@@ -3132,7 +3254,7 @@ main textarea:focus {
     width: 0;
   }
   to {
-    width: 21ch;
+    width: var(--typewriter-width, 32ch);
   }
 }
 
