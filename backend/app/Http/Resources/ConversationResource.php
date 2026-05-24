@@ -10,7 +10,8 @@ class ConversationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'              => $this->id,
+            'id'              => $this->uuid,
+            'db_id'           => $this->id,
             'type'            => $this->type,
             'title'           => $this->title,
             'last_message_at' => $this->last_message_at?->toDateTimeString(),

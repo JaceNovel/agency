@@ -1,0 +1,8 @@
+.DS_Store
+
+# Flutter / Dart (studyway_admin_app)
+studyway_admin_app/.dart_tool/
+studyway_admin_app/build/
+studyway_admin_app/.idea/
+studyway_admin_app/*.iml
+
