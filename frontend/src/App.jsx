@@ -1180,7 +1180,18 @@ function Dashboard() {
     'bg-blue-600 text-white',
     'bg-blue-600 text-white',
   ]
-  const offers = []
+  const offers = [
+    ['Résidence Paris 15', '295 000 FCFA/mois', 'Paris, France', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80', logos.parisSaclay],
+    ['Vol Lomé → Paris', '350 000 FCFA', '15 juin 2024', 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80', logos.airFrance],
+    ['Compte Étudiant', 'Gratuit', 'Ouverture 100% en ligne', 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=700&q=80', logos.societeGenerale],
+    ['Assurance Santé', '79 000 FCFA/an', 'Couverture complète', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=700&q=80', logos.orange],
+  ]
+  const partnerLogos = [
+    ['Partenaire', '/image.png'],
+    ['Ecobank', '/image copy.png'],
+    ['Wise', '/image copy 3.png'],
+    ['Ecobank', '/image copy 2.png'],
+  ]
 
   useEffect(() => {
     const timer = window.setInterval(() => setActiveSlide((slide) => (slide + 1) % heroSlides.length), 5000)
@@ -1255,24 +1266,14 @@ function Dashboard() {
 
         <section>
           <h2 className="mb-4 text-xl font-black">Offres recommandées pour vous</h2>
-          {!offers.length ? (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Aucune offre à afficher pour le moment.</div>
-          ) : (
-            <div className="grid gap-5 md:grid-cols-4">{offers.map(([title, price, location, image, logo], index) => <DashboardOffer key={title} title={title} price={price} location={location} image={image} logo={logo} index={index} />)}</div>
-          )}
+          <div className="grid gap-5 md:grid-cols-4">{offers.map(([title, price, location, image, logo], index) => <DashboardOffer key={title} title={title} price={price} location={location} image={image} logo={logo} index={index} />)}</div>
         </section>
 
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-black">Mon statut</h2>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black text-slate-600">À compléter</span>
-            </div>
-            <div className="text-sm font-semibold text-slate-600">Aucun dossier en cours pour le moment.</div>
-            <Link to="/accompagnement/demarrer" className="mt-5 inline-flex font-black text-blue-700">Démarrer une demande →</Link>
-          </section>
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d’examen</span><Link to="/documents" className="font-black text-blue-700">Voir détails</Link></div></section>
+          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">0 FCFA</div><Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Ajouter de l’argent</Link></section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>
             {[
@@ -1290,6 +1291,10 @@ function Dashboard() {
         </aside>
       </div>
 
+      <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm lg:-mr-8">
+        <h2 className="mb-7 text-2xl font-black">Ils nous font confiance</h2>
+        <div className="mx-auto grid max-w-4xl items-center gap-8 sm:grid-cols-2 lg:grid-cols-4">{partnerLogos.map(([name, src]) => <PartnerLogo key={`${name}-${src}`} name={name} src={src} />)}</div>
+      </section>
       {unavailableService && <UnavailableServiceModal service={unavailableService} onClose={() => setUnavailableService(null)} />}
     </div>
   )
@@ -3907,7 +3912,7 @@ function StartSupport() {
           <WalletCards className="text-amber-600" size={22} />
           <div>
             <div className="text-xs font-bold text-slate-500">Mon portefeuille</div>
-            <div className="text-lg font-black text-emerald-600">820 000 FCFA</div>
+            <div className="text-lg font-black text-emerald-600">0 FCFA</div>
           </div>
         </div>
       </div>
