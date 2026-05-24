@@ -18,6 +18,8 @@ import dashboardStudentHero from './assets/dashboard-african-student.png'
 import esimPhoneHero from './assets/esim-phone-hero.png'
 import financeHero from './assets/finance-student-hero.png'
 import parisPackBackground from './assets/paris-pack-background.png'
+import housingStudentHero from './assets/housing-student-hero.png'
+import transportTicketHero from './assets/transport-ticket-hero.png'
 import settingsPasswordHero from './assets/settings-password-hero.png'
 import settingsProfileHero from './assets/settings-profile-hero.png'
 
@@ -538,7 +540,7 @@ function AnimatedRoutes() {
       transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
     >
       <Routes location={location}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<HomeRoute />} />
         <Route path="/finance/:process" element={<FinanceProcess />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
@@ -575,6 +577,46 @@ function AnimatedRoutes() {
         <Route path="*" element={<Placeholder />} />
       </Routes>
     </motion.div>
+  )
+}
+
+function HomeRoute() {
+  const token = localStorage.getItem('studyway_token')
+  if (!token) return <PublicHome />
+  return <Dashboard />
+}
+
+function PublicHome() {
+  return (
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-lg border border-slate-200 bg-[#061b47] text-white shadow-sm">
+        <img src={dashboardStudentHero} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,27,71,.98)_0%,rgba(6,27,71,.88)_45%,rgba(6,27,71,.55)_75%,rgba(6,27,71,.25)_100%)]" />
+        <div className="relative z-10 max-w-3xl p-10">
+          <p className="text-sm font-black uppercase tracking-wide text-blue-200">StudyWay</p>
+          <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl">Tout votre parcours étudiant, au même endroit.</h1>
+          <p className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-blue-50">Universités, visa, logement, transport et accompagnement : créez un compte pour démarrer vos demandes et suivre votre dossier.</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/register" className="flex h-12 items-center justify-center rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-950/20">Créer un compte</Link>
+            <Link to="/login" className="flex h-12 items-center justify-center rounded-lg bg-white px-7 font-black text-blue-950">Se connecter</Link>
+            <Link to="/universites" className="flex h-12 items-center justify-center rounded-lg border border-white/20 bg-white/10 px-7 font-black text-white hover:bg-white/15">Explorer les formations</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {[
+          ['Universités', Building2, 'Explorez les formations Parcoursup depuis notre base importée.'],
+          ['Accompagnement', UserRound, 'Démarrez votre dossier et échangez avec nos conseillers.'],
+          ['Documents', FileText, 'Centralisez et suivez les documents demandés pour votre projet.'],
+        ].map(([title, Icon, text]) => (
+          <div key={title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={22} /></span><h2 className="text-lg font-black text-slate-950">{title}</h2></div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{text}</p>
+          </div>
+        ))}
+      </section>
+    </div>
   )
 }
 
@@ -1105,7 +1147,7 @@ function Dashboard() {
       rest: 'étudier dans la ville qui vous attend',
       title: 'Partez étudier dans la ville qui vous attend',
       text: 'Billets, logement, assurance et accompagnement réunis dans un seul espace fluide.',
-      image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85',
+      image: transportTicketHero,
       cta: 'Préparer mon départ',
       ctaTo: '/transport',
       tone: 'from-[#061b47]/95 via-[#1e3a8a]/65 to-transparent',
@@ -1115,7 +1157,7 @@ function Dashboard() {
       rest: 'sereinement dès votre arrivée',
       title: 'Installez-vous sereinement dès votre arrivée',
       text: 'Un conseiller, des services vérifiés, et des solutions pour chaque étape de votre projet.',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=85',
+      image: housingStudentHero,
       cta: 'Voir mes services',
       ctaTo: '/accompagnement',
       tone: 'from-[#061b47]/95 via-[#0f766e]/58 to-transparent',
@@ -1138,18 +1180,7 @@ function Dashboard() {
     'bg-blue-600 text-white',
     'bg-blue-600 text-white',
   ]
-  const offers = [
-    ['Résidence Paris 15', '295 000 FCFA/mois', 'Paris, France', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80', logos.parisSaclay],
-    ['Vol Lomé → Paris', '350 000 FCFA', '15 juin 2024', 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80', logos.airFrance],
-    ['Compte Étudiant', 'Gratuit', 'Ouverture 100% en ligne', 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=700&q=80', logos.societeGenerale],
-    ['Assurance Santé', '79 000 FCFA/an', 'Couverture complète', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=700&q=80', logos.orange],
-  ]
-  const partnerLogos = [
-    ['Partenaire', '/image.png'],
-    ['Ecobank', '/image copy.png'],
-    ['Wise', '/image copy 3.png'],
-    ['Ecobank', '/image copy 2.png'],
-  ]
+  const offers = []
 
   useEffect(() => {
     const timer = window.setInterval(() => setActiveSlide((slide) => (slide + 1) % heroSlides.length), 5000)
@@ -1224,14 +1255,24 @@ function Dashboard() {
 
         <section>
           <h2 className="mb-4 text-xl font-black">Offres recommandées pour vous</h2>
-          <div className="grid gap-5 md:grid-cols-4">{offers.map(([title, price, location, image, logo], index) => <DashboardOffer key={title} title={title} price={price} location={location} image={image} logo={logo} index={index} />)}</div>
+          {!offers.length ? (
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Aucune offre à afficher pour le moment.</div>
+          ) : (
+            <div className="grid gap-5 md:grid-cols-4">{offers.map(([title, price, location, image, logo], index) => <DashboardOffer key={title} title={title} price={price} location={location} image={image} logo={logo} index={index} />)}</div>
+          )}
         </section>
 
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d’examen</span><Link to="/documents" className="font-black text-blue-700">Voir détails</Link></div></section>
-          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Ajouter de l’argent</Link></section>
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-xl font-black">Mon statut</h2>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black text-slate-600">À compléter</span>
+            </div>
+            <div className="text-sm font-semibold text-slate-600">Aucun dossier en cours pour le moment.</div>
+            <Link to="/accompagnement/demarrer" className="mt-5 inline-flex font-black text-blue-700">Démarrer une demande →</Link>
+          </section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>
             {[
@@ -1246,14 +1287,9 @@ function Dashboard() {
               </Link>
             ))}
           </section>
-          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu’à <b className="text-amber-300">20 000 FCFA</b></p><Link to="/messages" className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-blue-600 px-5 font-black text-white">Parrainer maintenant <ArrowRight size={18} /></Link></section>
         </aside>
       </div>
 
-      <section className="-mr-5 rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm lg:-mr-8">
-        <h2 className="mb-7 text-2xl font-black">Ils nous font confiance</h2>
-        <div className="mx-auto grid max-w-4xl items-center gap-8 sm:grid-cols-2 lg:grid-cols-4">{partnerLogos.map(([name, src]) => <PartnerLogo key={`${name}-${src}`} name={name} src={src} />)}</div>
-      </section>
       {unavailableService && <UnavailableServiceModal service={unavailableService} onClose={() => setUnavailableService(null)} />}
     </div>
   )
@@ -2306,10 +2342,9 @@ function Universities() {
   useEffect(() => {
     setPerPage(12)
   }, [debouncedFilters])
-  const isFallback = Boolean(isError)
-  const formations = isFallback ? parcoursupFallbackFormations : (data?.data ?? [])
-  const totalResults = isFallback ? formations.length : (data?.meta?.total ?? formations.length)
-  const canShowMore = !isFallback && formations.length < totalResults
+  const formations = data?.data ?? []
+  const totalResults = data?.meta?.total ?? formations.length
+  const canShowMore = formations.length < totalResults
   const realStats = statsData?.data ?? {}
   const stats = [
     [Landmark, formatCompactNumber(realStats.formations ?? totalResults), 'Formations importées'],
@@ -2414,12 +2449,12 @@ function Universities() {
             <h2 className="text-2xl font-black text-slate-950">Formations disponibles</h2>
             <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${totalResults} résultats`}</span>
           </div>
-          {isFallback && (
+          {isError && (
             <div className="mb-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
-              Données de démonstration affichées : {error?.message || "impossible de joindre l’API Parcoursup."} Démarrez l’API Laravel pour charger les milliers de formations officielles.
+              {error?.message || "Impossible de charger les formations pour le moment. Réessayez plus tard."}
             </div>
           )}
-          {!isLoading && !isFallback && formations.length === 0 && (
+          {!isLoading && !isError && formations.length === 0 && (
             <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm font-semibold leading-6 text-slate-600">
               Aucun résultat pour ces filtres. Essayez une autre ville, domaine ou type de formation.
             </div>
@@ -2428,7 +2463,7 @@ function Universities() {
             {formations.map((formation, index) => <UniversityResultCard key={formation.id ?? formation.formation_id} formation={formation} index={index} />)}
           </div>
           <div className="mt-7 flex flex-col items-center gap-3">
-            {!isFallback && <div className="text-sm font-bold text-slate-500">Affichage de {formations.length} formations sur {totalResults}</div>}
+            <div className="text-sm font-bold text-slate-500">Affichage de {formations.length} formations sur {totalResults}</div>
             {canShowMore && (
               <motion.button
                 whileHover={{ y: -3, scale: 1.01 }}
@@ -2510,13 +2545,37 @@ function UniversityResultCard({ formation, index }) {
 
 function UniversityFormationDetail() {
   const { id } = useParams()
-  const { data } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['parcoursup-formation', id],
     queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
     staleTime: 1000 * 60 * 10,
     retry: 1,
   })
-  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
+  const formation = data?.data ?? null
+
+  if (isLoading) {
+    return <div className="rounded-lg border border-slate-200 bg-white p-8 text-sm font-semibold text-slate-600">Chargement…</div>
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+        <div className="rounded-lg border border-amber-100 bg-amber-50 p-6 text-sm font-semibold text-amber-800">
+          {error?.message || "Impossible de charger la formation."}
+        </div>
+      </div>
+    )
+  }
+
+  if (!formation) {
+    return (
+      <div className="space-y-6">
+        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Formation introuvable.</div>
+      </div>
+    )
+  }
   const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'Non communiqué'
   const capacity = formation.capacity ?? 'Non communiqué'
   const duration = formation.duration ?? 'Selon formation'
@@ -2684,13 +2743,37 @@ function UniversityDetailMetric({ icon: Icon, label, value }) {
 
 function UniversityApplication() {
   const { id } = useParams()
-  const { data } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['parcoursup-formation', id],
     queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
     staleTime: 1000 * 60 * 10,
     retry: 1,
   })
-  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
+  const formation = data?.data ?? null
+
+  if (isLoading) {
+    return <div className="rounded-lg border border-slate-200 bg-white p-8 text-sm font-semibold text-slate-600">Chargement…</div>
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+        <div className="rounded-lg border border-amber-100 bg-amber-50 p-6 text-sm font-semibold text-amber-800">
+          {error?.message || "Impossible de charger la formation."}
+        </div>
+      </div>
+    )
+  }
+
+  if (!formation) {
+    return (
+      <div className="space-y-6">
+        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Formation introuvable.</div>
+      </div>
+    )
+  }
   const formationId = formation.id ?? formation.formation_id
   const [submitted, setSubmitted] = useState(() => getStoredApplications().some((application) => String(application.formationId) === String(formationId)))
   const storedProfile = getStoredAcademicProfile()
@@ -3301,174 +3384,6 @@ function getFallbackCampusImage(formation) {
 
   return universityHero
 }
-
-const parcoursupFallbackFormations = [
-  {
-    id: 'demo-licence-info',
-    formation_id: 'demo-licence-info',
-    formation_name: 'Licence Informatique',
-    university_name: 'Université Paris Cité',
-    city: 'Paris',
-    region: 'Île-de-France',
-    country: 'France',
-    formation_type: 'Licence',
-    specialization: 'Informatique',
-    duration: '3 ans',
-    admission_rate: 62,
-    capacity: 180,
-    description: 'Formation universitaire en informatique pour construire des bases solides en algorithmique, développement, bases de données et mathématiques.',
-  },
-  {
-    id: 'demo-but-gea',
-    formation_id: 'demo-but-gea',
-    formation_name: 'BUT Gestion des entreprises et administrations',
-    university_name: 'IUT de Lyon',
-    city: 'Lyon',
-    region: 'Auvergne-Rhône-Alpes',
-    country: 'France',
-    formation_type: 'BUT',
-    specialization: 'Gestion',
-    duration: '3 ans',
-    admission_rate: 48,
-    capacity: 120,
-    description: 'Parcours professionnalisant pour préparer les étudiants à la gestion, la comptabilité, le management et l’administration.',
-  },
-  {
-    id: 'demo-bts-commerce',
-    formation_id: 'demo-bts-commerce',
-    formation_name: 'BTS Commerce international',
-    university_name: 'Lycée Jean Lurçat',
-    city: 'Paris',
-    region: 'Île-de-France',
-    country: 'France',
-    formation_type: 'BTS',
-    specialization: 'Commerce',
-    duration: '2 ans',
-    admission_rate: 55,
-    capacity: 35,
-    description: 'Formation courte orientée import-export, négociation internationale, logistique et relation client à l’étranger.',
-  },
-  {
-    id: 'demo-cpge-mpsi',
-    formation_id: 'demo-cpge-mpsi',
-    formation_name: 'CPGE MPSI',
-    university_name: 'Lycée Louis-le-Grand',
-    city: 'Paris',
-    region: 'Île-de-France',
-    country: 'France',
-    formation_type: 'CPGE',
-    specialization: 'Mathématiques',
-    duration: '2 ans',
-    admission_rate: 28,
-    capacity: 48,
-    description: 'Classe préparatoire scientifique exigeante pour préparer les concours d’écoles d’ingénieurs.',
-  },
-  {
-    id: 'demo-licence-droit',
-    formation_id: 'demo-licence-droit',
-    formation_name: 'Licence Droit',
-    university_name: 'Université de Bordeaux',
-    city: 'Bordeaux',
-    region: 'Nouvelle-Aquitaine',
-    country: 'France',
-    formation_type: 'Licence',
-    specialization: 'Droit',
-    duration: '3 ans',
-    admission_rate: 70,
-    capacity: 420,
-    description: 'Formation générale en droit privé, droit public, méthodologie juridique et institutions.',
-  },
-  {
-    id: 'demo-pass-sante',
-    formation_id: 'demo-pass-sante',
-    formation_name: 'PASS Santé',
-    university_name: 'Université de Montpellier',
-    city: 'Montpellier',
-    region: 'Occitanie',
-    country: 'France',
-    formation_type: 'PASS',
-    specialization: 'Santé',
-    duration: '1 an',
-    admission_rate: 34,
-    capacity: 620,
-    description: 'Parcours d’accès spécifique santé pour préparer médecine, pharmacie, odontologie, maïeutique ou kinésithérapie.',
-  },
-  {
-    id: 'demo-but-info',
-    formation_id: 'demo-but-info',
-    formation_name: 'BUT Informatique',
-    university_name: 'IUT de Lille',
-    city: 'Lille',
-    region: 'Hauts-de-France',
-    country: 'France',
-    formation_type: 'BUT',
-    specialization: 'Informatique',
-    duration: '3 ans',
-    admission_rate: 44,
-    capacity: 104,
-    description: 'Formation professionnalisante en développement logiciel, systèmes, bases de données et gestion de projet.',
-  },
-  {
-    id: 'demo-licence-eco',
-    formation_id: 'demo-licence-eco',
-    formation_name: 'Licence Économie et gestion',
-    university_name: 'Université Toulouse Capitole',
-    city: 'Toulouse',
-    region: 'Occitanie',
-    country: 'France',
-    formation_type: 'Licence',
-    specialization: 'Économie',
-    duration: '3 ans',
-    admission_rate: 66,
-    capacity: 300,
-    description: 'Parcours universitaire pour acquérir les bases en économie, gestion, statistiques et analyse financière.',
-  },
-  {
-    id: 'demo-bts-compta',
-    formation_id: 'demo-bts-compta',
-    formation_name: 'BTS Comptabilité et gestion',
-    university_name: 'Lycée La Martinière Duchère',
-    city: 'Lyon',
-    region: 'Auvergne-Rhône-Alpes',
-    country: 'France',
-    formation_type: 'BTS',
-    specialization: 'Comptabilité',
-    duration: '2 ans',
-    admission_rate: 58,
-    capacity: 32,
-    description: 'Formation courte orientée comptabilité, fiscalité, gestion financière et outils professionnels.',
-  },
-  {
-    id: 'demo-licence-arts',
-    formation_id: 'demo-licence-arts',
-    formation_name: 'Licence Arts plastiques',
-    university_name: 'Université Rennes 2',
-    city: 'Rennes',
-    region: 'Bretagne',
-    country: 'France',
-    formation_type: 'Licence',
-    specialization: 'Arts',
-    duration: '3 ans',
-    admission_rate: 61,
-    capacity: 95,
-    description: 'Formation en création artistique, histoire de l’art, pratiques plastiques et culture visuelle.',
-  },
-  {
-    id: 'demo-bts-electro',
-    formation_id: 'demo-bts-electro',
-    formation_name: 'BTS Électrotechnique',
-    university_name: 'Lycée Diderot',
-    city: 'Marseille',
-    region: 'Provence-Alpes-Côte d’Azur',
-    country: 'France',
-    formation_type: 'BTS',
-    specialization: 'Ingénierie',
-    duration: '2 ans',
-    admission_rate: 52,
-    capacity: 30,
-    description: 'Formation technique en énergie électrique, automatismes, maintenance et installations industrielles.',
-  },
-]
 
 function StudentGuides() {
   const [activeCategory, setActiveCategory] = useState('Orientation')
