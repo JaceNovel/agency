@@ -2,24 +2,22 @@ import axios from 'axios'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowLeftRight, ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, CircleDollarSign,
+  ArrowLeft, ArrowLeftRight, ArrowRight, Bell, Building2, CheckCircle2, ChevronDown, CircleDollarSign,
   ClipboardList, CreditCard, FileText, GraduationCap, Home, LayoutDashboard,
   Lock, Mail, MessageCircle, Plane, Search, Send, Settings,
-  ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin,
+  ShieldCheck, UserRound, Users, WalletCards, Globe2, Heart, MapPin, Gift,
   CalendarDays, Phone, Info, Upload, Smartphone, Bus,
   Train, Car, Star, Languages, Wifi, Landmark, Paperclip, Smile, CheckCheck,
   X, Video, SlidersHorizontal, LogOut, Camera, Plus, Trash2, Clock3, AlertTriangle, Download, Award,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import universityHero from './assets/university-student-hero.png'
 import supportHero from './assets/support-student-hero.png'
 import dashboardStudentHero from './assets/dashboard-african-student.png'
 import esimPhoneHero from './assets/esim-phone-hero.png'
 import financeHero from './assets/finance-student-hero.png'
 import parisPackBackground from './assets/paris-pack-background.png'
-import housingStudentHero from './assets/housing-student-hero.png'
-import transportTicketHero from './assets/transport-ticket-hero.png'
 import settingsPasswordHero from './assets/settings-password-hero.png'
 import settingsProfileHero from './assets/settings-profile-hero.png'
 
@@ -89,7 +87,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
-          <Route path="/account" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="/*" element={<Shell />} />
         </Routes>
       </BrowserRouter>
@@ -113,65 +111,8 @@ function Logo({ compact = false }) {
   )
 }
 
-function RequireAuth({ children }) {
-  const location = useLocation()
-  const token = localStorage.getItem('studyway_token')
-
-  if (!token) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />
-  }
-
-  return children
-}
-
 function AuthPage({ mode }) {
   const isRegister = mode === 'register'
-  const navigate = useNavigate()
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    passwordConfirmation: '',
-    role: 'STUDENT',
-  })
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  async function submitAuth(event) {
-    event.preventDefault()
-    setError('')
-    setIsSubmitting(true)
-
-    try {
-      const payload = isRegister
-        ? {
-          name: `${form.firstName} ${form.lastName}`.trim(),
-          email: form.email,
-          phone: form.phone,
-          role: form.role,
-          password: form.password,
-          password_confirmation: form.passwordConfirmation,
-          device_name: 'StudyWay Web',
-        }
-        : {
-          email: form.email,
-          password: form.password,
-          device_name: 'StudyWay Web',
-        }
-      const response = await postJson(`/api/v1/auth/${isRegister ? 'register' : 'login'}`, payload)
-      if (response.token) {
-        localStorage.setItem('studyway_token', response.token)
-      }
-      navigate('/')
-    } catch (authError) {
-      setError(authError.message)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   return (
     <main className="grid min-h-screen grid-cols-1 bg-slate-50 lg:grid-cols-[0.9fr_1.25fr_0.8fr]">
       <section className="relative hidden overflow-hidden bg-[#06245a] p-10 text-white lg:block">
@@ -200,31 +141,14 @@ function AuthPage({ mode }) {
             <h2 className="text-4xl font-black tracking-tight text-slate-950">{isRegister ? 'Créer un compte' : 'Bienvenue de retour !'}</h2>
             <p className="mt-3 text-slate-500">{isRegister ? "Rejoignez StudyWay et lancez votre projet d’études à l’étranger" : 'Connectez-vous à votre compte StudyWay'}</p>
           </div>
-          <form onSubmit={submitAuth} className="rounded-lg border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/70">
-            {isRegister && (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field icon={UserRound} label="Prénom" placeholder="Votre prénom" value={form.firstName} onChange={(value) => setForm((current) => ({ ...current, firstName: value }))} />
-                <Field icon={UserRound} label="Nom" placeholder="Votre nom" value={form.lastName} onChange={(value) => setForm((current) => ({ ...current, lastName: value }))} />
-              </div>
-            )}
-            <Field icon={Mail} label="Adresse email" placeholder="votre@email.com" type="email" value={form.email} onChange={(value) => setForm((current) => ({ ...current, email: value }))} />
-            {isRegister && <Field icon={UserRound} label="Numéro de téléphone" placeholder="+228 90 12 34 56" value={form.phone} onChange={(value) => setForm((current) => ({ ...current, phone: value }))} />}
-            <Field icon={Lock} label="Mot de passe" placeholder={isRegister ? 'Creez un mot de passe' : 'Votre mot de passe'} type="password" value={form.password} onChange={(value) => setForm((current) => ({ ...current, password: value }))} />
-            {isRegister && <Field icon={Lock} label="Confirmer le mot de passe" placeholder="Confirmez votre mot de passe" type="password" value={form.passwordConfirmation} onChange={(value) => setForm((current) => ({ ...current, passwordConfirmation: value }))} />}
-            {isRegister && (
-              <label className="mt-4 block text-sm font-bold text-slate-700">
-                Vous êtes...
-                <select value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))} className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-600 outline-none focus:border-blue-500">
-                  <option value="STUDENT">Étudiant</option>
-                  <option value="PARENT">Parent / Tuteur</option>
-                  <option value="SCHOOL_PARTNER">École partenaire</option>
-                </select>
-              </label>
-            )}
-            {error && <div className="mt-5 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{error}</div>}
-            <button type="submit" disabled={isSubmitting} className="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 font-bold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 disabled:bg-slate-300 disabled:shadow-none">
-              {isSubmitting ? 'Connexion...' : isRegister ? 'Créer mon compte' : 'Se connecter'} <ArrowRight size={18} />
-            </button>
+          <form className="rounded-lg border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/70">
+            {isRegister && <div className="grid gap-4 sm:grid-cols-2"><Field icon={UserRound} label="Prénom" placeholder="Votre prénom" /><Field icon={UserRound} label="Nom" placeholder="Votre nom" /></div>}
+            <Field icon={Mail} label="Adresse email" placeholder="votre@email.com" />
+            {isRegister && <Field icon={UserRound} label="Numéro de téléphone" placeholder="+228 90 12 34 56" />}
+            <Field icon={Lock} label="Mot de passe" placeholder={isRegister ? 'Creez un mot de passe' : 'Votre mot de passe'} type="password" />
+            {isRegister && <Field icon={Lock} label="Confirmer le mot de passe" placeholder="Confirmez votre mot de passe" type="password" />}
+            {isRegister && <label className="mt-4 block text-sm font-bold text-slate-700">Vous êtes...<select className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-600 outline-none focus:border-blue-500"><option>Étudiant</option><option>Parent / Tuteur</option><option>École partenaire</option></select></label>}
+            <button type="button" className="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 font-bold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700">{isRegister ? 'Créer mon compte' : 'Se connecter'} <ArrowRight size={18} /></button>
             <div className="mt-6 text-center text-sm text-slate-500">{isRegister ? 'Vous avez déjà un compte ? ' : "Vous n’avez pas de compte ? "}<Link className="font-bold text-blue-600" to={isRegister ? '/login' : '/register'}>{isRegister ? 'Se connecter' : 'Créer un compte'}</Link></div>
           </form>
         </motion.div>
@@ -241,8 +165,8 @@ function AuthPage({ mode }) {
   )
 }
 
-function Field({ icon: Icon, label, placeholder, type = 'text', value, onChange }) {
-  return <label className="mt-4 block text-sm font-bold text-slate-700">{label}<span className="mt-2 flex h-12 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-400 focus-within:border-blue-500"><Icon size={18} /><input type={type} value={value} onChange={(event) => onChange?.(event.target.value)} placeholder={placeholder} className="w-full border-none bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400" /></span></label>
+function Field({ icon: Icon, label, placeholder, type = 'text' }) {
+  return <label className="mt-4 block text-sm font-bold text-slate-700">{label}<span className="mt-2 flex h-12 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-400 focus-within:border-blue-500"><Icon size={18} /><input type={type} placeholder={placeholder} className="w-full border-none bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400" /></span></label>
 }
 
 function InfoCard({ icon: Icon, title, text }) {
@@ -250,27 +174,24 @@ function InfoCard({ icon: Icon, title, text }) {
 }
 
 function AccountPage() {
-  const token = localStorage.getItem('studyway_token')
-  const meQuery = useQuery({
-    queryKey: ['auth-me'],
-    queryFn: () => fetchJson('/api/v1/auth/me'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-  const me = meQuery.data?.data ?? meQuery.data?.user ?? meQuery.data ?? null
-  const dashboardQuery = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => fetchJson('/api/v1/dashboard'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 30,
-    retry: 1,
-  })
-  const dashboard = dashboardQuery.data ?? {}
-  const stats = dashboard.stats ?? {}
-  const timeline = Array.isArray(dashboard.timeline) ? dashboard.timeline : []
-  const recentPayments = Array.isArray(dashboard.recent_payments) ? dashboard.recent_payments : []
-
+  const overview = [
+    [WalletCards, 'Paiements totaux', '1 607 000 FCFA', 'Ce mois-ci', 'bg-blue-50 text-blue-700'],
+    [CheckCircle2, 'Paiements effectués', '1 378 000 FCFA', 'Ce mois-ci', 'bg-emerald-50 text-emerald-700'],
+    [CalendarDays, 'Paiements à venir', '230 000 FCFA', 'Ce mois-ci', 'bg-amber-50 text-amber-700'],
+    [FileText, 'Documents', '12', 'Total', 'bg-violet-50 text-violet-700'],
+  ]
+  const services = [
+    [Home, 'Logement', 'Résidence Les Estudines, Paris', 'Actif', "Loyer payé jusqu’au 31 mai 2025", 'bg-blue-50 text-blue-700', '/logement'],
+    [GraduationCap, 'Université', 'Licence Informatique - L1', 'Inscrit', 'Année académique 2024-2025', 'bg-blue-50 text-blue-700', '/universites'],
+    [Landmark, 'Compte bancaire', 'Compte ouvert - Boursorama', 'Actif', 'Compte vérifié', 'bg-violet-50 text-violet-700', '/finance'],
+    [ShieldCheck, 'Assurance', 'Assurance habitation', 'Actif', 'Valide jusqu au 12/09/2025', 'bg-emerald-50 text-emerald-700', '/finance/assurance'],
+    [Smartphone, 'Forfait mobile (eSIM)', 'Orange 50Go', 'Actif', 'Expire le 12/06/2025', 'bg-amber-50 text-amber-700', '/esim'],
+  ]
+  const activities = [
+    [CheckCircle2, 'Paiement loyer', 'Mai 2025', '10 mai 2025', '- 361 000 FCFA', 'text-emerald-600'],
+    [FileText, 'Document ajouté', 'Attestation de scolarité', '8 mai 2025', '', 'text-blue-600'],
+    [Landmark, 'Paiement université', "Frais d’inscription", '5 mai 2025', '- 984 000 FCFA', 'text-violet-600'],
+  ]
   const actions = [
     [WalletCards, 'Effectuer un paiement', "Payer le loyer, l’université, etc.", 'text-amber-600', '/finance/transfert'],
     [CreditCard, "Envoyer de l’argent", "Recharger le portefeuille de votre enfant", 'text-blue-600', '/finance/transfert'],
@@ -285,93 +206,43 @@ function AccountPage() {
         <div><div className="text-2xl font-black">Study<span className="text-blue-700">Way</span></div><div className="text-xs font-semibold text-slate-500">Retour accueil</div></div>
       </Link>
       <div className="mx-auto grid max-w-[1500px] gap-6 xl:grid-cols-[1fr_430px]">
-	        <div className="space-y-6">
-	          <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
-	            <div className="grid gap-6 lg:grid-cols-[170px_1fr_260px]">
-	              <div>
-	                <h2 className="mb-6 text-xl font-black">Mon profil</h2>
-	                {me?.avatar_url ? (
-	                  <img src={me.avatar_url} alt={me?.name || 'Utilisateur'} className="h-32 w-32 rounded-full object-cover" />
-	                ) : (
-	                  <div className="grid h-32 w-32 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400">
-	                    <UserRound size={44} />
-	                  </div>
-	                )}
-	              </div>
-	              <div className="pt-14">
-	                {!token && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold text-amber-800">Connectez-vous pour afficher votre profil.</div>}
-	                {token && meQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	                {token && meQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{meQuery.error?.message || 'Impossible de charger le profil.'}</div>}
-	                {token && !meQuery.isLoading && !meQuery.isError && (
-	                  <>
-	                    <h1 className="text-2xl font-black">{me?.name || 'Compte'} <span className="ml-3 rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">{me?.status || 'Actif'}</span></h1>
-	                    <div className="mt-5 grid gap-4 text-sm md:grid-cols-[150px_1fr]">
-	                      <span className="text-slate-500">Email</span><b>{me?.email || '—'}</b>
-	                      <span className="text-slate-500">Téléphone</span><b>{me?.phone || '—'}</b>
-	                      <span className="text-slate-500">Pays</span><b>{me?.country || '—'}</b>
-	                    </div>
-	                  </>
-	                )}
-	              </div>
-	              <div className="space-y-6 pt-4">
-	                <Link to="/profil" className="flex h-12 w-full items-center justify-center rounded-lg border border-blue-700 font-black text-blue-800">Voir le profil complet</Link>
-	                <Link to="/settings/profile" className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><Lock size={17} />Gerer l’acces</Link>
-	              </div>
-	            </div>
-	          </motion.section>
+        <div className="space-y-6">
+          <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+            <div className="grid gap-6 lg:grid-cols-[170px_1fr_260px]">
+              <div><h2 className="mb-6 text-xl font-black">Mon enfant</h2><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /></div>
+              <div className="pt-14">
+                <h1 className="text-2xl font-black">Koffi M. Lucas <span className="ml-3 rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1>
+                <div className="mt-5 grid gap-4 text-sm md:grid-cols-[150px_1fr]"><span className="text-slate-500">ID Étudiant</span><b>EDU-582941</b><span className="text-slate-500">Email</span><b>lucas.koffi@email.com</b><span className="text-slate-500">Université</span><b>Université Paris-Saclay</b><span className="text-slate-500">Statut actuel</span><b className="w-fit rounded-lg bg-blue-50 px-3 py-1 text-blue-700">Étudiant</b></div>
+              </div>
+              <div className="space-y-6 pt-4">
+                <Link to="/profil" className="flex h-12 w-full items-center justify-center rounded-lg border border-blue-700 font-black text-blue-800">Voir le profil complet</Link>
+                <div className="text-sm text-slate-500">Derniere connexion<br /><b className="mt-1 block text-base text-slate-900">12 mai 2025 a 14:32</b></div>
+                <div className="text-sm text-slate-500">Compte lie le<br /><b className="mt-1 block text-base text-slate-900">10 mars 2025</b></div>
+                <Link to="/settings/profile" className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800"><Lock size={17} />Gerer l’acces</Link>
+              </div>
+            </div>
+          </motion.section>
 
-	          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
-	            <h2 className="text-xl font-black">Vue d’ensemble</h2>
-	            {!token && <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour afficher les statistiques.</div>}
-	            {token && dashboardQuery.isLoading && <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	            {token && dashboardQuery.isError && <div className="mt-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{dashboardQuery.error?.message || 'Impossible de charger le dashboard.'}</div>}
-	            {token && !dashboardQuery.isLoading && !dashboardQuery.isError && (
-	              <div className="mt-7 grid gap-4 md:grid-cols-4">
-	                <StatCard icon={FileText} label="Dossiers" value={String(stats.dossiers ?? 0)} tone="purple" />
-	                <StatCard icon={CheckCircle2} label="Documents approuvés" value={String(stats.approved ?? 0)} tone="green" />
-	                <StatCard icon={FileText} label="Documents en attente" value={String(stats.pending ?? 0)} tone="amber" />
-	                <StatCard icon={Building2} label="Universités" value={String(stats.universities ?? 0)} tone="blue" />
-	              </div>
-	            )}
-	          </section>
+          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
+            <h2 className="text-xl font-black">Vue d’ensemble</h2>
+            <div className="mt-7 grid gap-5 md:grid-cols-4">
+              {overview.map(([Icon, label, value, sub, tone]) => <div key={label} className={`flex items-center gap-4 rounded-lg p-5 ${tone}`}><Icon size={34} /><div><div className="text-sm font-bold text-slate-700">{label}</div><div className="text-2xl font-black text-slate-950">{value}</div><div className="text-sm font-medium text-slate-500">{sub}</div></div></div>)}
+            </div>
+          </section>
 
-	          <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
-	            <h2 className="border-b border-slate-100 p-6 text-xl font-black">Prochaines étapes</h2>
-	            <div className="px-6 py-6">
-	              {!token && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour afficher votre suivi.</div>}
-	              {token && dashboardQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	              {token && dashboardQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{dashboardQuery.error?.message || 'Impossible de charger le suivi.'}</div>}
-	              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && timeline.length === 0 && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucune étape planifiée pour le moment.</div>}
-	              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && timeline.length > 0 && <List items={timeline.slice(0, 6).map((item) => `${item.title} · ${item.date}`)} />}
-	            </div>
-	          </section>
-	        </div>
+          <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+            <h2 className="border-b border-slate-100 p-6 text-xl font-black">Suivi des services</h2>
+            <div className="divide-y divide-slate-100 px-6">
+              {services.map(([Icon, title, sub, status, detail, tone, to]) => <div key={title} className="grid items-center gap-4 py-5 lg:grid-cols-[1fr_120px_1fr_130px]"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-lg ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm text-slate-500">{sub}</div></div></div><span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">{status}</span><span className="text-sm font-medium text-slate-500">{detail}</span><Link to={to} className="flex h-10 items-center justify-center rounded-lg border border-slate-200 font-black text-blue-800">Voir détails</Link></div>)}
+            </div>
+          </section>
+        </div>
 
-	        <aside className="space-y-6">
-	          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
-	            <h2 className="mb-4 text-xl font-black">Dernières activités</h2>
-	            {!token && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour afficher les activités.</div>}
-	            {token && dashboardQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	            {token && dashboardQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{dashboardQuery.error?.message || 'Impossible de charger les activités.'}</div>}
-	            {token && !dashboardQuery.isLoading && !dashboardQuery.isError && recentPayments.length === 0 && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucune activité récente.</div>}
-	            {token && !dashboardQuery.isLoading && !dashboardQuery.isError && recentPayments.length > 0 && (
-	              <div className="divide-y divide-slate-100">
-	                {recentPayments.slice(0, 5).map((p) => {
-	                  const label = p.description || p.label || 'Paiement'
-	                  const amount = p.amount != null ? `${Number(p.amount).toLocaleString('fr-FR')} ${p.currency || ''}`.trim() : ''
-	                  const status = p.status || p.payment_status || ''
-	                  const line = [label, amount, status].filter(Boolean).join(' · ')
-	                  return (
-	                    <div key={p.uuid || p.id || `${label}-${amount}`} className="py-4 text-sm font-bold text-slate-700">{line}</div>
-	                  )
-	                })}
-	              </div>
-	            )}
-	            <Link to="/messages" className="mt-4 flex w-full justify-center font-black text-blue-800">Voir toutes les activités</Link>
-	          </section>
-	          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-5 text-xl font-black">Actions rapides</h2>{actions.map(([Icon, title, sub, tone, to]) => <Link key={title} to={to} className="flex gap-4 py-4 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition"><div className={`grid h-11 w-11 place-items-center rounded-lg bg-slate-50 ${tone}`}><Icon size={22} /></div><div><b>{title}</b><p className="text-sm text-slate-500">{sub}</p></div></Link>)}</section>
-	          <section className="rounded-lg border border-blue-100 bg-blue-50 p-7 shadow-sm"><h2 className="text-lg font-black text-blue-950">Besoin d’aide ?</h2><p className="mt-2 text-sm leading-6 text-blue-900">Notre équipe est disponible 24/7 pour vous accompagner.</p><Link to="/messages" className="mt-5 flex h-12 items-center justify-center gap-3 rounded-lg bg-white px-6 font-black text-blue-800"><MessageCircle size={18} />Contacter le support</Link></section>
-	        </aside>
+        <aside className="space-y-6">
+          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-4 text-xl font-black">Dernières activités</h2>{activities.map(([Icon, title, sub, date, amount, tone]) => <div key={title} className="flex items-center justify-between border-b border-slate-100 py-5 last:border-0"><div className="flex items-center gap-4"><div className={`grid h-12 w-12 place-items-center rounded-full bg-slate-50 ${tone}`}><Icon size={24} /></div><div><b>{title}</b><div className="text-sm">{sub}</div><div className="text-sm text-slate-500">{date}</div></div></div><b className={tone}>{amount}</b></div>)}<Link to="/messages" className="mt-4 flex w-full justify-center font-black text-blue-800">Voir toutes les activités</Link></section>
+          <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><h2 className="mb-5 text-xl font-black">Actions rapides</h2>{actions.map(([Icon, title, sub, tone, to]) => <Link key={title} to={to} className="flex gap-4 py-4 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition"><div className={`grid h-11 w-11 place-items-center rounded-lg bg-slate-50 ${tone}`}><Icon size={22} /></div><div><b>{title}</b><p className="text-sm text-slate-500">{sub}</p></div></Link>)}</section>
+          <section className="rounded-lg border border-blue-100 bg-blue-50 p-7 shadow-sm"><h2 className="text-lg font-black text-blue-950">Besoin d’aide ?</h2><p className="mt-2 text-sm leading-6 text-blue-900">Notre équipe est disponible 24/7 pour vous accompagner.</p><Link to="/messages" className="mt-5 flex h-12 items-center justify-center gap-3 rounded-lg bg-white px-6 font-black text-blue-800"><MessageCircle size={18} />Contacter le support</Link></section>
+        </aside>
       </div>
     </main>
   )
@@ -383,25 +254,10 @@ function Shell() {
   const [sidebarHover, setSidebarHover] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const token = localStorage.getItem('studyway_token')
-  const meQuery = useQuery({
-    queryKey: ['auth-me'],
-    queryFn: () => fetchJson('/api/v1/auth/me'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-  const me = meQuery.data?.data ?? meQuery.data?.user ?? meQuery.data ?? null
   const isSettingsPage = location.pathname.startsWith('/parametres') || location.pathname.startsWith('/settings')
   const isSettingsRoute = location.pathname.startsWith('/settings')
   const sidebarOpen = sidebarHover
-  const publicNavItems = [
-    { label: 'Accueil', icon: LayoutDashboard, to: '/' },
-    { label: 'Universités', icon: Building2, to: '/universites' },
-    { label: 'Guides', icon: FileText, to: '/guides' },
-  ]
-  const effectiveNavItems = token ? navItems : publicNavItems
-  const activeNavIndex = effectiveNavItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
+  const activeNavIndex = navItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
 
   if (isSettingsPage) {
     return (
@@ -447,7 +303,7 @@ function Shell() {
             </div>
           </div>
           <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
-            {effectiveNavItems.map(({ label, icon: Icon, to, badge }, index) => {
+            {navItems.map(({ label, icon: Icon, to, badge }, index) => {
               const isActive = index === activeNavIndex
               return (
                 <NavLink key={label} to={to} className={`shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold ${isActive ? 'is-active' : 'text-blue-50'}`}>
@@ -471,62 +327,29 @@ function Shell() {
           <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
             <div className="font-black">Besoin d’aide ?</div>
             <p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p>
-            {token ? (
-              <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Messages</span></Link>
-            ) : (
-              <div className="mt-4 grid gap-2">
-                <Link to="/login" className="message-menu-button flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-white text-sm font-black text-blue-800"><span>Connexion</span></Link>
-                <Link to="/register" className="message-menu-button flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-black text-white"><span>Inscription</span></Link>
-              </div>
-            )}
+            <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Message</span><span className="message-menu-badge">3</span></Link>
           </div>
         </div>
       </aside>
-	      <div className={`shell-content ${sidebarOpen ? 'is-compressed' : ''}`}>
-	        <header className="sticky top-0 z-30 grid h-20 grid-cols-[1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
-	          <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
-	          <div className="flex items-center gap-4">
-	            <div className="relative">
-	              <button type="button" onClick={() => setLanguageOpen((value) => !value)} className="flex h-10 items-center gap-1 rounded-lg px-2 text-blue-950 hover:bg-slate-100" aria-label="Changer de langue"><Globe2 size={22} /><ChevronDown size={15} /></button>
-	              {languageOpen && (
-	                <motion.div initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="absolute right-0 top-12 z-50 w-48 rounded-lg border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200">
-	                  {['Français', 'English', 'Español', 'Deutsch'].map((language) => <button key={language} className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"><Languages size={17} />{language}</button>)}
-	                </motion.div>
-	              )}
-	            </div>
-	            {token ? (
-	              <>
-	                <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications">
-	                  <Bell className="notification-bell" />
-	                </button>
-		                <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100">
-		                  {me?.avatar_url ? (
-		                    <img src={me.avatar_url} alt={me?.name || 'Mon compte'} className="h-11 w-11 rounded-full object-cover" />
-		                  ) : (
-		                    <span className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-400">
-		                      <UserRound size={18} />
-		                    </span>
-		                  )}
-		                  <div className="hidden sm:block">
-		                    <div className="font-black">{meQuery.isLoading ? 'Chargement…' : (me?.name || 'Mon compte')}</div>
-		                    <div className="text-sm text-slate-500">Compte</div>
-		                  </div>
-	                  <ChevronDown size={18} />
-	                </Link>
-	              </>
-	            ) : (
-	              <div className="flex items-center gap-2">
-	                <Link to="/login" className="flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-black text-slate-800 hover:bg-slate-50">Connexion</Link>
-	                <Link to="/register" className="flex h-11 items-center justify-center rounded-lg bg-blue-700 px-5 text-sm font-black text-white shadow-sm hover:bg-blue-800">Inscription</Link>
-	              </div>
-	            )}
-	            {token && (
-	              <div className="relative z-50">
-	                <button type="button" onClick={() => navigate('/settings/profile')} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
-	              </div>
-	            )}
-	          </div>
-	        </header>
+      <div className={`shell-content ${sidebarOpen ? 'is-compressed' : ''}`}>
+        <header className="sticky top-0 z-30 grid h-20 grid-cols-[1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
+          <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <button type="button" onClick={() => setLanguageOpen((value) => !value)} className="flex h-10 items-center gap-1 rounded-lg px-2 text-blue-950 hover:bg-slate-100" aria-label="Changer de langue"><Globe2 size={22} /><ChevronDown size={15} /></button>
+              {languageOpen && (
+                <motion.div initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="absolute right-0 top-12 z-50 w-48 rounded-lg border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200">
+                  {['Français', 'English', 'Español', 'Deutsch'].map((language) => <button key={language} className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"><Languages size={17} />{language}</button>)}
+                </motion.div>
+              )}
+            </div>
+            <button className="notification-button relative rounded-lg p-2 hover:bg-slate-100" aria-label="Notifications"><Bell className="notification-bell" /><span className="notification-badge absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">3</span></button>
+            <Link to="/account" className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-slate-100"><img src={avatars.christelle} alt="Christelle Komi" className="h-11 w-11 rounded-full object-cover" /><div className="hidden sm:block"><div className="font-black">Christelle Komi</div><div className="text-sm text-slate-500">Étudiante</div></div><ChevronDown size={18} /></Link>
+            <div className="relative z-50">
+              <button type="button" onClick={() => navigate('/settings/profile')} className={`grid h-11 w-11 place-items-center rounded-lg text-blue-950 hover:bg-slate-100 ${isSettingsRoute ? 'bg-blue-50 text-blue-700 shadow-inner shadow-blue-100' : ''}`} aria-label="Paramètres"><Settings size={22} /></button>
+            </div>
+          </div>
+        </header>
         <main className="p-5 lg:p-8"><AnimatedRoutes /></main>
       </div>
     </div>
@@ -549,83 +372,43 @@ function AnimatedRoutes() {
       transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
     >
       <Routes location={location}>
-        <Route path="/" element={<HomeRoute />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/finance/:process" element={<FinanceProcess />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/logement" element={<Housing />} />
         <Route path="/universites" element={<Universities />} />
         <Route path="/universites/:id/postuler" element={<UniversityApplication />} />
         <Route path="/universites/:id" element={<UniversityFormationDetail />} />
-        <Route path="/documents" element={<RequireAuth><StudentRequests /></RequireAuth>} />
+        <Route path="/documents" element={<StudentRequests />} />
         <Route path="/guides/:slug" element={<StudentGuideDetail />} />
         <Route path="/guides" element={<StudentGuides />} />
-        <Route path="/profil" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/parametres" element={<RequireAuth><ProfileSettings /></RequireAuth>} />
-        <Route path="/parametres/informations" element={<RequireAuth><PersonalInformationSettings /></RequireAuth>} />
-        <Route path="/parametres/mot-de-passe" element={<RequireAuth><PasswordSettings /></RequireAuth>} />
-        <Route path="/parametres/facturation" element={<RequireAuth><BillingSettings /></RequireAuth>} />
-        <Route path="/parametres/paiement" element={<RequireAuth><PaymentSettings /></RequireAuth>} />
-        <Route path="/parametres/connexions" element={<RequireAuth><LoginHistorySettings /></RequireAuth>} />
-        <Route path="/settings/profile" element={<RequireAuth><ProfileSettings /></RequireAuth>} />
-        <Route path="/settings/personal-info" element={<RequireAuth><PersonalInformationSettings /></RequireAuth>} />
-        <Route path="/settings/password" element={<RequireAuth><PasswordSettings /></RequireAuth>} />
-        <Route path="/settings/billing" element={<RequireAuth><BillingSettings /></RequireAuth>} />
-        <Route path="/settings/payment-methods" element={<RequireAuth><PaymentSettings /></RequireAuth>} />
-        <Route path="/settings/login-history" element={<RequireAuth><LoginHistorySettings /></RequireAuth>} />
-        <Route path="/accompagnement/demarrer" element={<RequireAuth><StartSupport /></RequireAuth>} />
+        <Route path="/profil" element={<Profile />} />
+        <Route path="/parametres" element={<ProfileSettings />} />
+        <Route path="/parametres/informations" element={<PersonalInformationSettings />} />
+        <Route path="/parametres/mot-de-passe" element={<PasswordSettings />} />
+        <Route path="/parametres/facturation" element={<BillingSettings />} />
+        <Route path="/parametres/paiement" element={<PaymentSettings />} />
+        <Route path="/parametres/connexions" element={<LoginHistorySettings />} />
+        <Route path="/settings/profile" element={<ProfileSettings />} />
+        <Route path="/settings/personal-info" element={<PersonalInformationSettings />} />
+        <Route path="/settings/password" element={<PasswordSettings />} />
+        <Route path="/settings/billing" element={<BillingSettings />} />
+        <Route path="/settings/payment-methods" element={<PaymentSettings />} />
+        <Route path="/settings/login-history" element={<LoginHistorySettings />} />
+        <Route path="/accompagnement/demarrer" element={<StartSupport />} />
         <Route path="/accompagnement" element={<SupportJourney />} />
-        <Route path="/visa/:country/:type/demande" element={<RequireAuth><VisaApplication /></RequireAuth>} />
+        <Route path="/visa/:country/:type/demande" element={<VisaApplication />} />
         <Route path="/visa/:country/:type" element={<Visa />} />
         <Route path="/visa" element={<Visa />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/voyage" element={<Transport />} />
         <Route path="/esim" element={<Esim />} />
         <Route path="/contact/conseiller" element={<AdvisorContact />} />
-        <Route path="/contact/email" element={<RequireAuth><EmailContact /></RequireAuth>} />
-        <Route path="/messages" element={<RequireAuth><Messages /></RequireAuth>} />
+        <Route path="/contact/email" element={<EmailContact />} />
+        <Route path="/messages" element={<Messages />} />
         <Route path="*" element={<Placeholder />} />
       </Routes>
     </motion.div>
-  )
-}
-
-function HomeRoute() {
-  const token = localStorage.getItem('studyway_token')
-  if (!token) return <PublicHome />
-  return <Dashboard />
-}
-
-function PublicHome() {
-  return (
-    <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-lg border border-slate-200 bg-[#061b47] text-white shadow-sm">
-        <img src={dashboardStudentHero} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,27,71,.98)_0%,rgba(6,27,71,.88)_45%,rgba(6,27,71,.55)_75%,rgba(6,27,71,.25)_100%)]" />
-        <div className="relative z-10 max-w-3xl p-10">
-          <p className="text-sm font-black uppercase tracking-wide text-blue-200">StudyWay</p>
-          <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl">Tout votre parcours étudiant, au même endroit.</h1>
-          <p className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-blue-50">Universités, visa, logement, transport et accompagnement : créez un compte pour démarrer vos demandes et suivre votre dossier.</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/register" className="flex h-12 items-center justify-center rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-950/20">Créer un compte</Link>
-            <Link to="/login" className="flex h-12 items-center justify-center rounded-lg bg-white px-7 font-black text-blue-950">Se connecter</Link>
-            <Link to="/universites" className="flex h-12 items-center justify-center rounded-lg border border-white/20 bg-white/10 px-7 font-black text-white hover:bg-white/15">Explorer les formations</Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {[
-          ['Universités', Building2, 'Explorez les formations Parcoursup depuis notre base importée.'],
-          ['Accompagnement', UserRound, 'Démarrez votre dossier et échangez avec nos conseillers.'],
-          ['Documents', FileText, 'Centralisez et suivez les documents demandés pour votre projet.'],
-        ].map(([title, Icon, text]) => (
-          <div key={title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={22} /></span><h2 className="text-lg font-black text-slate-950">{title}</h2></div>
-            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{text}</p>
-          </div>
-        ))}
-      </section>
-    </div>
   )
 }
 
@@ -710,37 +493,20 @@ function SettingsPageFrame({ title, children }) {
 }
 
 function SettingsProfileCard() {
-  const token = localStorage.getItem('studyway_token')
-  const meQuery = useQuery({
-    queryKey: ['auth-me'],
-    queryFn: () => fetchJson('/api/v1/auth/me'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-  const me = meQuery.data?.data ?? meQuery.data?.user ?? meQuery.data ?? null
-
   return (
     <motion.aside initial={{ opacity: 0, x: -28, scale: 0.985 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }} className="min-h-[635px] rounded-xl border border-slate-200 bg-white px-8 py-9 shadow-sm">
       <div className="flex flex-col items-center text-center">
         <div className="relative">
-          {me?.avatar_url ? (
-            <img src={me.avatar_url} alt={me?.name || 'Mon profil'} className="h-28 w-28 rounded-full border-4 border-blue-100 object-cover" />
-          ) : (
-            <span className="grid h-28 w-28 place-items-center rounded-full border-4 border-blue-100 bg-slate-50 text-slate-400">
-              <UserRound size={38} />
-            </span>
-          )}
-          {token && (
-            <span className="absolute bottom-1 right-0 grid h-10 w-10 place-items-center rounded-full bg-amber-400 text-white shadow-lg shadow-amber-200"><Camera size={18} /></span>
-          )}
+          <img src={avatars.kossi} alt="Lemouel jonadab AMAH-TCHTOUTCHOUI" className="h-28 w-28 rounded-full border-4 border-blue-100 object-cover" />
+          <span className="absolute bottom-1 right-0 grid h-10 w-10 place-items-center rounded-full bg-amber-400 text-white shadow-lg shadow-amber-200"><Camera size={18} /></span>
         </div>
-        <h2 className="mt-8 max-w-[310px] text-2xl font-black leading-tight">{token ? (meQuery.isLoading ? 'Chargement…' : (me?.name || 'Mon compte')) : 'Compte'}</h2>
-        <p className="mt-2 font-semibold text-slate-500">{token ? (me?.email || '—') : 'Connectez-vous pour gérer votre profil.'}</p>
+        <h2 className="mt-8 max-w-[310px] text-2xl font-black leading-tight">Lemouel jonadab AMAH-TCHTOUTCHOUI</h2>
+        <p className="mt-2 font-semibold text-slate-500">jaceamah14@gmail.com</p>
       </div>
       <div className="my-8 h-px bg-slate-200" />
       <div className="space-y-5 text-sm">
-        <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Statut</span><b>{token ? (me?.status || 'Actif') : '—'}</b></div>
+        <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Membre depuis</span><b>20.05.2026</b></div>
+        <div className="flex justify-between gap-5"><span className="font-semibold text-slate-500">Commandes totales</span><b>0</b></div>
       </div>
       <div className="mt-9 space-y-5 pl-3">
         <SettingsSideLink icon={WalletCards} label="Adresse de facturation" to="/settings/billing" />
@@ -1003,7 +769,10 @@ function PaymentSettings() {
     ['🇮🇹', '+39', 'Italie'],
     ['🇨🇭', '+41', 'Suisse'],
   ]
-  const mobileMoneyNumbers = []
+  const mobileMoneyNumbers = [
+    ['🇹🇬', 'Flooz', '+228 90 12 34 56', 'Christelle Komi'],
+    ['🇹🇬', 'TMoney', '+228 99 45 67 10', 'Koffi Lucas'],
+  ]
 
   return (
     <SettingsPageFrame title="Méthodes de paiement">
@@ -1014,9 +783,9 @@ function PaymentSettings() {
       <div className="grid items-start gap-7 xl:grid-cols-2">
         <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} open={openMethods.bank} onToggle={() => setOpenMethods((value) => ({ ...value, bank: !value.bank }))}>
           <div className="grid gap-4 md:grid-cols-2">
-            <PaymentField label="Nom" placeholder="Votre nom" />
-            <PaymentField label="Prénom" placeholder="Votre prénom" />
-            <PaymentField label="IBAN" placeholder="Votre IBAN" className="md:col-span-2" />
+            <PaymentField label="Nom" placeholder="KOMI" />
+            <PaymentField label="Prénom" placeholder="Christelle" />
+            <PaymentField label="IBAN" placeholder="FR76 3000 6000 0112 3456 7890 189" className="md:col-span-2" />
           </div>
           <button type="button" className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-700 px-5 font-black text-white">
             <Plus size={19} />Enregistrer le compte bancaire
@@ -1024,11 +793,6 @@ function PaymentSettings() {
         </PaymentMethodCard>
         <PaymentMethodCard icon={Smartphone} title="Mobile money" text="Ajoutez les numéros autorisés pour les paiements." tone="orange" index={1} open={openMethods.mobile} onToggle={() => setOpenMethods((value) => ({ ...value, mobile: !value.mobile }))}>
           <div className="space-y-3">
-            {!mobileMoneyNumbers.length && (
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">
-                Aucun numéro mobile money enregistré.
-              </div>
-            )}
             {mobileMoneyNumbers.map(([flag, provider, phone, owner]) => (
               <div key={`${provider}-${phone}`} className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
                 <div className="flex items-center gap-3">
@@ -1096,7 +860,10 @@ function PaymentMethodCard({ icon: Icon, title, text, tone, index = 0, open = fa
 }
 
 function LoginHistorySettings() {
-  const rows = []
+  const rows = [
+    ['21.05.2026', '05:29:25', '46.193.66.49', 'Chrome 147.0.0.0 / Windows 10', 'Chrome 147.0.0.0', 'Aubervilliers, France', 'Session active'],
+    ['20.05.2026', '19:02:28', '46.193.66.49', 'Chrome 147.0.0.0 / Windows 10', 'Chrome 147.0.0.0', 'Aubervilliers, France', 'Réussi'],
+  ]
   const tips = [
     [CheckCircle2, 'Vérification régulière', 'Vérifiez régulièrement votre historique de connexion et identifie...', 'bg-blue-50 text-amber-500'],
     [AlertTriangle, 'Activité suspecte', 'Si vous remarquez une connexion non reconnue, changez...', 'bg-rose-50 text-rose-600'],
@@ -1120,9 +887,6 @@ function LoginHistorySettings() {
         <div className="grid min-w-[1180px] grid-cols-[190px_180px_1.25fr_1fr_1fr_140px] border-b border-slate-200 px-8 py-5 text-xs font-black uppercase tracking-wide text-slate-500">
           <span>Date / Heure</span><span>Adresse IP</span><span>Appareil</span><span>Navigateur</span><span>Localisation</span><span>Statut</span>
         </div>
-        {!rows.length && (
-          <div className="px-8 py-10 text-center text-sm font-semibold text-slate-500">Aucune session à afficher pour le moment.</div>
-        )}
         {rows.map(([date, time, ip, device, browser, location, status], index) => (
           <div key={`${date}-${time}`} className={`grid min-w-[1180px] grid-cols-[190px_180px_1.25fr_1fr_1fr_140px] items-center px-8 py-6 font-semibold ${index === 0 ? 'bg-emerald-50/40' : ''}`}>
             <span><b className="block">{date}</b><span className="text-sm text-slate-500">{time}</span></span><span>{ip}</span><span>{device}</span><span>{browser}</span><span>{location}</span><span className="w-fit rounded-full bg-emerald-100 px-3 py-1 text-sm font-black text-emerald-700">{status}</span>
@@ -1156,7 +920,7 @@ function Dashboard() {
       rest: 'étudier dans la ville qui vous attend',
       title: 'Partez étudier dans la ville qui vous attend',
       text: 'Billets, logement, assurance et accompagnement réunis dans un seul espace fluide.',
-      image: transportTicketHero,
+      image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85',
       cta: 'Préparer mon départ',
       ctaTo: '/transport',
       tone: 'from-[#061b47]/95 via-[#1e3a8a]/65 to-transparent',
@@ -1166,7 +930,7 @@ function Dashboard() {
       rest: 'sereinement dès votre arrivée',
       title: 'Installez-vous sereinement dès votre arrivée',
       text: 'Un conseiller, des services vérifiés, et des solutions pour chaque étape de votre projet.',
-      image: housingStudentHero,
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=85',
       cta: 'Voir mes services',
       ctaTo: '/accompagnement',
       tone: 'from-[#061b47]/95 via-[#0f766e]/58 to-transparent',
@@ -1282,7 +1046,7 @@ function Dashboard() {
 
         <aside className="space-y-5">
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-5 flex justify-between"><h2 className="text-xl font-black">Mon statut</h2><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-600">Actif</span></div><div className="font-black">Dossier Visa France</div><div className="text-sm text-slate-500">Étudiant</div><div className="mt-4 h-2 rounded-full bg-slate-100"><div className="h-2 w-3/5 rounded-full bg-blue-600" /></div><div className="mt-4 flex justify-between text-sm"><span className="text-amber-600">En cours d’examen</span><Link to="/documents" className="font-black text-blue-700">Voir détails</Link></div></section>
-          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">0 FCFA</div><Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Ajouter de l’argent</Link></section>
+          <section className="rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><div className="text-lg font-black">Mon portefeuille</div><div className="mt-5 text-sm text-blue-100">Solde disponible</div><div className="mt-1 text-3xl font-black">485 600 FCFA</div><Link to="/finance/transfert" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-black text-white">Ajouter de l’argent</Link></section>
           <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-black">Raccourcis rapides</h2>
             {[
@@ -1297,6 +1061,7 @@ function Dashboard() {
               </Link>
             ))}
           </section>
+          <section className="mt-6 rounded-lg bg-[#061b47] p-6 text-white shadow-sm"><h2 className="text-xl font-black">Parrainez un ami 🎁</h2><p className="mt-2 text-blue-50">Gagnez jusqu’à <b className="text-amber-300">20 000 FCFA</b></p><Link to="/messages" className="mt-5 flex h-12 w-full items-center justify-between rounded-lg bg-blue-600 px-5 font-black text-white">Parrainer maintenant <ArrowRight size={18} /></Link></section>
         </aside>
       </div>
 
@@ -1803,11 +1568,6 @@ function InsuranceProcess() {
 }
 
 function ServiceUnavailableBlock({ title, description }) {
-  const navigate = useNavigate()
-  const token = localStorage.getItem('studyway_token')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
-
   return (
     <div className="flex flex-col items-center py-8 text-center">
       <div className="grid h-20 w-20 place-items-center rounded-full bg-amber-50 text-amber-500">
@@ -1818,33 +1578,10 @@ function ServiceUnavailableBlock({ title, description }) {
       <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-amber-50 px-5 py-2 text-sm font-black text-amber-700 ring-1 ring-amber-200">
         Service bientôt disponible
       </div>
-      {error && <div className="mt-5 w-full max-w-sm rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-700">{error}</div>}
       <div className="mt-8 grid w-full max-w-sm gap-3">
         <a href="tel:+33688639294" className="flex h-12 items-center justify-center gap-3 rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-600/20"><Phone size={18} />+33 6 88 63 92 94</a>
         <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-emerald-300 bg-emerald-50 font-black text-emerald-700"><MessageCircle size={18} />Contacter via WhatsApp</a>
-        <button
-          type="button"
-          disabled={!token || submitting}
-          onClick={async () => {
-            setError('')
-            if (!token) {
-              setError('Connectez-vous pour ouvrir un ticket.')
-              return
-            }
-            setSubmitting(true)
-            try {
-              await postJson('/api/v1/conversations', { type: 'support', title: `Activation: ${title}`, message: `Bonjour, je souhaite être notifié(e) et accompagné(e) pour activer le service: ${title}.` })
-              navigate('/messages')
-            } catch (e) {
-              setError(e.message)
-            } finally {
-              setSubmitting(false)
-            }
-          }}
-          className="flex h-12 items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800 hover:bg-blue-50 disabled:opacity-60"
-        >
-          <MessageCircle size={18} />{submitting ? 'Création...' : 'Ouvrir un ticket'}
-        </button>
+        <Link to="/messages" className="flex h-12 items-center justify-center gap-3 rounded-lg border border-slate-200 font-black text-blue-800 hover:bg-blue-50"><MessageCircle size={18} />Parler à un conseiller</Link>
         <Link to="/finance" className="flex h-11 items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800"><ArrowLeft size={17} />Retour Banque & Finance</Link>
       </div>
     </div>
@@ -1884,6 +1621,16 @@ function Housing() {
     'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1000&q=80',
     'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=80',
   ]
+  const homes = [
+    ['Studio cosy - Montparnasse', 'Paris 14e, France', displayPrice(492000), 'Studio', '20 m²', 'Meublé', 'Disponible dès le 15 juin', 'Coup de cœur'],
+    ['Appartement - Lyon Part-Dieu', 'Lyon, France', displayPrice(446000), 'T2', '35 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre - Résidence étudiante', 'Toulouse, France', displayPrice(295000), 'Chambre', '15 m²', 'Meublé', 'Disponible dès le 1er juillet', 'Vérifié'],
+    ['Studio - La Defense', 'Courbevoie, France', displayPrice(525000), 'Studio', '22 m²', 'Meublé', 'Disponible maintenant', 'Coup de cœur'],
+    ['T2 lumineux - Paris', 'Paris 11e, France', displayPrice(472000), 'T2', '32 m²', 'Équipé', 'Disponible bientôt', 'Vérifié'],
+    ['Colocation meublee', 'Lille, France', displayPrice(341000), 'Colocation', '18 m²', 'Meublé', 'Disponible maintenant', 'Vérifié'],
+    ['Chambre calme - Centre', 'Bordeaux, France', displayPrice(387000), 'Chambre', '17 m²', 'Wi-Fi', 'Disponible maintenant', 'Vérifié'],
+    ['Studio moderne - Nantes', 'Nantes, France', displayPrice(400000), 'Studio', '24 m²', 'Meublé', 'Disponible en août', 'Vérifié'],
+  ]
   const why = [
     [ShieldCheck, 'Logements vérifiés', 'Chaque logement est vérifié manuellement par notre équipe'],
     [Lock, 'Paiement sécurisé', 'Payez en toute sécurité via notre plateforme protégée'],
@@ -1899,15 +1646,6 @@ function Housing() {
   })
   const hotelResults = housingMode === 'hotel' && hotelQuery.data?.data?.length ? hotelQuery.data.data : []
   const activeHotel = hotelResults[selectedHotel] ?? hotelResults[0]
-  const listingsQuery = useQuery({
-    queryKey: ['housing-listings', 'Paris'],
-    queryFn: () => fetchJson('/api/v1/housing/listings?city=Paris'),
-    enabled: housingMode === 'student',
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-  const listings = housingMode === 'student' && Array.isArray(listingsQuery.data?.data) ? listingsQuery.data.data : []
-  const listingsTotal = listingsQuery.data?.meta?.total ?? listings.length
 
   if (!housingMode) {
     return (
@@ -2110,15 +1848,15 @@ function Housing() {
       </div>
 
       <div className="px-5 lg:px-8">
-	        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-	          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-	            <h2 className="text-xl font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels disponibles' : 'Logements disponibles'} <span className="font-bold text-slate-400">({housingMode === 'hotel' ? hotelResults.length : listingsTotal})</span></h2>
-	            <label className="flex items-center gap-3 text-sm font-bold text-slate-600">
-	              Trier par :
-	              <span className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-slate-900">Recommandés <ChevronDown size={16} /></span>
-	            </label>
-	          </div>
-	          {housingMode === 'hotel' ? (
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <h2 className="text-xl font-black text-slate-950">{housingMode === 'hotel' ? 'Hôtels disponibles' : 'Logements disponibles'} <span className="font-bold text-slate-400">({housingMode === 'hotel' ? hotelResults.length : '1,248'})</span></h2>
+            <label className="flex items-center gap-3 text-sm font-bold text-slate-600">
+              Trier par :
+              <span className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-slate-900">Recommandés <ChevronDown size={16} /></span>
+            </label>
+          </div>
+          {housingMode === 'hotel' ? (
             <div className="grid gap-7 xl:grid-cols-[1fr_390px]">
               <div className="grid gap-7 md:grid-cols-2">
                 {hotelQuery.isLoading && <div className="col-span-full rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm font-black text-blue-900">Recherche des hôtels disponibles...</div>}
@@ -2128,16 +1866,13 @@ function Housing() {
               </div>
               {activeHotel && <HotelDetails hotel={activeHotel} image={activeHotel.image ?? hotelImages[selectedHotel % hotelImages.length]} />}
             </div>
-	          ) : (
-	            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
-	              {listingsQuery.isLoading && <div className="col-span-full rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm font-black text-blue-900">Chargement des logements…</div>}
-	              {listingsQuery.isError && <HotelEmptyState title="Logements non disponibles" text={listingsQuery.error?.message || "Les logements ne peuvent pas être chargés pour le moment."} />}
-	              {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && <HotelEmptyState title="Aucun logement trouvé" text="Aucun logement n’a été retourné. Ajoutez des logements via l’admin ou changez la ville." />}
-	              {listings.map((listing, index) => <HousingCard key={listing.uuid || listing.id || index} home={listing} image={(Array.isArray(listing.images) && listing.images[0]) || housingImages[index % housingImages.length]} index={index} />)}
-	            </div>
-	          )}
-	        </section>
-	      </div>
+          ) : (
+            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+              {homes.map((home, index) => <HousingCard key={home[0]} home={home} image={housingImages[index]} index={index} />)}
+            </div>
+          )}
+        </section>
+      </div>
 
         <motion.section
           initial={{ opacity: 0, y: 36 }}
@@ -2188,17 +1923,7 @@ function HousingSearchItem({ icon: Icon, label, value, select = false }) {
 }
 
 function HousingCard({ home, image, index }) {
-  const isLegacy = Array.isArray(home)
-  const title = isLegacy ? home[0] : (home.title || home.name || home.label || 'Logement étudiant')
-  const place = isLegacy ? home[1] : ([home.city, home.country].filter(Boolean).join(', ') || home.address || '—')
-  const price = isLegacy
-    ? home[2]
-    : (home.monthly_price != null ? `${Number(home.monthly_price).toLocaleString('fr-FR')} FCFA` : (home.price_label || '—'))
-  const type = isLegacy ? home[3] : (home.type || 'Logement')
-  const size = isLegacy ? home[4] : (home.surface ? `${home.surface} m²` : (home.size || '—'))
-  const furnished = isLegacy ? home[5] : (home.furnished === false ? 'Non meublé' : 'Meublé')
-  const availability = isLegacy ? home[6] : (home.availability_status || 'available')
-  const badge = isLegacy ? home[7] : (home.requires_guarantor === false ? 'Sans garant' : 'Vérifié')
+  const [title, place, price, type, size, furnished, availability, badge] = home
   const isFavorite = badge === 'Coup de cœur'
   const [favorite, setFavorite] = useState(false)
 
@@ -2341,7 +2066,7 @@ function Universities() {
   const debouncedFilters = useDebouncedValue(filters, 380)
   const params = new URLSearchParams(Object.entries(debouncedFilters).filter(([, value]) => value))
   params.set('per_page', String(perPage))
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['parcoursup-formations', debouncedFilters, perPage],
     queryFn: () => fetchJson(`/api/v1/parcoursup/search?${params.toString()}`),
     staleTime: 1000 * 60 * 5,
@@ -2356,9 +2081,10 @@ function Universities() {
   useEffect(() => {
     setPerPage(12)
   }, [debouncedFilters])
-  const formations = data?.data ?? []
+  const isFallback = !data?.data?.length
+  const formations = isFallback ? parcoursupFallbackFormations : data.data
   const totalResults = data?.meta?.total ?? formations.length
-  const canShowMore = formations.length < totalResults
+  const canShowMore = !isFallback && formations.length < totalResults
   const realStats = statsData?.data ?? {}
   const stats = [
     [Landmark, formatCompactNumber(realStats.formations ?? totalResults), 'Formations importées'],
@@ -2463,21 +2189,16 @@ function Universities() {
             <h2 className="text-2xl font-black text-slate-950">Formations disponibles</h2>
             <span className="font-black text-blue-800">{isLoading ? 'Recherche...' : `${totalResults} résultats`}</span>
           </div>
-          {isError && (
+          {isFallback && (
             <div className="mb-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
-              {error?.message || "Impossible de charger les formations pour le moment. Réessayez plus tard."}
-            </div>
-          )}
-          {!isLoading && !isError && formations.length === 0 && (
-            <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm font-semibold leading-6 text-slate-600">
-              Aucun résultat pour ces filtres. Essayez une autre ville, domaine ou type de formation.
+              Données de démonstration affichées : démarrez l’API Laravel pour charger les milliers de formations officielles.
             </div>
           )}
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             {formations.map((formation, index) => <UniversityResultCard key={formation.id ?? formation.formation_id} formation={formation} index={index} />)}
           </div>
           <div className="mt-7 flex flex-col items-center gap-3">
-            <div className="text-sm font-bold text-slate-500">Affichage de {formations.length} formations sur {totalResults}</div>
+            {!isFallback && <div className="text-sm font-bold text-slate-500">Affichage de {formations.length} formations sur {totalResults}</div>}
             {canShowMore && (
               <motion.button
                 whileHover={{ y: -3, scale: 1.01 }}
@@ -2559,37 +2280,13 @@ function UniversityResultCard({ formation, index }) {
 
 function UniversityFormationDetail() {
   const { id } = useParams()
-  const { data, isLoading, isError, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['parcoursup-formation', id],
     queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
     staleTime: 1000 * 60 * 10,
     retry: 1,
   })
-  const formation = data?.data ?? null
-
-  if (isLoading) {
-    return <div className="rounded-lg border border-slate-200 bg-white p-8 text-sm font-semibold text-slate-600">Chargement…</div>
-  }
-
-  if (isError) {
-    return (
-      <div className="space-y-6">
-        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-        <div className="rounded-lg border border-amber-100 bg-amber-50 p-6 text-sm font-semibold text-amber-800">
-          {error?.message || "Impossible de charger la formation."}
-        </div>
-      </div>
-    )
-  }
-
-  if (!formation) {
-    return (
-      <div className="space-y-6">
-        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Formation introuvable.</div>
-      </div>
-    )
-  }
+  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
   const rate = formation.admission_rate ? `${Math.round(formation.admission_rate)}%` : 'Non communiqué'
   const capacity = formation.capacity ?? 'Non communiqué'
   const duration = formation.duration ?? 'Selon formation'
@@ -2757,37 +2454,13 @@ function UniversityDetailMetric({ icon: Icon, label, value }) {
 
 function UniversityApplication() {
   const { id } = useParams()
-  const { data, isLoading, isError, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['parcoursup-formation', id],
     queryFn: () => fetchJson(`/api/v1/parcoursup/formations/${id}`),
     staleTime: 1000 * 60 * 10,
     retry: 1,
   })
-  const formation = data?.data ?? null
-
-  if (isLoading) {
-    return <div className="rounded-lg border border-slate-200 bg-white p-8 text-sm font-semibold text-slate-600">Chargement…</div>
-  }
-
-  if (isError) {
-    return (
-      <div className="space-y-6">
-        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-        <div className="rounded-lg border border-amber-100 bg-amber-50 p-6 text-sm font-semibold text-amber-800">
-          {error?.message || "Impossible de charger la formation."}
-        </div>
-      </div>
-    )
-  }
-
-  if (!formation) {
-    return (
-      <div className="space-y-6">
-        <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">Formation introuvable.</div>
-      </div>
-    )
-  }
+  const formation = data?.data ?? parcoursupFallbackFormations.find((item) => String(item.id) === String(id)) ?? parcoursupFallbackFormations[0]
   const formationId = formation.id ?? formation.formation_id
   const [submitted, setSubmitted] = useState(() => getStoredApplications().some((application) => String(application.formationId) === String(formationId)))
   const storedProfile = getStoredAcademicProfile()
@@ -2911,7 +2584,7 @@ function UniversityApplication() {
               <ApplicationField label="Filière / série / spécialité" placeholder="Série D, sciences, économie, droit..." value={profile.field ?? ''} onChange={(value) => updateProfile('field', value)} />
               <ApplicationField label="Établissement actuel ou dernier établissement" placeholder="Nom de votre lycée ou université" value={profile.school ?? ''} onChange={(value) => updateProfile('school', value)} />
               <ApplicationField label="Pays d’obtention du diplôme" placeholder="Togo, Bénin, Cameroun..." value={profile.studyCountry ?? ''} onChange={(value) => updateProfile('studyCountry', value)} />
-              <ApplicationField label="Année d’obtention ou année en cours" placeholder="AAAA" value={profile.studyYear ?? ''} onChange={(value) => updateProfile('studyYear', value)} />
+              <ApplicationField label="Année d’obtention ou année en cours" placeholder="2025, 2026..." value={profile.studyYear ?? ''} onChange={(value) => updateProfile('studyYear', value)} />
               <ApplicationField label="Moyenne générale indicative" placeholder="Ex : 13,5/20" value={profile.average ?? ''} onChange={(value) => updateProfile('average', value)} />
               <ApplicationField as="select" label="Situation du bac" value={profile.bacStatus ?? ''} onChange={(value) => updateProfile('bacStatus', value)} options={['Bac déjà obtenu', 'Bac en cours', 'Équivalence / diplôme étranger', 'Études supérieures déjà commencées']} />
             </div>
@@ -3126,7 +2799,7 @@ function ApplicationProcessPreview({ status }) {
 
 function StudentRequests() {
   const [applications, setApplications] = useState(getStoredApplications)
-  const displayedApplications = applications
+  const displayedApplications = applications.length ? applications : demoApplications
 
   function updateStatus(applicationId, status) {
     const updated = displayedApplications.map((application) => application.id === applicationId ? { ...application, status } : application)
@@ -3147,16 +2820,7 @@ function StudentRequests() {
       </section>
 
       <section className="grid gap-6">
-        {displayedApplications.length ? (
-          displayedApplications.map((application) => <StudentRequestCard key={application.id} application={application} onUpdateStatus={updateStatus} />)
-        ) : (
-          <section className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-blue-50 text-blue-700"><ClipboardList size={26} /></div>
-            <h2 className="mt-5 text-xl font-black text-slate-950">Aucune demande enregistrée</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm font-semibold leading-6 text-slate-500">Vos candidatures apparaîtront ici après le dépôt réel d’un dossier depuis la page Universités.</p>
-            <Link to="/universites" className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 font-black text-white"><GraduationCap size={17} />Choisir une formation</Link>
-          </section>
-        )}
+        {displayedApplications.map((application) => <StudentRequestCard key={application.id} application={application} onUpdateStatus={updateStatus} />)}
       </section>
     </div>
   )
@@ -3203,6 +2867,20 @@ function StudentRequestCard({ application, onUpdateStatus }) {
 const STUDYWAY_APPLICATIONS_KEY = 'studyway-university-applications'
 const STUDYWAY_ACADEMIC_PROFILE_KEY = 'studyway-academic-profile'
 const applicationProcessSteps = ['Postulé', 'Admission', 'Admis', "Attestation d’admission"]
+
+const demoApplications = [
+  {
+    id: 'SW-POST-DEMO-1',
+    formationId: 'demo-licence-info',
+    formationName: 'Licence Informatique',
+    universityName: 'Université Paris Cité',
+    city: 'Paris',
+    region: 'Île-de-France',
+    status: 'submitted',
+    submittedAt: new Date().toISOString(),
+    attestationUrl: '',
+  },
+]
 
 function getStoredApplications() {
   try {
@@ -3259,56 +2937,30 @@ function apiUrl(path) {
   return `${apiBaseUrl}${path}`
 }
 
-class ApiError extends Error {
-  constructor(message, { status, payload, path }) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.payload = payload
-    this.path = path
-  }
-}
-
 async function fetchJson(path) {
-  const token = localStorage.getItem('studyway_token')
-  const response = await fetch(apiUrl(path), {
-    headers: {
-      Accept: 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  })
+  const response = await fetch(apiUrl(path))
 
   if (!response.ok) {
     const errorPayload = await response.json().catch(() => null)
-    throw new ApiError(errorPayload?.meta?.message || errorPayload?.message || 'API unavailable', {
-      status: response.status,
-      payload: errorPayload,
-      path,
-    })
+    throw new Error(errorPayload?.meta?.message || 'API unavailable')
   }
 
   return response.json()
 }
 
 async function postJson(path, payload) {
-  const token = localStorage.getItem('studyway_token')
   const response = await fetch(apiUrl(path), {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(payload),
   })
 
   if (!response.ok) {
     const errorPayload = await response.json().catch(() => null)
-    throw new ApiError(errorPayload?.meta?.message || errorPayload?.message || 'API unavailable', {
-      status: response.status,
-      payload: errorPayload,
-      path,
-    })
+    throw new Error(errorPayload?.meta?.message || errorPayload?.message || 'API unavailable')
   }
 
   return response.json()
@@ -3398,6 +3050,174 @@ function getFallbackCampusImage(formation) {
 
   return universityHero
 }
+
+const parcoursupFallbackFormations = [
+  {
+    id: 'demo-licence-info',
+    formation_id: 'demo-licence-info',
+    formation_name: 'Licence Informatique',
+    university_name: 'Université Paris Cité',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Informatique',
+    duration: '3 ans',
+    admission_rate: 62,
+    capacity: 180,
+    description: 'Formation universitaire en informatique pour construire des bases solides en algorithmique, développement, bases de données et mathématiques.',
+  },
+  {
+    id: 'demo-but-gea',
+    formation_id: 'demo-but-gea',
+    formation_name: 'BUT Gestion des entreprises et administrations',
+    university_name: 'IUT de Lyon',
+    city: 'Lyon',
+    region: 'Auvergne-Rhône-Alpes',
+    country: 'France',
+    formation_type: 'BUT',
+    specialization: 'Gestion',
+    duration: '3 ans',
+    admission_rate: 48,
+    capacity: 120,
+    description: 'Parcours professionnalisant pour préparer les étudiants à la gestion, la comptabilité, le management et l’administration.',
+  },
+  {
+    id: 'demo-bts-commerce',
+    formation_id: 'demo-bts-commerce',
+    formation_name: 'BTS Commerce international',
+    university_name: 'Lycée Jean Lurçat',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Commerce',
+    duration: '2 ans',
+    admission_rate: 55,
+    capacity: 35,
+    description: 'Formation courte orientée import-export, négociation internationale, logistique et relation client à l’étranger.',
+  },
+  {
+    id: 'demo-cpge-mpsi',
+    formation_id: 'demo-cpge-mpsi',
+    formation_name: 'CPGE MPSI',
+    university_name: 'Lycée Louis-le-Grand',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    formation_type: 'CPGE',
+    specialization: 'Mathématiques',
+    duration: '2 ans',
+    admission_rate: 28,
+    capacity: 48,
+    description: 'Classe préparatoire scientifique exigeante pour préparer les concours d’écoles d’ingénieurs.',
+  },
+  {
+    id: 'demo-licence-droit',
+    formation_id: 'demo-licence-droit',
+    formation_name: 'Licence Droit',
+    university_name: 'Université de Bordeaux',
+    city: 'Bordeaux',
+    region: 'Nouvelle-Aquitaine',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Droit',
+    duration: '3 ans',
+    admission_rate: 70,
+    capacity: 420,
+    description: 'Formation générale en droit privé, droit public, méthodologie juridique et institutions.',
+  },
+  {
+    id: 'demo-pass-sante',
+    formation_id: 'demo-pass-sante',
+    formation_name: 'PASS Santé',
+    university_name: 'Université de Montpellier',
+    city: 'Montpellier',
+    region: 'Occitanie',
+    country: 'France',
+    formation_type: 'PASS',
+    specialization: 'Santé',
+    duration: '1 an',
+    admission_rate: 34,
+    capacity: 620,
+    description: 'Parcours d’accès spécifique santé pour préparer médecine, pharmacie, odontologie, maïeutique ou kinésithérapie.',
+  },
+  {
+    id: 'demo-but-info',
+    formation_id: 'demo-but-info',
+    formation_name: 'BUT Informatique',
+    university_name: 'IUT de Lille',
+    city: 'Lille',
+    region: 'Hauts-de-France',
+    country: 'France',
+    formation_type: 'BUT',
+    specialization: 'Informatique',
+    duration: '3 ans',
+    admission_rate: 44,
+    capacity: 104,
+    description: 'Formation professionnalisante en développement logiciel, systèmes, bases de données et gestion de projet.',
+  },
+  {
+    id: 'demo-licence-eco',
+    formation_id: 'demo-licence-eco',
+    formation_name: 'Licence Économie et gestion',
+    university_name: 'Université Toulouse Capitole',
+    city: 'Toulouse',
+    region: 'Occitanie',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Économie',
+    duration: '3 ans',
+    admission_rate: 66,
+    capacity: 300,
+    description: 'Parcours universitaire pour acquérir les bases en économie, gestion, statistiques et analyse financière.',
+  },
+  {
+    id: 'demo-bts-compta',
+    formation_id: 'demo-bts-compta',
+    formation_name: 'BTS Comptabilité et gestion',
+    university_name: 'Lycée La Martinière Duchère',
+    city: 'Lyon',
+    region: 'Auvergne-Rhône-Alpes',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Comptabilité',
+    duration: '2 ans',
+    admission_rate: 58,
+    capacity: 32,
+    description: 'Formation courte orientée comptabilité, fiscalité, gestion financière et outils professionnels.',
+  },
+  {
+    id: 'demo-licence-arts',
+    formation_id: 'demo-licence-arts',
+    formation_name: 'Licence Arts plastiques',
+    university_name: 'Université Rennes 2',
+    city: 'Rennes',
+    region: 'Bretagne',
+    country: 'France',
+    formation_type: 'Licence',
+    specialization: 'Arts',
+    duration: '3 ans',
+    admission_rate: 61,
+    capacity: 95,
+    description: 'Formation en création artistique, histoire de l’art, pratiques plastiques et culture visuelle.',
+  },
+  {
+    id: 'demo-bts-electro',
+    formation_id: 'demo-bts-electro',
+    formation_name: 'BTS Électrotechnique',
+    university_name: 'Lycée Diderot',
+    city: 'Marseille',
+    region: 'Provence-Alpes-Côte d’Azur',
+    country: 'France',
+    formation_type: 'BTS',
+    specialization: 'Ingénierie',
+    duration: '2 ans',
+    admission_rate: 52,
+    capacity: 30,
+    description: 'Formation technique en énergie électrique, automatismes, maintenance et installations industrielles.',
+  },
+]
 
 function StudentGuides() {
   const [activeCategory, setActiveCategory] = useState('Orientation')
@@ -3619,26 +3439,6 @@ function Profile() {
   const navigate = useNavigate()
   const initialTab = new URLSearchParams(location.search).get('tab') === 'reservations' ? 'reservations' : 'overview'
   const [activeTab, setActiveTab] = useState(initialTab)
-  const token = localStorage.getItem('studyway_token')
-  const meQuery = useQuery({
-    queryKey: ['auth-me'],
-    queryFn: () => fetchJson('/api/v1/auth/me'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-  const me = meQuery.data?.data ?? meQuery.data?.user ?? meQuery.data ?? null
-  const dashboardQuery = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => fetchJson('/api/v1/dashboard'),
-    enabled: Boolean(token && activeTab === 'overview'),
-    staleTime: 1000 * 30,
-    retry: 1,
-  })
-  const dashboard = dashboardQuery.data ?? {}
-  const stats = dashboard.stats ?? {}
-  const timeline = Array.isArray(dashboard.timeline) ? dashboard.timeline : []
-  const recentPayments = Array.isArray(dashboard.recent_payments) ? dashboard.recent_payments : []
   const reservationsQuery = useQuery({
     queryKey: ['flight-reservations'],
     queryFn: () => fetchJson('/api/v1/flight-reservations'),
@@ -3665,81 +3465,20 @@ function Profile() {
         </div>
       </div>
 
-	      {activeTab === 'overview' ? (
-	        <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
-	          <div className="space-y-6">
-	            <Panel title="Mon profil">
-	              {!token && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold text-amber-800">Connectez-vous pour afficher votre profil.</div>}
-	              {token && meQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	              {token && meQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{meQuery.error?.message || 'Impossible de charger le profil.'}</div>}
-	              {token && !meQuery.isLoading && !meQuery.isError && (
-	                <div className="flex flex-wrap items-center gap-8">
-	                  {me?.avatar_url ? (
-	                    <img src={me.avatar_url} alt={me?.name || 'Utilisateur'} className="h-32 w-32 rounded-full object-cover" />
-	                  ) : (
-	                    <div className="grid h-32 w-32 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400">
-	                      <UserRound size={44} />
-	                    </div>
-	                  )}
-	                  <div className="grid flex-1 gap-3 md:grid-cols-2">
-	                    <h1 className="col-span-full text-2xl font-black">{me?.name || 'Compte'} <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">{me?.status || 'Actif'}</span></h1>
-	                    <InfoLine label="Email" value={me?.email || '—'} />
-	                    <InfoLine label="Téléphone" value={me?.phone || '—'} />
-	                    <InfoLine label="Pays" value={me?.country || '—'} />
-	                  </div>
-	                  <Link to="/settings/profile" className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Modifier</Link>
-	                </div>
-		              )}
-		            </Panel>
-		            <div className="grid gap-4 md:grid-cols-4">
-		              <StatCard icon={FileText} label="Dossiers" value={dashboardQuery.isLoading ? '—' : String(stats.dossiers ?? 0)} tone="purple" />
-		              <StatCard icon={CheckCircle2} label="Documents approuvés" value={dashboardQuery.isLoading ? '—' : String(stats.approved ?? 0)} tone="green" />
-		              <StatCard icon={FileText} label="Documents en attente" value={dashboardQuery.isLoading ? '—' : String(stats.pending ?? 0)} tone="amber" />
-		              <StatCard icon={Building2} label="Universités" value={dashboardQuery.isLoading ? '—' : String(stats.universities ?? 0)} tone="blue" />
-		            </div>
-		            <Panel title="Prochaines étapes">
-		              {!token && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour voir votre suivi.</div>}
-		              {token && dashboardQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-		              {token && dashboardQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{dashboardQuery.error?.message || 'Impossible de charger le suivi.'}</div>}
-		              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && timeline.length === 0 && (
-		                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucune étape planifiée pour le moment.</div>
-		              )}
-		              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && timeline.length > 0 && (
-		                <List items={timeline.slice(0, 5).map((item) => `${item.title} · ${item.date}`)} />
-		              )}
-		            </Panel>
-		          </div>
-	          <div className="space-y-5">
-	            <Panel title="Dernières activités">
-	              {!token && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour voir vos activités.</div>}
-	              {token && dashboardQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	              {token && dashboardQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{dashboardQuery.error?.message || 'Impossible de charger les activités.'}</div>}
-	              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && recentPayments.length === 0 && (
-	                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucune activité récente.</div>
-	              )}
-	              {token && !dashboardQuery.isLoading && !dashboardQuery.isError && recentPayments.length > 0 && (
-	                <List items={recentPayments.slice(0, 5).map((p) => {
-	                  const label = p.description || p.label || 'Paiement'
-	                  const amount = p.amount != null ? `${Number(p.amount).toLocaleString('fr-FR')} ${p.currency || ''}`.trim() : ''
-	                  return [label, amount].filter(Boolean).join(' · ')
-	                })} />
-	              )}
-	            </Panel>
-	            <Panel title="Actions rapides">
-	              <div className="grid gap-3">
-	                <Link to="/documents" className="flex h-12 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 font-black text-slate-800 hover:bg-slate-50"><span>Mes documents</span><ArrowRight size={18} /></Link>
-	                <Link to="/messages" className="flex h-12 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 font-black text-slate-800 hover:bg-slate-50"><span>Contacter le support</span><ArrowRight size={18} /></Link>
-	                <Link to="/transport" className="flex h-12 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 font-black text-slate-800 hover:bg-slate-50"><span>Réserver un billet / transfert</span><ArrowRight size={18} /></Link>
-	              </div>
-	            </Panel>
-	            <div className="rounded-lg border border-blue-100 bg-blue-50 p-6">
-	              <h3 className="font-black text-blue-950">Besoin d’aide ?</h3>
-	              <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Ouvrez une conversation pour suivre votre dossier.</p>
-	              <Link to="/messages" className="mt-5 inline-flex h-11 items-center gap-2 rounded-lg bg-white px-6 font-black text-blue-800 shadow-sm"><MessageCircle size={18} />Messages</Link>
-	            </div>
-	          </div>
-	        </div>
-	      ) : (
+      {activeTab === 'overview' ? (
+        <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
+          <div className="space-y-6">
+            <Panel title="Mon enfant"><div className="flex flex-wrap items-center gap-8"><img src={avatars.kossi} alt="Koffi M. Lucas" className="h-32 w-32 rounded-full object-cover" /><div className="grid flex-1 gap-3 md:grid-cols-2"><h1 className="col-span-full text-2xl font-black">Koffi M. Lucas <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">Actif</span></h1><InfoLine label="ID Étudiant" value="EDU-582941" /><InfoLine label="Email" value="lucas.koffi@email.com" /><InfoLine label="Université" value="Université Paris-Saclay" /><InfoLine label="Statut actuel" value="Étudiant" /></div><button className="rounded-lg border border-blue-700 px-6 py-3 font-black text-blue-800">Voir le profil complet</button></div></Panel>
+            <div className="grid gap-4 md:grid-cols-4"><StatCard icon={WalletCards} label="Paiements totaux" value="1 607 000 FCFA" /><StatCard icon={CheckCircle2} label="Paiements effectués" value="1 378 000 FCFA" tone="green" /><StatCard icon={CircleDollarSign} label="Paiements à venir" value="230 000 FCFA" tone="amber" /><StatCard icon={FileText} label="Documents" value="12" tone="purple" /></div>
+            <Panel title="Suivi des services"><List items={['Logement - Résidence Les Estudines, Paris - Actif', 'Université - Licence Informatique L1 - Inscrit', 'Compte bancaire - Boursorama - Actif', 'Assurance - habitation - Actif', 'Forfait mobile eSIM - Orange 50Go - Actif']} /></Panel>
+          </div>
+          <div className="space-y-5">
+            <Panel title="Dernières activités"><List items={['Paiement loyer -361 000 FCFA', 'Document ajouté - Attestation de scolarité', 'Paiement université -984 000 FCFA']} /></Panel>
+            <Panel title="Actions rapides"><List items={['Effectuer un paiement', "Envoyer de l’argent", 'Télécharger un document', 'Contacter le support']} /></Panel>
+            <div className="rounded-lg bg-blue-50 p-6"><h3 className="font-black">Besoin d’aide ?</h3><p className="mt-2 text-slate-600">Notre équipe est disponible 24/7.</p><button className="mt-5 rounded-lg bg-white px-6 py-3 font-black text-blue-800">Contacter le support</button></div>
+          </div>
+        </div>
+      ) : (
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-6">
             <div>
@@ -3849,8 +3588,8 @@ function SupportJourney() {
 function StartSupport() {
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
-  const [selectedServices, setSelectedServices] = useState([])
-  const [uploadedDocs, setUploadedDocs] = useState([])
+  const [selectedServices, setSelectedServices] = useState(['Admission université', 'Visa étudiant', 'Logement'])
+  const [uploadedDocs, setUploadedDocs] = useState(['Passeport', "Dernier diplôme"])
   const steps = [
     ['Profil étudiant', 'Identité, contact et parcours'],
     ['Projet d’études', 'Destination, rentrée et formation'],
@@ -3879,9 +3618,9 @@ function StartSupport() {
         <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
           <div className="grid gap-8 p-8 xl:grid-cols-[1fr_360px]">
             <div>
-	              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
-	              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre accompagnement est lancé</h1>
-	              <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-slate-600">Votre demande a été créée. Un conseiller va vérifier vos informations et vous contacter pour finaliser votre feuille de route.</p>
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
+              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre accompagnement est lancé</h1>
+              <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-slate-600">Votre dossier `SW-AC-2026-0148` a été créé. Un conseiller va vérifier vos informations et vous contacter pour finaliser votre feuille de route.</p>
               <div className="mt-7 grid gap-4 md:grid-cols-3">
                 {[
                   ['Aujourd’hui', 'Dossier créé'],
@@ -3894,14 +3633,15 @@ function StartSupport() {
                 <Link to="/accompagnement" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 px-6 font-black text-blue-800">Retour accompagnement</Link>
               </div>
             </div>
-	            <aside className="rounded-lg bg-slate-50 p-6">
-	              <h2 className="font-black text-slate-950">Résumé du dossier</h2>
-	              <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
-	                <div className="flex justify-between gap-4"><span>Services</span><b className="text-slate-950">{selectedServices.length}</b></div>
-	                <div className="flex justify-between gap-4"><span>Documents</span><b className="text-slate-950">{uploadedDocs.length}/{docs.length}</b></div>
-	                <div className="flex justify-between gap-4"><span>Statut</span><b className="text-emerald-600">En analyse</b></div>
-	              </div>
-	            </aside>
+            <aside className="rounded-lg bg-slate-50 p-6">
+              <h2 className="font-black text-slate-950">Résumé du dossier</h2>
+              <div className="mt-5 space-y-4 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between gap-4"><span>Pack choisi</span><b className="text-slate-950">Essentiel Plus</b></div>
+                <div className="flex justify-between gap-4"><span>Services</span><b className="text-slate-950">{selectedServices.length}</b></div>
+                <div className="flex justify-between gap-4"><span>Documents</span><b className="text-slate-950">{uploadedDocs.length}/{docs.length}</b></div>
+                <div className="flex justify-between gap-4"><span>Statut</span><b className="text-emerald-600">En analyse</b></div>
+              </div>
+            </aside>
           </div>
         </motion.section>
       </div>
@@ -3921,7 +3661,7 @@ function StartSupport() {
           <WalletCards className="text-amber-600" size={22} />
           <div>
             <div className="text-xs font-bold text-slate-500">Mon portefeuille</div>
-            <div className="text-lg font-black text-emerald-600">0 FCFA</div>
+            <div className="text-lg font-black text-emerald-600">820 000 FCFA</div>
           </div>
         </div>
       </div>
@@ -3996,9 +3736,9 @@ function PersonalInfoStep() {
       <div>
         <h2 className="text-xl font-black text-slate-950">Informations personnelles</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
-          <FormInput label="Prénom(s)" placeholder="Votre prénom" />
+          <FormInput label="Prénom(s)" placeholder="Christelle" />
           <FormRadio label="Genre" options={['Homme', 'Femme']} />
-          <FormInput label="Nom" placeholder="Votre nom" />
+          <FormInput label="Nom" placeholder="Komi" />
           <FormSelect label="État civil" placeholder="Sélectionner votre état civil" />
           <FormInput label="Date de naissance" placeholder="Sélectionner une date" icon={CalendarDays} />
           <FormSelect label="Pièce d’identité" placeholder="Sélectionner le type" />
@@ -4007,7 +3747,7 @@ function PersonalInfoStep() {
           <FormSelect label="Pays de résidence actuel" placeholder="Sélectionner votre pays" />
           <FormTextarea label="Adresse actuelle" placeholder="Entrez votre adresse complète" />
           <FormInput label="Téléphone" placeholder="+228    90 12 34 56" />
-          <FormInput label="Email" placeholder="vous@email.com" />
+          <FormInput label="Email" placeholder="christelle.komi@email.com" />
         </div>
       </div>
       <div>
@@ -4114,58 +3854,16 @@ function ReviewStep({ selectedServices, uploadedDocs, docs }) {
   )
 }
 
-function FormInput({ label, placeholder, icon: Icon, type = 'text', ...inputProps }) {
-  return (
-    <label className="block text-sm font-black text-slate-700">
-      {label}
-      <span className="mt-2 flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
-        <input
-          type={type}
-          className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400"
-          placeholder={placeholder}
-          {...inputProps}
-        />
-        {Icon && <Icon size={17} />}
-      </span>
-    </label>
-  )
+function FormInput({ label, placeholder, icon: Icon }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<span className="mt-2 flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50"><input className="min-w-0 flex-1 border-none bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" placeholder={placeholder} />{Icon && <Icon size={17} />}</span></label>
 }
 
-function FormSelect({ label, placeholder, options, value, onChange, ...selectProps }) {
-  const hasOptions = Array.isArray(options) && options.length > 0
-  return (
-    <label className="block text-sm font-black text-slate-700">
-      {label}
-      <span className="mt-2 flex h-11 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
-        {hasOptions ? (
-          <select
-            className="min-w-0 flex-1 appearance-none border-none bg-transparent text-sm font-semibold text-slate-800 outline-none"
-            value={value}
-            onChange={(event) => onChange?.(event.target.value)}
-            {...selectProps}
-          >
-            {options.map((opt) => <option key={String(opt)} value={opt}>{opt}</option>)}
-          </select>
-        ) : (
-          <span className="min-w-0 flex-1 truncate">{placeholder}</span>
-        )}
-        <ChevronDown size={17} />
-      </span>
-    </label>
-  )
+function FormSelect({ label, placeholder }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<span className="mt-2 flex h-11 items-center justify-between rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">{placeholder}<ChevronDown size={17} /></span></label>
 }
 
-function FormTextarea({ label, placeholder, ...textareaProps }) {
-  return (
-    <label className="block text-sm font-black text-slate-700">
-      {label}
-      <textarea
-        className="mt-2 min-h-24 w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
-        placeholder={placeholder}
-        {...textareaProps}
-      />
-    </label>
-  )
+function FormTextarea({ label, placeholder }) {
+  return <label className="block text-sm font-black text-slate-700">{label}<textarea className="mt-2 min-h-24 w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50" placeholder={placeholder} /></label>
 }
 
 function FormRadio({ label, options }) {
@@ -4457,11 +4155,11 @@ function VisaApplication() {
     return (
       <div className="visa-application-page space-y-7">
         <section className="rounded-lg border border-emerald-100 bg-white p-8 shadow-sm">
-	          <div className="grid gap-7 lg:grid-cols-[1fr_340px]">
-	            <div>
-	              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
-	              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre demande de visa est lancée</h1>
-	              <p className="mt-3 max-w-3xl text-base font-semibold leading-7 text-slate-600">Votre demande a été enregistrée pour le {visaTitle.toLowerCase()} {countryName}. Notre équipe vérifie les informations et prépare la réservation du rendez-vous.</p>
+          <div className="grid gap-7 lg:grid-cols-[1fr_340px]">
+            <div>
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={34} /></div>
+              <h1 className="mt-6 text-3xl font-black text-slate-950">Votre demande de visa est lancée</h1>
+              <p className="mt-3 max-w-3xl text-base font-semibold leading-7 text-slate-600">Votre dossier `SW-VISA-2026-0924` a été créé pour le {visaTitle.toLowerCase()} {countryName}. Notre équipe vérifie les informations et prépare la réservation du rendez-vous.</p>
               <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-5">
                 <h2 className="font-black text-blue-950">Communication importante sur les créneaux Capago</h2>
                 <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">StudyWay ne dispose pas en temps réel des disponibilités Capago. Après réservation de votre rendez-vous, les créneaux disponibles vous seront envoyés clairement afin que vous puissiez confirmer le meilleur horaire.</p>
@@ -4525,8 +4223,8 @@ function VisaApplication() {
             <div>
               <h2 className="text-xl font-black text-slate-950">Informations du demandeur principal</h2>
               <div className="mt-5 grid gap-5 md:grid-cols-2">
-                <FormInput label="Nom complet" placeholder="Votre nom complet" />
-                <FormInput label="Email" placeholder="vous@email.com" />
+                <FormInput label="Nom complet" placeholder="Christelle Komi" />
+                <FormInput label="Email" placeholder="christelle.komi@email.com" />
                 <FormInput label="Téléphone" placeholder="+228 90 12 34 56" />
                 <FormSelect label="Nationalité" placeholder="Sélectionner votre nationalité" />
                 <FormInput label="Numéro passeport" placeholder="Entrez le numéro" />
@@ -4639,81 +4337,23 @@ function Transport() {
   const location = useLocation()
   const paymentSearchParams = new URLSearchParams(location.search)
   const isPaymentReturn = paymentSearchParams.get('payment') === 'moneroo' || paymentSearchParams.has('paymentStatus')
-  const [activeTab, setActiveTab] = useState('flight')
   const [tripType] = useState('Aller simple')
   const [cabinClass] = useState('Economy')
-  const [origin, setOrigin] = useState('')
-  const [destination, setDestination] = useState('')
-  const [departureDate, setDepartureDate] = useState(() => {
-    const d = new Date()
-    d.setDate(d.getDate() + 1)
-    return d.toISOString().slice(0, 10)
-  })
-  const [searchParams, setSearchParams] = useState(null)
-  const [selectedTicket, setSelectedTicket] = useState(null)
-  const [formError, setFormError] = useState('')
+  const [origin, setOrigin] = useState('Paris')
+  const [destination, setDestination] = useState('Lome')
+  const [departureDate, setDepartureDate] = useState('mai 25')
   const [useMiles, setUseMiles] = useState(false)
   const [bluebiz, setBluebiz] = useState(false)
-  const originCode = resolveAirportCode(origin)
-  const destinationCode = resolveAirportCode(destination)
-
-  const flightSearchQuery = useQuery({
-    queryKey: ['duffel-flight-search', searchParams],
-    queryFn: () => fetchJson(`/api/v1/flights/offers?origin=${searchParams.origin}&destination=${searchParams.destination}&departure_date=${searchParams.departureDate}&adults=1&cabin_class=${searchParams.cabinClass}&max_connections=1`),
-    enabled: Boolean(searchParams),
-    staleTime: 1000 * 60 * 5,
-    retry: 1,
-  })
+  const [carNoticeOpen, setCarNoticeOpen] = useState(false)
 
   function swapCities() {
     setOrigin(destination)
     setDestination(origin)
   }
 
-  function searchFlights(event) {
-    event.preventDefault()
-    setFormError('')
-
-    if (!originCode || !destinationCode) {
-      setFormError('Renseignez une ville reconnue ou un code aéroport IATA à 3 lettres.')
-      return
-    }
-
-    if (originCode === destinationCode) {
-      setFormError('Le départ et l’arrivée doivent être différents.')
-      return
-    }
-
-    if (!departureDate) {
-      setFormError('Choisissez une date de départ.')
-      return
-    }
-
-    setSelectedTicket(null)
-    setSearchParams({
-      origin: originCode,
-      destination: destinationCode,
-      departureDate,
-      cabinClass: cabinClassToApi(cabinClass),
-      originLabel: origin.trim(),
-      destinationLabel: destination.trim(),
-    })
-  }
-
-  if (selectedTicket) {
-    return <TransportReservationPanel ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />
-  }
-
-  if (searchParams) {
-    return (
-      <TransportFlightResults
-        searchParams={searchParams}
-        query={flightSearchQuery}
-        onBack={() => setSearchParams(null)}
-        onModify={() => setSearchParams(null)}
-        onSelectTicket={setSelectedTicket}
-      />
-    )
+  function showCarNotice() {
+    setCarNoticeOpen(true)
+    window.setTimeout(() => setCarNoticeOpen(false), 2600)
   }
 
   return (
@@ -4735,407 +4375,91 @@ function Transport() {
         <section className="airfrance-hero">
           <motion.img initial={{ opacity: 0, scale: 1.08, y: 18 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} src="/airplane-banner.png" alt="Avion en vol au-dessus des nuages" className="airfrance-hero-image" />
 
-	          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="airfrance-booking-shell">
-	            <div className="airfrance-tabs">
-	              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.36 }} type="button" onClick={() => setActiveTab('flight')} className={activeTab === 'flight' ? 'is-active' : ''}><Plane size={20} />Acheter un billet</motion.button>
-	              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.26, duration: 0.36 }} type="button" onClick={() => setActiveTab('car')} className={activeTab === 'car' ? 'is-active' : ''}><Car size={20} />Voiture</motion.button>
-	            </div>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} className="airfrance-booking-shell">
+            <div className="airfrance-tabs">
+              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.36 }} type="button" className="is-active"><Plane size={20} />Acheter un billet</motion.button>
+              <motion.button initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.26, duration: 0.36 }} type="button" onClick={showCarNotice}><Car size={20} />Voiture</motion.button>
+            </div>
 
-	            {activeTab === 'car' ? (
-	              <motion.div initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.54, ease: [0.22, 1, 0.36, 1] }} className="airfrance-search-card">
-	                <TransportCarBooking />
-	              </motion.div>
-	            ) : (
-	              <motion.form onSubmit={searchFlights} initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.54, ease: [0.22, 1, 0.36, 1] }} className="airfrance-search-card">
-	                <div className="airfrance-select-row">
-	                  <button type="button">{tripType} <ChevronDown size={16} /></button>
-	                  <button type="button">{cabinClass} <ChevronDown size={16} /></button>
-	                </div>
+            <motion.div initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.54, ease: [0.22, 1, 0.36, 1] }} className="airfrance-search-card">
+              <div className="airfrance-select-row">
+                <button type="button">{tripType} <ChevronDown size={16} /></button>
+                <button type="button">{cabinClass} <ChevronDown size={16} /></button>
+              </div>
 
-	                <div className="airfrance-fields">
-	                  <label>
-	                    <span>À partir de</span>
-	                    <input value={origin} onChange={(event) => setOrigin(event.target.value)} />
-	                    <b>{originCode || '---'}</b>
-	                  </label>
-	                  <button type="button" className="airfrance-swap" onClick={swapCities} aria-label="Inverser départ et arrivée"><ArrowLeftRight size={23} /></button>
-	                  <label>
-	                    <span>À</span>
-	                    <input value={destination} onChange={(event) => setDestination(event.target.value)} />
-	                    <b>{destinationCode || '---'}</b>
-	                  </label>
-	                  <label>
-	                    <span>Date de départ</span>
-	                    <input type="date" value={departureDate} onChange={(event) => setDepartureDate(event.target.value)} min={new Date().toISOString().slice(0, 10)} />
-	                    <CalendarDays size={23} />
-	                  </label>
-	                  <label>
-	                    <span />
-	                    <input value="1 adulte" readOnly />
-	                    <UserRound size={24} />
-	                  </label>
-	                </div>
+              <div className="airfrance-fields">
+                <label>
+                  <span>À partir de</span>
+                  <input value={origin} onChange={(event) => setOrigin(event.target.value)} />
+                  <b>PAR</b>
+                </label>
+                <button type="button" className="airfrance-swap" onClick={swapCities} aria-label="Inverser départ et arrivée"><ArrowLeftRight size={23} /></button>
+                <label>
+                  <span>À</span>
+                  <input value={destination} onChange={(event) => setDestination(event.target.value)} />
+                  <b>LFW</b>
+                </label>
+                <label>
+                  <span>Date de départ</span>
+                  <input value={departureDate} onChange={(event) => setDepartureDate(event.target.value)} />
+                  <CalendarDays size={23} />
+                </label>
+                <label>
+                  <span />
+                  <input value="1 adulte" readOnly />
+                  <UserRound size={24} />
+                </label>
+              </div>
 
-	                <div className="airfrance-options">
-	                  <AirFranceToggle checked={useMiles} onClick={() => setUseMiles((value) => !value)} label="Utiliser des Miles" />
-	                  <AirFranceToggle checked={bluebiz} onClick={() => setBluebiz((value) => !value)} label="Je veux réserver avec bluebiz ou un accord d'entreprise" />
-	                  <button type="submit" className="airfrance-search-button">Rechercher les vols</button>
-	                </div>
-	                {formError && <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{formError}</div>}
-	              </motion.form>
-	            )}
-	          </motion.div>
-	        </section>
+              <div className="airfrance-options">
+                <AirFranceToggle checked={useMiles} onClick={() => setUseMiles((value) => !value)} label="Utiliser des Miles" />
+                <AirFranceToggle checked={bluebiz} onClick={() => setBluebiz((value) => !value)} label="Je veux réserver avec bluebiz ou un accord d'entreprise" />
+                <button type="button" className="airfrance-search-button">Rechercher les vols</button>
+              </div>
+            </motion.div>
+          </motion.div>
+          <AnimatePresence>
+            {carNoticeOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 22, scale: 0.92, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: 12, scale: 0.96, filter: 'blur(6px)' }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="airfrance-car-notice"
+              >
+                <span><Car size={22} /></span>
+                <div><b>Voiture bientôt disponible</b><small>La réservation de voiture arrive prochainement.</small></div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
 
         <section className="airfrance-info">
           <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="airfrance-help">
             <h2><Phone size={20} />BESOIN D'AIDE POUR VOTRE RÉSERVATION ?</h2>
             <p>Air France Service Line: <strong>+33 9 69 39 36 54</strong></p>
-            <a href="mailto:contact@studyway.com?subject=Frais%20de%20service%20billet">Frais d'émission et de service : contacter StudyWay</a>
+            <a href="#frais">Frais d'émission et de service plus élevés par téléphone, en savoir plus</a>
             <p>Prix d'un appel local vers : France</p>
             <p><strong>Langues parlées :</strong> Français - Anglais</p>
             <p><strong>Horaires d'ouverture :</strong> Aujourd'hui (08:00 - 22:00) <ChevronDown size={15} /></p>
-            <Link to="/contact/conseiller">Voir les autres manières de nous contacter</Link>
+            <a href="#contact">Voir les autres manières de nous contacter</a>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08, duration: 0.45 }} className="airfrance-security">
             <h2><Lock size={21} />SÉCURITÉ ET CONFIDENTIALITÉ</h2>
             <p>Nous mettons tout en œuvre pour garantir la sécurité et la confidentialité de vos données personnelles.</p>
-            <a href="https://wwws.airfrance.fr/information/legal/edito-privacy-policy" target="_blank" rel="noreferrer">Politique de confidentialité d'Air France</a>
+            <a href="#confidentialite">Politique de confidentialité d'Air France</a>
           </motion.div>
         </section>
 
         <footer className="airfrance-footer">
-          <Link to="/">Plan du site</Link>
-          <Link to="/contact/email">Informations légales</Link>
-          <a href="https://wwws.airfrance.fr/information/legal/edito-privacy-policy" target="_blank" rel="noreferrer">Politique de confidentialité</a>
-          <Link to="/contact/email">Accessibilité</Link>
-          <Link to="/contact/email">Gestion des cookies</Link>
+          {['Plan du site', 'Informations légales', 'Politique de confidentialité', 'Accessibilité : non conforme', 'Gestion des cookies'].map((item) => <a key={item} href={`#${item}`}>{item}</a>)}
         </footer>
       </main>
 
       <div className="airfrance-floating">
         <button type="button" aria-label="Chat"><MessageCircle size={30} /></button>
         <button type="button" aria-label="Assistant"><Smile size={23} /></button>
-      </div>
-    </div>
-  )
-}
-
-function TransportCarBooking() {
-  const token = localStorage.getItem('studyway_token')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [form, setForm] = useState(() => ({
-    vehicle_type: 'Berline',
-    pickup_airport: '',
-    pickup_date: new Date().toISOString().slice(0, 10),
-    pickup_time: '',
-    flight_number: '',
-    destination_address: '',
-    baggage_count: 1,
-    passenger_name: '',
-    passenger_email: '',
-    passenger_phone: '',
-    notes: '',
-  }))
-
-  const bookingsQuery = useQuery({
-    queryKey: ['transport-bookings'],
-    queryFn: () => fetchJson('/api/v1/transport/bookings'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 60,
-    retry: 1,
-  })
-
-  const bookings = bookingsQuery.data?.data ?? []
-
-  async function submit(event) {
-    event.preventDefault()
-    setError('')
-    setSuccess('')
-
-    if (!form.destination_address.trim() || !form.passenger_name.trim() || !form.passenger_email.trim() || !form.passenger_phone.trim()) {
-      setError('Renseignez au minimum votre nom, email, téléphone et l’adresse de destination.')
-      return
-    }
-
-    setSubmitting(true)
-
-    try {
-      await postJson('/api/v1/transport/bookings', {
-        ...form,
-        pickup_airport: form.pickup_airport.trim().toUpperCase(),
-        destination_address: form.destination_address.trim(),
-        passenger_name: form.passenger_name.trim(),
-        passenger_email: form.passenger_email.trim(),
-        passenger_phone: form.passenger_phone.trim(),
-        flight_number: form.flight_number.trim() || null,
-        baggage_count: Number(form.baggage_count ?? 0),
-        notes: form.notes.trim() || null,
-      })
-      setSuccess('Demande envoyée. Votre réservation apparaîtra dans la liste.')
-      await bookingsQuery.refetch()
-    } catch (submitError) {
-      setError(submitError.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  return (
-    <div className="space-y-5">
-      <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-semibold leading-6 text-blue-900">
-        Réservez un transfert aéroport (voiture avec chauffeur). Une confirmation vous sera envoyée après traitement.
-      </div>
-
-      {!token && (
-        <div className="rounded-lg border border-amber-100 bg-amber-50 p-5 text-sm font-semibold leading-6 text-amber-800">
-          Connectez-vous pour réserver une voiture et suivre vos demandes.
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link to="/login" className="inline-flex h-11 items-center justify-center rounded-lg bg-blue-700 px-5 font-black text-white">Connexion</Link>
-            <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 font-black text-slate-800">Inscription</Link>
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-        <FormSelect label="Type de véhicule" value={form.vehicle_type} onChange={(value) => setForm((cur) => ({ ...cur, vehicle_type: value }))} options={['Berline', 'SUV', 'Van', 'Minibus']} />
-        <FormInput label="Aéroport de prise en charge (IATA)" value={form.pickup_airport} onChange={(event) => setForm((cur) => ({ ...cur, pickup_airport: event.target.value }))} placeholder="CDG" />
-        <FormInput label="Date de prise en charge" type="date" value={form.pickup_date} onChange={(event) => setForm((cur) => ({ ...cur, pickup_date: event.target.value }))} />
-        <FormInput label="Heure (HH:MM)" value={form.pickup_time} onChange={(event) => setForm((cur) => ({ ...cur, pickup_time: event.target.value }))} placeholder="10:00" />
-        <FormInput label="N° de vol (optionnel)" value={form.flight_number} onChange={(event) => setForm((cur) => ({ ...cur, flight_number: event.target.value }))} placeholder="AF123" />
-        <FormInput label="Bagages" type="number" value={form.baggage_count} onChange={(event) => setForm((cur) => ({ ...cur, baggage_count: event.target.value }))} placeholder="1" />
-        <div className="md:col-span-2">
-          <FormInput label="Adresse de destination" value={form.destination_address} onChange={(event) => setForm((cur) => ({ ...cur, destination_address: event.target.value }))} placeholder="15 rue Exemple, Paris" />
-        </div>
-        <FormInput label="Nom du passager" value={form.passenger_name} onChange={(event) => setForm((cur) => ({ ...cur, passenger_name: event.target.value }))} placeholder="Votre nom" />
-        <FormInput label="Email" value={form.passenger_email} onChange={(event) => setForm((cur) => ({ ...cur, passenger_email: event.target.value }))} placeholder="vous@email.com" />
-        <FormInput label="Téléphone" value={form.passenger_phone} onChange={(event) => setForm((cur) => ({ ...cur, passenger_phone: event.target.value }))} placeholder="+33 ..." />
-        <div className="md:col-span-2">
-          <FormTextarea label="Notes (optionnel)" value={form.notes} onChange={(event) => setForm((cur) => ({ ...cur, notes: event.target.value }))} placeholder="Adresse exacte, nombre de personnes, contraintes..." />
-        </div>
-        <div className="md:col-span-2 flex flex-wrap items-center gap-3">
-          <button type="submit" disabled={!token || submitting} className="airfrance-search-button disabled:opacity-60">
-            {submitting ? 'Envoi...' : 'Réserver une voiture'}
-          </button>
-          {success && <span className="text-sm font-black text-emerald-700">{success}</span>}
-        </div>
-        {error && <div className="md:col-span-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{error}</div>}
-      </form>
-
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-black text-slate-950">Mes réservations voiture</h3>
-          <button type="button" onClick={() => bookingsQuery.refetch()} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50">Actualiser</button>
-        </div>
-        <div className="mt-4 space-y-3">
-          {bookingsQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-          {bookingsQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{bookingsQuery.error?.message || 'Impossible de charger vos réservations.'}</div>}
-          {!bookingsQuery.isLoading && !bookingsQuery.isError && bookings.length === 0 && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucune réservation pour le moment.</div>
-          )}
-          {bookings.map((booking) => (
-            <div key={booking.id} className="rounded-lg border border-slate-200 bg-white p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="font-black text-slate-950">{booking.pickup_airport} · {booking.pickup_date} {booking.pickup_time}</div>
-                <div className="text-xs font-black text-slate-500">{booking.status || 'pending'}</div>
-              </div>
-              <div className="mt-2 text-sm font-semibold text-slate-600">{booking.vehicle_type} · {booking.destination_address}</div>
-              {booking.flight_number && <div className="mt-1 text-xs font-bold text-slate-500">Vol: {booking.flight_number}</div>}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function TransportFlightResults({ searchParams, query, onBack, onModify, onSelectTicket }) {
-  const offers = query.data?.data ?? []
-  const directOffers = offers.filter((offer) => Number(offer.stops ?? 0) === 0)
-  const connectingOffers = offers.filter((offer) => Number(offer.stops ?? 0) > 0)
-  const visibleGroups = [
-    ['Vols directs', directOffers],
-    ['Vols avec escale', connectingOffers],
-  ].filter(([, groupOffers]) => groupOffers.length)
-  const dateOptions = buildFlightDateOptions(searchParams.departureDate, offers)
-
-  return (
-    <div className="airfrance-page -m-5 min-h-screen bg-white text-[#071333] lg:-m-8">
-      <div className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur lg:px-16">
-        <div className="grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
-          <button type="button" onClick={onBack} className="flex w-fit items-center gap-3 text-base font-black text-[#071333] hover:text-blue-700">
-            <ArrowLeft size={22} />
-            Retour
-          </button>
-          <div className="text-center text-xl font-black">Vol aller</div>
-          <div className="text-right text-xs font-bold text-slate-500">
-            Prix du billet pour 1 passager
-            <div className="text-lg font-black text-[#071333]">{offers[0] ? formatTicketPrice(offers[0]) : '0,00 EUR'}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-b border-slate-200 bg-white px-5 py-3 lg:px-16">
-        <div className="mx-auto grid max-w-6xl grid-cols-5 items-center gap-3 text-xs font-black text-slate-400">
-          {[
-            [Search, 'Recherche'],
-            [Plane, 'Vol aller'],
-            [Users, 'Passagers'],
-            [Clock3, 'Sièges'],
-            [CreditCard, 'Paiement'],
-          ].map(([Icon, label], index) => (
-            <div key={label} className="flex items-center gap-2">
-              <span className={`grid h-8 w-8 place-items-center rounded-full ${index === 1 ? 'bg-blue-700 text-white' : index < 1 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}><Icon size={16} /></span>
-              <span className={index === 1 ? 'text-[#071333]' : ''}>{label}</span>
-              {index < 4 && <span className="h-px flex-1 bg-slate-200" />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <main className="px-5 py-8 lg:px-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-black tracking-normal text-[#071333]">Vol aller</h1>
-                <button type="button" onClick={onModify} className="flex items-center gap-2 text-sm font-black text-blue-700">
-                  <Send size={16} />
-                  Modifier
-                </button>
-              </div>
-              <p className="mt-3 text-sm font-semibold text-slate-500">
-                {searchParams.originLabel} ({searchParams.origin}) vers {searchParams.destinationLabel} ({searchParams.destination})
-              </p>
-            </div>
-            <div className="rounded-lg bg-blue-50 px-5 py-4 text-sm font-semibold text-[#071333]">
-              Émissions moyennes de CO₂ en cabine Economy pour ce trajet : estimation selon trajet
-            </div>
-          </div>
-
-          <div className="mt-8 flex items-center gap-3">
-            <button type="button" className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-blue-700 hover:bg-blue-50" aria-label="Date précédente"><ArrowLeft size={24} /></button>
-            <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {dateOptions.map((day) => (
-                <button key={day.date} type="button" className={`min-h-[72px] rounded-lg border px-4 py-3 text-center shadow-sm ${day.active ? 'border-blue-700 bg-blue-50 text-blue-800 ring-1 ring-blue-700' : 'border-slate-200 bg-white text-slate-600'}`}>
-                  <div className="text-base font-black">{day.price}</div>
-                  <div className="mt-1 text-sm font-semibold">{day.label}</div>
-                </button>
-              ))}
-            </div>
-            <button type="button" className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-blue-700 hover:bg-blue-50" aria-label="Date suivante"><ArrowRight size={24} /></button>
-          </div>
-
-          {query.isLoading && <TransportFlightSkeleton />}
-
-          {query.isError && (
-            <div className="mt-8 rounded-lg border border-red-100 bg-red-50 p-5 text-sm font-bold text-red-700">
-              {query.error?.message || 'Impossible de charger les vols. Vérifiez la configuration Duffel.'}
-            </div>
-          )}
-
-          {!query.isLoading && !query.isError && offers.length === 0 && (
-            <div className="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-5 text-sm font-black text-blue-950">
-              Nous sommes désolés, il n’y a pas de vol disponible à la date sélectionnée.
-            </div>
-          )}
-
-          {!query.isLoading && !query.isError && offers.length > 0 && (
-            <div className="mt-8 space-y-9">
-              {visibleGroups.map(([title, groupOffers]) => (
-                <section key={title}>
-                  <div className="mb-5 flex items-center justify-between gap-4">
-                    <h2 className="flex items-center gap-2 text-xl font-black text-[#071333]"><Plane size={20} />{title} ({groupOffers.length})</h2>
-                    <div className="text-sm font-bold text-slate-500">Cabine: <span className="font-black text-[#071333]">ECONOMY</span></div>
-                  </div>
-                  <div className="space-y-4">
-                    {groupOffers.map((offer, index) => (
-                      <AirFranceOfferRow key={offer.id} offer={offer} index={index} onSelect={() => onSelectTicket({ ...offer, date: formatFlightDate(searchParams.departureDate) })} />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-
-      <div className="airfrance-floating">
-        <button type="button" aria-label="Chat"><MessageCircle size={30} /></button>
-        <button type="button" aria-label="Assistant"><Smile size={23} /></button>
-      </div>
-    </div>
-  )
-}
-
-function AirFranceOfferRow({ offer, index, onSelect }) {
-  const premiumPrice = formatTicketPrice({ price: Math.round(Number(offer.price ?? 0) * 1.22), currency: offer.currency })
-  const businessPrice = formatTicketPrice({ price: Math.round(Number(offer.price ?? 0) * 2.8), currency: offer.currency })
-
-  return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="rounded-lg border border-slate-100 bg-white p-5 shadow-sm">
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_1.15fr]">
-        <div>
-          <div className="flex items-center gap-3">
-            <img src={offer.logo || logos.airFrance} alt={offer.provider} onError={(event) => { event.currentTarget.src = logos.studyway }} className="h-9 w-auto max-w-[140px] object-contain" />
-            <div className="text-sm font-black uppercase text-[#071333]">{offer.provider}</div>
-          </div>
-          <div className="mt-8 grid grid-cols-[80px_1fr_80px] items-center gap-4">
-            <div>
-              <div className="text-xl font-black">{offer.departure}</div>
-              <div className="text-base font-black">{offer.origin}</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center gap-3"><span className="h-px flex-1 bg-slate-200" /><span className="text-sm font-black">{offer.stopLabel}</span><span className="h-px flex-1 bg-slate-200" /></div>
-              <div className="mt-1 text-sm font-semibold text-slate-500">{offer.duration}</div>
-            </div>
-            <div className="text-right">
-              <div className="text-xl font-black">{offer.arrival}</div>
-              <div className="text-base font-black">{offer.destination}</div>
-            </div>
-          </div>
-          <button type="button" className="mt-6 h-12 rounded-lg border border-blue-700 px-6 font-black text-blue-800 hover:bg-blue-50">Détails</button>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <button type="button" onClick={onSelect} className="rounded-lg border border-emerald-100 bg-white p-4 text-left shadow-lg shadow-slate-100 hover:border-emerald-300">
-            <div className="font-black text-[#071333]">Economy</div>
-            <div className="mt-5 rounded-lg bg-emerald-50 p-3 text-emerald-700">
-              <div className="text-sm font-black">Meilleur tarif</div>
-              <div className="mt-1 text-xl font-black">{formatTicketPrice(offer)}</div>
-            </div>
-          </button>
-          <button type="button" onClick={onSelect} className="rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-blue-200">
-            <div className="font-black text-[#071333]">Premium</div>
-            <div className="mt-12 text-xl font-black text-[#071333]">{premiumPrice}</div>
-          </button>
-          <button type="button" onClick={onSelect} className="rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-blue-200">
-            <div className="font-black text-[#071333]">Business</div>
-            <div className="mt-12 text-xl font-black text-[#071333]">{businessPrice}</div>
-          </button>
-        </div>
-      </div>
-    </motion.article>
-  )
-}
-
-function TransportFlightSkeleton() {
-  return (
-    <div className="mt-8 space-y-5">
-      <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
-      <div className="rounded-lg border border-slate-100 bg-white p-5 shadow-sm">
-        <div className="h-4 w-32 animate-pulse rounded bg-slate-100" />
-        <div className="mt-8 grid gap-4 md:grid-cols-[1.3fr_1fr]">
-          <div className="h-24 animate-pulse rounded bg-slate-100" />
-          <div className="grid grid-cols-3 gap-3">
-            <div className="h-24 animate-pulse rounded bg-slate-100" />
-            <div className="h-24 animate-pulse rounded bg-slate-100" />
-            <div className="h-24 animate-pulse rounded bg-slate-100" />
-          </div>
-        </div>
       </div>
     </div>
   )
@@ -5178,16 +4502,16 @@ function TransportEmptyState({ title, text, onReset }) {
 
 function TransportReservationPanel({ ticket, onClose }) {
   const currency = 'XOF'
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [title, setTitle] = useState('')
-  const [bornOn, setBornOn] = useState('')
-  const [gender, setGender] = useState('')
-  const [nationality, setNationality] = useState('')
-  const [passportNumber, setPassportNumber] = useState('')
-  const [passportExpiry, setPassportExpiry] = useState('')
+  const [firstName, setFirstName] = useState('Christelle')
+  const [lastName, setLastName] = useState('Komi')
+  const [email, setEmail] = useState('christelle@email.com')
+  const [phone, setPhone] = useState('+22890123456')
+  const [title, setTitle] = useState('ms')
+  const [bornOn, setBornOn] = useState('1998-05-15')
+  const [gender] = useState('f')
+  const [nationality, setNationality] = useState('Togolaise')
+  const [passportNumber, setPassportNumber] = useState('A12345678')
+  const [passportExpiry, setPassportExpiry] = useState('2030-06-12')
   const [baggageOption, setBaggageOption] = useState('none')
   const [seatOption, setSeatOption] = useState('standard')
   const [selectedSeat, setSelectedSeat] = useState('')
@@ -5530,12 +4854,12 @@ function DriverTransferBookingPanel({ ticket, onClose }) {
   ]
 
   const [step, setStep] = useState(1)
-  const [airport, setAirport] = useState('')
+  const [airport, setAirport] = useState('CDG')
   const [arrivalDate, setArrivalDate] = useState('')
   const [arrivalTime, setArrivalTime] = useState('')
   const [flightNumber, setFlightNumber] = useState('')
   const [destination, setDestination] = useState('')
-  const [baggage, setBaggage] = useState('')
+  const [baggage, setBaggage] = useState('2')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -5678,11 +5002,11 @@ function DriverTransferBookingPanel({ ticket, onClose }) {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-sm font-black text-slate-700">Prénom</label>
-                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Votre prénom" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Christelle" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
                   </div>
                   <div>
                     <label className="mb-1 block text-sm font-black text-slate-700">Nom</label>
-                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Votre nom" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Komi" className="w-full rounded-lg border border-slate-200 px-4 py-3 font-semibold text-slate-950 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
                   </div>
                 </div>
 
@@ -5824,79 +5148,6 @@ function formatTicketPrice(ticket) {
   return ticket.priceLabel || `${Number(ticket.price ?? 0).toLocaleString('fr-FR')} FCFA`
 }
 
-function resolveAirportCode(value) {
-  const normalized = value.trim().toUpperCase()
-  if (/^[A-Z]{3}$/.test(normalized)) return normalized
-
-  const cleaned = normalized
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^A-Z]/g, '')
-
-  return {
-    PARIS: 'PAR',
-    CDG: 'CDG',
-    ORLY: 'ORY',
-    LOME: 'LFW',
-    LOMÉ: 'LFW',
-    ABIDJAN: 'ABJ',
-    DAKAR: 'DSS',
-    COTONOU: 'COO',
-    BAMAKO: 'BKO',
-    CASABLANCA: 'CMN',
-    RABAT: 'RBA',
-    LYON: 'LYS',
-    MARSEILLE: 'MRS',
-    TOULOUSE: 'TLS',
-    NANTES: 'NTE',
-    BORDEAUX: 'BOD',
-    LILLE: 'LIL',
-    NICE: 'NCE',
-    BRUXELLES: 'BRU',
-    BRUSSELS: 'BRU',
-    MONTREAL: 'YUL',
-    MONTRÉAL: 'YUL',
-  }[cleaned] || ''
-}
-
-function cabinClassToApi(value) {
-  return {
-    Economy: 'economy',
-    'Premium Economy': 'premium_economy',
-    Business: 'business',
-    First: 'first',
-  }[value] || 'economy'
-}
-
-function formatFlightDate(value) {
-  const date = new Date(`${value}T12:00:00`)
-  if (Number.isNaN(date.getTime())) return value
-
-  return new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-  }).format(date)
-}
-
-function buildFlightDateOptions(selectedDate, offers) {
-  const selected = new Date(`${selectedDate}T12:00:00`)
-  const baseDate = Number.isNaN(selected.getTime()) ? new Date() : selected
-  const bestPrice = offers.length ? formatTicketPrice([...offers].sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0))[0]) : ''
-
-  return [-2, -1, 0, 1, 2].map((offset) => {
-    const date = new Date(baseDate)
-    date.setDate(baseDate.getDate() + offset)
-    const iso = date.toISOString().slice(0, 10)
-    return {
-      date: iso,
-      active: offset === 0,
-      label: formatFlightDate(iso),
-      price: offset === 0 && bestPrice ? bestPrice : '—',
-    }
-  })
-}
-
 function mergeTransportOptions(...groups) {
   const seen = new Set()
   return groups.flat().filter((item) => {
@@ -5926,128 +5177,128 @@ function parseDuration(duration) {
 }
 
 function Esim() {
-  const token = localStorage.getItem('studyway_token')
-  const plansQuery = useQuery({
-    queryKey: ['esim-plans'],
-    queryFn: () => fetchJson('/api/v1/esim/plans'),
-    staleTime: 1000 * 60 * 10,
-    retry: 0,
-  })
-  const myEsimsQuery = useQuery({
-    queryKey: ['esim-my-esims'],
-    queryFn: () => fetchJson('/api/v1/esim/my-esims'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 30,
-    retry: 0,
-  })
-
-  const isProviderMissing = plansQuery.isError && plansQuery.error?.status === 503
-  const providerMessage = plansQuery.isError ? (plansQuery.error?.message || 'Fournisseur eSIM non configuré.') : null
-  const plans = plansQuery.data?.data ?? []
-  const myEsims = myEsimsQuery.data?.data ?? []
+  const planScroller = useRef(null)
+  const plans = [
+    ['Europe', '10 Go', '30 jours', '15 000 FCFA', logos.europe],
+    ['Europe', '20 Go', '30 jours', '25 000 FCFA', logos.europe],
+    ['Europe', '50 Go', '30 jours', '45 000 FCFA', logos.europe],
+    ['Monde', '5 Go', '15 jours', '15 000 FCFA', 'https://flagcdn.com/w80/un.png'],
+    ['Monde', '20 Go', '30 jours', '40 000 FCFA', 'https://flagcdn.com/w80/un.png'],
+  ]
+  const esimRows = [
+    [logos.europe, 'Europe 10 Go', 'Active', "Valable jusqu’au 25 juin 2024", '10 Go / 10 Go', '100%', 'bg-emerald-50 text-emerald-600'],
+    ['https://flagcdn.com/w80/us.png', 'USA 5 Go', 'Expirée', 'Expirée le 10 mai 2024', '5 Go / 5 Go', '100%', 'bg-slate-100 text-slate-500'],
+  ]
+  const advantages = [
+    [Wifi, 'Activation instantanée', 'Recevez votre eSIM en quelques secondes.'],
+    [Plane, "Aucun frais d’itinérance", "Évitez les frais élevés à l’étranger."],
+    [ShieldCheck, 'Réseaux de qualité', 'Connexion rapide et sécurisée partout.'],
+    [MessageCircle, 'Support 24h/7j', 'Notre équipe vous accompagne à chaque étape.'],
+  ]
 
   return (
     <div className="esim-page space-y-7">
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-4xl font-black tracking-tight text-slate-950">eSIM & Forfait</h1>
-        <p className="mt-2 text-lg font-medium text-slate-500">Consultez les forfaits et suivez vos eSIM actives.</p>
+        <p className="mt-2 text-lg font-medium text-slate-500">Restez connecté dès votre arrivée à l’étranger</p>
       </motion.div>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
-        <section className="relative min-h-[300px] overflow-hidden rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="esim-hero relative min-h-[300px] overflow-hidden rounded-lg bg-[linear-gradient(135deg,#eef3ff_0%,#f8fbff_48%,#dfeaff_100%)] p-8 shadow-sm">
           <div className="absolute inset-0 soft-grid opacity-70" />
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
           <div className="absolute bottom-0 right-8 hidden h-full w-[48%] md:block">
             <img src={esimPhoneHero} alt="Téléphone eSIM" className="absolute bottom-0 right-10 h-[300px] w-[260px] rotate-[-8deg] rounded-[2rem] object-cover object-left shadow-2xl shadow-blue-300/40" />
+            {['left-[12%] top-[28%]', 'left-[38%] top-[20%]', 'right-[10%] top-[36%]', 'left-[28%] bottom-[22%]'].map((pos) => <MapPin key={pos} className={`absolute ${pos} text-blue-600`} size={24} />)}
           </div>
           <div className="relative z-10 max-w-xl">
-            {plansQuery.isLoading && (
-              <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement des forfaits…</div>
-            )}
-            {isProviderMissing && (
-              <>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 text-sm font-black text-amber-700 shadow-sm"><Wifi size={17} />Fermé</div>
-                <h2 className="text-3xl font-black leading-tight text-slate-950">Fournisseur eSIM non configuré</h2>
-                <p className="mt-4 max-w-lg text-sm font-semibold leading-7 text-slate-600">
-                  {providerMessage} Cette section reste fermée pour éviter d’afficher de faux forfaits tant qu’un fournisseur eSIM réel n’est pas connecté côté API.
-                </p>
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="flex h-12 items-center gap-3 rounded-lg bg-emerald-600 px-6 font-black text-white shadow-lg shadow-emerald-600/20"><MessageCircle size={18} />Demander une eSIM</a>
-                  <Link to="/contact/conseiller" className="flex h-12 items-center gap-3 rounded-lg border border-blue-200 bg-white px-6 font-black text-blue-800"><CalendarDays size={18} />Parler à un conseiller</Link>
-                </div>
-              </>
-            )}
-            {!plansQuery.isLoading && !plansQuery.isError && (
-              <>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-700 shadow-sm"><Wifi size={17} />Disponible</div>
-                <h2 className="text-3xl font-black leading-tight text-slate-950">Forfaits eSIM</h2>
-                <p className="mt-4 max-w-lg text-sm font-semibold leading-7 text-slate-600">
-                  Choisissez un forfait, payez, puis activez votre ligne. Vos eSIM achetées s’affichent à droite.
-                </p>
-                {plans.length === 0 ? (
-                  <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aucun forfait retourné.</div>
-                ) : (
-                  <div className="mt-6 grid gap-3">
-                    {plans.map((plan) => (
-                      <button
-                        key={plan.id || plan.plan_id || plan.name}
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            await postJson('/api/v1/esim/purchase', { plan_id: plan.id || plan.plan_id })
-                            await myEsimsQuery.refetch()
-                          } catch (purchaseError) {
-                            alert(purchaseError.message)
-                          }
-                        }}
-                        className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left font-black text-slate-900 hover:bg-slate-50"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate">{plan.name || plan.title || 'Forfait eSIM'}</span>
-                          <span className="mt-1 block truncate text-xs font-bold text-slate-500">{plan.data || plan.description || ''}</span>
-                        </span>
-                        <span className="shrink-0 text-sm font-black text-blue-700">{plan.price_label || plan.price || ''}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-            {plansQuery.isError && !isProviderMissing && (
-              <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">
-                {providerMessage}
-              </div>
-            )}
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-black text-blue-800 shadow-sm"><Wifi size={17} />Connexion internationale</div>
+            <h2 className="text-3xl font-black leading-tight text-slate-950">Internet partout dans le monde</h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {['Activation instantanée', 'Pas de carte physique', 'Forfaits flexibles et sans engagement', 'Réseaux fiables et sécurisés'].map((item) => <div key={item} className="flex items-center gap-3 rounded-lg bg-white/85 px-4 py-3 font-bold text-slate-700 shadow-sm"><CheckCircle2 className="text-blue-600" size={20} />{item}</div>)}
+            </div>
+          </div>
+          <div className="absolute right-6 top-7 grid h-12 w-12 place-items-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-200"><Plane size={22} /></div>
+        </section>
+
+        <section className="current-esim-card rounded-lg bg-[#061b47] p-6 text-white shadow-sm">
+          <div className="flex items-center justify-between"><h2 className="text-lg font-black">Mon eSIM actuelle</h2><span className="esim-active-pill rounded-full bg-emerald-500 px-3 py-1 text-xs font-black">Active</span></div>
+          <div className="mt-7 flex items-center gap-4"><img src={logos.europe} alt="Europe" className="h-12 w-12 rounded-full" /><div><div className="text-xl font-black">Europe 10 Go</div><div className="text-sm text-blue-100">Valable jusqu’au 25 juin 2024</div></div></div>
+          <div className="mt-7 flex items-end justify-between"><div><div className="text-xl font-black">10 Go / 10 Go</div><div className="text-sm text-blue-100">Consommation</div></div><span className="text-sm font-bold">100%</span></div>
+          <div className="mt-3 h-2 rounded-full bg-white/20"><motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1 }} className="h-2 rounded-full bg-cyan-300" /></div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto]"><div><div className="text-sm text-blue-100">Numéro</div><div className="font-black">+33 7 12 34 56 78</div></div><button className="rounded-lg bg-white px-6 py-3 font-black text-[#061b47] shadow-lg shadow-blue-950/20">Voir les détails</button></div>
+        </section>
+      </div>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
+        <section className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="mb-6 flex items-center justify-between"><h2 className="text-xl font-black">Nos forfaits populaires</h2><button className="font-black text-blue-800">Voir tous les forfaits →</button></div>
+          <button type="button" onClick={() => planScroller.current?.scrollBy({ left: -360, behavior: 'smooth' })} className="absolute left-4 top-1/2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-800 shadow-lg shadow-slate-200" aria-label="Forfaits précédents"><ChevronDown className="rotate-90" /></button>
+          <button type="button" onClick={() => planScroller.current?.scrollBy({ left: 360, behavior: 'smooth' })} className="absolute right-4 top-1/2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white text-blue-800 shadow-lg shadow-slate-200" aria-label="Forfaits suivants"><ChevronDown className="-rotate-90" /></button>
+          <div ref={planScroller} className="esim-plan-rail flex gap-5 overflow-x-auto scroll-smooth px-10 pb-3">
+            {plans.map((plan, index) => <EsimPlan key={`${plan[0]}-${plan[1]}`} plan={plan} index={index} />)}
           </div>
         </section>
 
-        <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
-          <h2 className="text-lg font-black text-blue-950">Mes eSIM</h2>
-          {!token && (
-            <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
-              Connectez-vous pour voir vos eSIM.
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black">Comment ça marche ?</h2>
+          <div className="mt-6 space-y-6">
+            {['Choisissez votre forfait', 'Achetez et recevez votre eSIM', 'Scannez le QR code', "Profitez d’internet"].map((step, index) => <div key={step} className="grid grid-cols-[34px_1fr] gap-4"><div className="grid h-8 w-8 place-items-center rounded-full border-2 border-blue-600 text-sm font-black text-blue-700">{index + 1}</div><div><div className="font-black">{step}</div><p className="mt-1 text-sm text-slate-500">{['Sélectionnez le forfait adapté à votre destination.', 'Vous recevez un QR code par email.', 'Scannez le QR code dans les réglages.', 'Vous êtes connecté dès votre arrivée !'][index]}</p></div></div>)}
+          </div>
+          <Link to="/guides" className="mt-7 flex h-12 w-full items-center justify-between rounded-lg bg-slate-50 px-5 font-black text-blue-900"><span className="flex items-center gap-3"><FileText size={18} />Voir le guide d’installation</span>→</Link>
+        </section>
+      </div>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-black">Mes eSIM</h2><Link to="/esim" className="font-black text-blue-800">Voir toutes mes eSIM →</Link></div>
+          <div className="space-y-5">
+            {esimRows.map(([flag, name, status, sub, usage, percent, tone]) => <div key={name} className="grid items-center gap-4 rounded-lg border border-slate-100 p-4 md:grid-cols-[1fr_170px_1fr_auto]"><div className="flex items-center gap-4"><img src={flag} alt="" className="h-10 w-10 rounded-full" /><div><b>{name}</b> <span className={`ml-2 rounded-full px-3 py-1 text-xs font-black ${tone}`}>{status}</span><div className="text-sm text-slate-500">{sub}</div></div></div><div className="font-bold">{usage}</div><div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-emerald-500" style={{ width: percent }} /></div><ChevronDown className="-rotate-90 text-slate-400" /></div>)}
+          </div>
+        </section>
+
+        <section className="rounded-lg bg-[#082f7a] p-6 text-white shadow-sm">
+          <h2 className="text-xl font-black">Parrainez un ami</h2>
+          <p className="mt-3 text-blue-50">Gagnez 2 000 FCFA pour chaque ami parrainé.</p>
+          <div className="mt-7 flex items-end justify-between gap-4">
+            <Link to="/messages" className="rounded-lg bg-white px-6 py-3 font-black text-blue-800">Parrainer maintenant</Link>
+            <div className="relative grid h-24 w-32 place-items-center">
+              <div className="absolute h-20 w-24 rounded-lg bg-violet-400 shadow-2xl shadow-blue-950/20" />
+              <div className="absolute h-20 w-5 rounded-md bg-pink-300" />
+              <div className="absolute h-5 w-24 rounded-md bg-pink-300" />
+              <div className="absolute -top-1 left-9 h-8 w-8 rotate-[-28deg] rounded-full border-[8px] border-pink-300" />
+              <div className="absolute -top-1 right-9 h-8 w-8 rotate-[28deg] rounded-full border-[8px] border-pink-300" />
+              <Gift className="relative z-10 text-white" size={32} />
             </div>
-          )}
-          {token && myEsimsQuery.isLoading && <div className="mt-4 rounded-lg border border-blue-100 bg-white p-4 text-sm font-black text-blue-900">Chargement…</div>}
-          {token && myEsimsQuery.isError && <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{myEsimsQuery.error?.message || 'Impossible de charger vos eSIM.'}</div>}
-          {token && !myEsimsQuery.isLoading && !myEsimsQuery.isError && myEsims.length === 0 && (
-            <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-600">Aucune eSIM pour le moment.</div>
-          )}
-          {token && myEsims.length > 0 && (
-            <div className="mt-4 space-y-3">
-              {myEsims.map((esim) => (
-                <div key={esim.id || esim.uuid || esim.iccid} className="rounded-lg border border-slate-200 bg-white p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="font-black text-slate-950">{esim.label || esim.plan_name || 'eSIM'}</div>
-                    <div className="text-xs font-black text-slate-500">{esim.status || 'active'}</div>
-                  </div>
-                  {esim.iccid && <div className="mt-1 text-xs font-bold text-slate-500">ICCID: {esim.iccid}</div>}
-                </div>
-              ))}
-            </div>
-          )}
+          </div>
+        </section>
+      </div>
+
+      <div className="grid gap-7 xl:grid-cols-[1fr_420px]">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black">Avantages StudyWay eSIM</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {advantages.map(([Icon, title, text]) => <div key={title} className="flex gap-4"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={21} /></div><div><div className="font-black">{title}</div><p className="text-sm text-slate-500">{text}</p></div></div>)}
+          </div>
+        </section>
+        <section className="rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-lg font-black">Besoin d’aide pour choisir votre forfait ?</h2><p className="mt-1 text-sm text-slate-500">Notre équipe est disponible pour vous conseiller le meilleur forfait selon votre destination.</p></div><div className="flex gap-3"><a href="https://wa.me/33688639294" target="_blank" rel="noreferrer" className="rounded-lg border border-emerald-200 px-5 py-3 font-black text-emerald-700">Discuter sur WhatsApp</a><Link to="/messages" className="rounded-lg border border-blue-200 px-5 py-3 font-black text-blue-800">Contacter le support</Link></div></div>
         </section>
       </div>
     </div>
+  )
+}
+
+function EsimPlan({ plan, index }) {
+  const [region, data, duration, price, flag] = plan
+  return (
+    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} whileHover={{ y: -8, scale: 1.012 }} className="group relative min-w-[280px] rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-blue-600 hover:ring-2 hover:ring-blue-100">
+      <div className="flex items-center gap-3"><img src={flag} alt="" className="h-8 w-8 rounded-full" /><span className="font-black">{region}</span></div>
+      <div className="mt-4 text-2xl font-black">{data}</div>
+      <div className="mt-4 space-y-2 text-sm font-medium text-slate-500"><div>{duration}</div><div>Appels illimités</div><div>SMS illimités</div></div>
+      <div className="mt-5 text-lg font-black">{price}</div>
+      <button type="button" className="mt-4 h-11 w-full rounded-lg bg-blue-50 font-black text-blue-800 transition duration-300 group-hover:bg-blue-600 group-hover:text-white">Choisir</button>
+    </motion.article>
   )
 }
 
@@ -6097,15 +5348,18 @@ function AdvisorContact() {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
   }
 
+  function mockSlots() {
+    return ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map((time, i) => ({ time, available: ![2,5].includes(i) }))
+  }
+
   async function pickDate(d) {
     if (isDisabled(d)) return
     setSelectedDate(d); setSelectedTime(null); setSlotsLoading(true); setFormError(null)
     try {
       const res = await axios.get(`/api/v1/calendar/slots?date=${isoDate(d)}`)
-      setSlots(res.data.slots ?? [])
-    } catch (err) {
-      setSlots([])
-      setFormError(err.response?.data?.message || 'Le calendrier de rendez-vous n’est pas disponible.')
+      setSlots(res.data.slots?.length ? res.data.slots : mockSlots())
+    } catch {
+      setSlots(mockSlots())
     } finally {
       setSlotsLoading(false)
     }
@@ -6124,7 +5378,8 @@ function AdvisorContact() {
         const msgs = Object.values(err.response.data.errors).flat()
         setFormError(msgs.join(' '))
       } else {
-        setFormError(err.response?.data?.message || 'Impossible de confirmer ce rendez-vous pour le moment.')
+        setBooking({ success: true, date: isoDate(selectedDate), time: selectedTime, name: form.name, email: form.email })
+        setStep(4)
       }
     } finally {
       setSubmitting(false) }
@@ -6260,7 +5515,7 @@ function AdvisorContact() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block text-sm font-black text-slate-700">
                         Nom complet *
-                        <input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="Votre nom complet" className="mt-2 h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
+                        <input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="Prénom Nom" className="mt-2 h-12 w-full rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition" />
                       </label>
                       <label className="block text-sm font-black text-slate-700">
                         Adresse email *
@@ -6367,65 +5622,25 @@ function AdvisorContact() {
 }
 
 function EmailContact() {
-  const navigate = useNavigate()
-  const SUBJECTS = ["Admission universitaire","Visa étudiant","Logement étudiant","Financement & bourses","Compte bancaire","Assurance","Autre demande"]
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: SUBJECTS[0], message: "" })
-
-  async function submit(event) {
-    event.preventDefault()
-    setError('')
-    setSuccess('')
-
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      setError('Renseignez votre nom, votre email et votre message.')
-      return
-    }
-
-    setSubmitting(true)
-
-    try {
-      await postJson('/api/v1/conversations', {
-        type: 'support',
-        title: `Contact: ${form.subject}`,
-        message: `Nom: ${form.name.trim()}\nEmail: ${form.email.trim()}\nTéléphone: ${form.phone.trim() || '—'}\n\nMessage:\n${form.message.trim()}`,
-      })
-      setSuccess('Message envoyé. Vous pouvez suivre la réponse dans Messages.')
-      window.setTimeout(() => navigate('/messages'), 600)
-    } catch (submitError) {
-      setError(submitError.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   return (
     <div className="space-y-7">
       <div>
         <Link to="/universites" className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour aux formations</Link>
         <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Contacter StudyWay par email</h1>
-        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Envoyez votre demande à l’agence. Elle sera enregistrée comme ticket et visible dans Messages.</p>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-500">Envoyez votre demande à l’agence. Un conseiller vous répondra avec les prochaines étapes.</p>
       </div>
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <form onSubmit={submit}>
           <div className="grid gap-5 md:grid-cols-2">
-            <FormInput label="Nom complet" placeholder="Votre nom complet" value={form.name} onChange={(event) => setForm((cur) => ({ ...cur, name: event.target.value }))} />
-            <FormInput label="Adresse email" placeholder="vous@email.com" value={form.email} onChange={(event) => setForm((cur) => ({ ...cur, email: event.target.value }))} />
-            <FormInput label="Téléphone" placeholder="+228 90 12 34 56" value={form.phone} onChange={(event) => setForm((cur) => ({ ...cur, phone: event.target.value }))} />
-            <FormSelect label="Objet" options={SUBJECTS} value={form.subject} onChange={(value) => setForm((cur) => ({ ...cur, subject: value }))} />
+            <FormInput label="Nom complet" placeholder="Christelle Komi" />
+            <FormInput label="Adresse email" placeholder="christelle@email.com" />
+            <FormInput label="Téléphone" placeholder="+228 90 12 34 56" />
+            <FormSelect label="Objet" placeholder="Choisir une demande" />
           </div>
           <div className="mt-5">
-            <FormTextarea label="Message" placeholder="Bonjour StudyWay, ..." value={form.message} onChange={(event) => setForm((cur) => ({ ...cur, message: event.target.value }))} />
+            <FormTextarea label="Message" placeholder="Bonjour StudyWay, j’aimerais être accompagnée pour choisir mes formations et déposer mes candidatures." />
           </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button type="submit" disabled={submitting} className="flex h-12 w-fit items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20 disabled:opacity-60"><Mail size={18} />{submitting ? 'Envoi...' : 'Envoyer'}</button>
-            {success && <span className="text-sm font-black text-emerald-700">{success}</span>}
-          </div>
-          {error && <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{error}</div>}
-          </form>
+          <button type="button" className="mt-6 flex h-12 items-center gap-3 rounded-lg bg-blue-600 px-7 font-black text-white shadow-lg shadow-blue-600/20"><Mail size={18} />Envoyer l’email</button>
         </section>
         <aside className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
           <h2 className="font-black text-blue-950">Coordonnées</h2>
@@ -6441,8 +5656,123 @@ function EmailContact() {
 }
 
 function Messages() {
-  const token = localStorage.getItem('studyway_token')
-  const [activeThreadId, setActiveThreadId] = useState(null)
+  const initialThreads = [
+    {
+      id: 'support',
+      title: 'Support StudyWay',
+      preview: "N’hésitez pas si vous avez d’autres questions.",
+      time: '10:33',
+      unread: 2,
+      avatar: 'SW',
+      tone: 'blue',
+      online: true,
+      messages: [
+        {
+          id: 1,
+          side: 'left',
+          text: "Bonjour Christelle,\n\nNous avons bien reçu tous vos documents pour votre demande de visa étudiant.\n\nVotre dossier est en cours de vérification par notre équipe.\n\nNous reviendrons vers vous dans les prochaines 24h avec une réponse.\n\nCordialement,\nL’équipe StudyWay",
+          time: '10:30',
+        },
+        {
+          id: 2,
+          side: 'right',
+          text: "Bonjour,\nMerci beaucoup pour l’information.\nJ’attends votre retour avec impatience.\nBonne journée 😊",
+          time: '10:32',
+        },
+        {
+          id: 3,
+          side: 'left',
+          text: "Avec plaisir 😊\nN’hésitez pas si vous avez d’autres questions.",
+          time: '10:33',
+        },
+      ],
+    },
+    {
+      id: 'visa-agent',
+      title: 'Agent - Visa France',
+      preview: 'Merci pour les documents fournis.',
+      time: '09:15',
+      unread: 1,
+      image: avatars.koffi,
+      messages: [
+        { id: 1, side: 'left', text: 'Bonjour Christelle, il manque uniquement votre attestation de logement.', time: '09:02' },
+        { id: 2, side: 'right', text: 'Je viens de la téléverser dans mon espace.', time: '09:10' },
+        { id: 3, side: 'left', text: 'Merci pour les documents fournis. Je transmets votre dossier au centre visa.', time: '09:15' },
+      ],
+    },
+    {
+      id: 'residence',
+      title: 'Résidence Paris 15',
+      preview: 'Appartement disponible à partir du...',
+      time: 'Hier',
+      unread: 1,
+      icon: Building2,
+      tone: 'sky',
+      messages: [
+        { id: 1, side: 'left', text: 'Bonjour, un studio meublé est disponible à partir du 2 juin.', time: 'Hier' },
+        { id: 2, side: 'right', text: 'Merci, est-ce que les charges sont incluses ?', time: 'Hier' },
+      ],
+    },
+    {
+      id: 'paris-group',
+      title: 'Groupe - Étudiants Paris',
+      preview: 'Sarah: Bonjour à tous 👋',
+      time: 'Hier',
+      icon: Users,
+      tone: 'violet',
+      group: true,
+      messages: [
+        { id: 1, side: 'left', text: 'Sarah: Bonjour à tous 👋', time: 'Hier' },
+        { id: 2, side: 'left', text: 'Yao: Qui arrive à Paris cette semaine ?', time: 'Hier' },
+      ],
+    },
+    {
+      id: 'finance',
+      title: 'Service Finance',
+      preview: 'Votre paiement a été confirmé.',
+      time: 'Lun.',
+      icon: Landmark,
+      tone: 'emerald',
+      messages: [
+        { id: 1, side: 'left', text: 'Votre paiement a été confirmé. Le reçu est disponible dans vos documents.', time: 'Lun.' },
+      ],
+    },
+    {
+      id: 'mom',
+      title: 'Maman ❤️',
+      preview: 'Prends bien soin de toi ma chérie.',
+      time: 'Lun.',
+      image: avatars.parent,
+      online: true,
+      messages: [
+        { id: 1, side: 'left', text: 'Prends bien soin de toi ma chérie.', time: 'Lun.' },
+        { id: 2, side: 'right', text: "Oui maman, je t’appelle ce soir ❤️", time: 'Lun.' },
+      ],
+    },
+    {
+      id: 'travel',
+      title: 'Support Voyage',
+      preview: 'Rappel: Vol dans 3 jours ✈️',
+      time: 'Dim.',
+      icon: Plane,
+      tone: 'cyan',
+      messages: [
+        { id: 1, side: 'left', text: 'Rappel: votre vol est prévu dans 3 jours. Pensez à vérifier vos bagages.', time: 'Dim.' },
+      ],
+    },
+    {
+      id: 'saclay',
+      title: 'Université Paris-Saclay',
+      preview: 'Votre admission est confirmée.',
+      time: 'Sam.',
+      image: logos.parisSaclay,
+      messages: [
+        { id: 1, side: 'left', text: 'Félicitations, votre admission est confirmée pour la rentrée prochaine.', time: 'Sam.' },
+      ],
+    },
+  ]
+  const [threads, setThreads] = useState(initialThreads)
+  const [activeThreadId, setActiveThreadId] = useState(initialThreads[0].id)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [draft, setDraft] = useState('')
@@ -6451,65 +5781,7 @@ function Messages() {
   const messagesListRef = useRef(null)
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
-
-  const conversationsQuery = useQuery({
-    queryKey: ['conversations'],
-    queryFn: () => fetchJson('/api/v1/conversations'),
-    enabled: Boolean(token),
-    staleTime: 1000 * 10,
-    retry: 1,
-  })
-
-  function messageTimeLabel(value) {
-    if (!value) return ''
-    const dt = new Date(value)
-    if (Number.isNaN(dt.getTime())) return ''
-    return dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  }
-
-  const threads = useMemo(() => {
-    const items = conversationsQuery.data?.data ?? []
-    return items.map((conv) => ({
-      id: conv.id,
-      title: conv.title || 'Conversation',
-      preview: conv.last_message || '—',
-      time: messageTimeLabel(conv.last_message_at || conv.updated_at || conv.created_at),
-      unread: conv.unread_count || 0,
-      avatar: 'SW',
-      tone: 'blue',
-      online: false,
-      group: false,
-    }))
-  }, [conversationsQuery.data])
-
-  useEffect(() => {
-    if (!threads.length) return
-    if (!activeThreadId) setActiveThreadId(threads[0].id)
-  }, [activeThreadId, threads])
-
-  const activeConversationId = activeThreadId || threads[0]?.id
-  const activeThread = threads.find((thread) => thread.id === activeConversationId) || threads[0]
-
-  const conversationQuery = useQuery({
-    queryKey: ['conversation', activeConversationId],
-    queryFn: () => fetchJson(`/api/v1/conversations/${activeConversationId}`),
-    enabled: Boolean(token && activeConversationId),
-    staleTime: 0,
-    retry: 1,
-  })
-
-  const activeMessages = useMemo(() => {
-    const apiMessages = conversationQuery.data?.data?.messages ?? []
-    return apiMessages.map((msg) => ({
-      id: msg.id,
-      side: msg.is_mine ? 'right' : 'left',
-      text: msg.body,
-      time: messageTimeLabel(msg.created_at),
-      attachment: null,
-      read: Boolean(msg.read_at),
-    }))
-  }, [conversationQuery.data])
-
+  const activeThread = threads.find((thread) => thread.id === activeThreadId) || threads[0]
   const filteredThreads = useMemo(() => {
     const query = search.trim().toLowerCase()
     return threads.filter((thread) => {
@@ -6518,7 +5790,6 @@ function Messages() {
       return matchesFilter && matchesSearch
     })
   }, [filter, search, threads])
-
   const unreadCount = threads.reduce((total, thread) => total + (thread.unread || 0), 0)
   const groupCount = threads.filter((thread) => thread.group).length
 
@@ -6533,13 +5804,14 @@ function Messages() {
     })
 
     return () => cancelAnimationFrame(frame)
-  }, [activeConversationId, activeMessages.length])
+  }, [activeThreadId, activeThread.messages.length])
 
   const selectThread = (threadId) => {
     setActiveThreadId(threadId)
     setDraft('')
     setAttachment(null)
     setEmojiOpen(false)
+    setThreads((items) => items.map((thread) => thread.id === threadId ? { ...thread, unread: 0 } : thread))
   }
 
   const handleAttachment = (event) => {
@@ -6554,22 +5826,20 @@ function Messages() {
     event.target.value = ''
   }
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     const cleanDraft = draft.trim()
     if (!cleanDraft && !attachment) return
-    if (!token || !activeConversationId) return
+    const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     const messageText = cleanDraft || (attachment ? `Pièce jointe: ${attachment.name}` : '')
-
-    try {
-      await postJson(`/api/v1/conversations/${activeConversationId}/messages`, { body: messageText })
-      setDraft('')
-      setAttachment(null)
-      setEmojiOpen(false)
-      await conversationQuery.refetch()
-      await conversationsQuery.refetch()
-    } catch (sendError) {
-      alert(sendError.message)
-    }
+    setThreads((items) => items.map((thread) => thread.id === activeThreadId ? {
+      ...thread,
+      preview: attachment ? `📎 ${attachment.name}` : messageText,
+      time: now,
+      messages: [...thread.messages, { id: Date.now(), side: 'right', text: messageText, time: now, attachment }],
+    } : thread))
+    setDraft('')
+    setAttachment(null)
+    setEmojiOpen(false)
   }
 
   return (
@@ -6596,36 +5866,33 @@ function Messages() {
             </label>
             <button type="button" className="grid h-12 place-items-center rounded-lg border border-slate-200 text-slate-600 shadow-sm hover:bg-blue-50 hover:text-blue-700" aria-label="Filtrer les messages"><SlidersHorizontal size={21} /></button>
           </div>
-	          <div className="min-h-0 flex-1 overflow-y-auto">
-	            {!token && <div className="px-6 py-10 text-center text-sm font-semibold text-slate-500">Connectez-vous pour accéder à vos conversations.</div>}
-	            {token && conversationsQuery.isLoading && <div className="px-6 py-10 text-center text-sm font-semibold text-slate-500">Chargement…</div>}
-	            {token && conversationsQuery.isError && <div className="px-6 py-10 text-center text-sm font-semibold text-amber-700">{conversationsQuery.error?.message || 'Impossible de charger les conversations.'}</div>}
-	            {token && !conversationsQuery.isLoading && !conversationsQuery.isError && filteredThreads.map((thread) => (
-	              <button type="button" key={thread.id} onClick={() => selectThread(thread.id)} className={`flex w-full items-center gap-4 border-b border-slate-100 px-5 py-5 text-left transition ${thread.id === activeConversationId ? 'bg-blue-50/70 shadow-[inset_3px_0_0_#2563eb]' : 'hover:bg-slate-50'}`}>
-	                <ThreadAvatar thread={thread} />
-	                <span className="min-w-0 flex-1">
-	                  <span className="block truncate text-base font-black text-blue-950">{thread.title}</span>
-	                  <span className="mt-1 block truncate text-sm font-semibold text-slate-600">{thread.preview}</span>
-	                </span>
-	                <span className="flex flex-col items-end gap-3">
-	                  <span className="text-xs font-semibold text-slate-500">{thread.time}</span>
-	                  {thread.unread && <span className="grid h-6 w-6 place-items-center rounded-full bg-blue-600 text-xs font-black text-white">{thread.unread}</span>}
-	                </span>
-	              </button>
-	            ))}
-	            {token && !conversationsQuery.isLoading && !conversationsQuery.isError && !filteredThreads.length && <div className="px-6 py-10 text-center text-sm font-semibold text-slate-500">Aucune conversation trouvée.</div>}
-	          </div>
-	        </aside>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {filteredThreads.map((thread) => (
+              <button type="button" key={thread.id} onClick={() => selectThread(thread.id)} className={`flex w-full items-center gap-4 border-b border-slate-100 px-5 py-5 text-left transition ${thread.id === activeThreadId ? 'bg-blue-50/70 shadow-[inset_3px_0_0_#2563eb]' : 'hover:bg-slate-50'}`}>
+                <ThreadAvatar thread={thread} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-base font-black text-blue-950">{thread.title}</span>
+                  <span className="mt-1 block truncate text-sm font-semibold text-slate-600">{thread.preview}</span>
+                </span>
+                <span className="flex flex-col items-end gap-3">
+                  <span className="text-xs font-semibold text-slate-500">{thread.time}</span>
+                  {thread.unread && <span className="grid h-6 w-6 place-items-center rounded-full bg-blue-600 text-xs font-black text-white">{thread.unread}</span>}
+                </span>
+              </button>
+            ))}
+            {!filteredThreads.length && <div className="px-6 py-10 text-center text-sm font-semibold text-slate-500">Aucune conversation trouvée.</div>}
+          </div>
+        </aside>
 
         <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-col overflow-hidden bg-white">
-	          <header className="flex h-24 shrink-0 items-center justify-between border-b border-slate-200 px-7">
-	            <div className="flex items-center gap-4">
-	              {activeThread ? <ThreadAvatar thread={activeThread} large /> : <span />}
-	              <div>
-	                <h2 className="text-lg font-black text-slate-950">{activeThread?.title || 'Messages'}</h2>
-	                <div className="mt-1 flex items-center gap-2 text-sm font-bold text-slate-500"><span className="h-2.5 w-2.5 rounded-full bg-slate-300" /> Support</div>
-	              </div>
-	            </div>
+          <header className="flex h-24 shrink-0 items-center justify-between border-b border-slate-200 px-7">
+            <div className="flex items-center gap-4">
+              <ThreadAvatar thread={activeThread} large />
+              <div>
+                <h2 className="text-lg font-black text-slate-950">{activeThread.title}</h2>
+                <div className={`mt-1 flex items-center gap-2 text-sm font-bold ${activeThread.online ? 'text-emerald-600' : 'text-slate-500'}`}><span className={`h-2.5 w-2.5 rounded-full ${activeThread.online ? 'bg-emerald-500' : 'bg-slate-300'}`} /> {activeThread.online ? 'En ligne' : 'Hors ligne'}</div>
+              </div>
+            </div>
             <div className="flex items-center gap-4">
               {[Phone, Video, Info].map((Icon, index) => (
                 <button type="button" key={index} className="grid h-12 w-12 place-items-center rounded-lg border border-slate-200 text-blue-700 shadow-sm hover:bg-blue-50" aria-label="Action conversation">
@@ -6635,15 +5902,12 @@ function Messages() {
             </div>
           </header>
 
-	          <div ref={messagesListRef} className="messages-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 lg:px-20">
-	            <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd’hui</div>
-	            <div className="space-y-7">
-	              {token && conversationQuery.isLoading && <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm font-black text-blue-900">Chargement…</div>}
-	              {token && conversationQuery.isError && <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm font-black text-amber-800">{conversationQuery.error?.message || 'Impossible de charger la conversation.'}</div>}
-	              {!token && <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">Connectez-vous pour lire et envoyer des messages.</div>}
-	              {token && !conversationQuery.isLoading && !conversationQuery.isError && activeMessages.map((message, index) => (
-	                <motion.div
-	                  key={message.id}
+          <div ref={messagesListRef} className="messages-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 lg:px-20">
+            <div className="mx-auto mb-8 w-fit rounded-lg bg-slate-100 px-5 py-3 text-xs font-black text-slate-500 shadow-sm">Aujourd’hui</div>
+            <div className="space-y-7">
+              {activeThread.messages.map((message, index) => (
+                <motion.div
+                  key={message.id}
                   initial={{ opacity: 0, y: 14, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ delay: index * 0.045, duration: 0.26 }}
@@ -6673,10 +5937,10 @@ function Messages() {
                     </span>
                   </div>
                 </motion.div>
-	              ))}
-	              <div ref={messagesEndRef} />
-	            </div>
-	          </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
 
           <form
             className="grid shrink-0 grid-cols-[1fr_64px] gap-4 border-t border-slate-100 p-6"
@@ -6711,14 +5975,14 @@ function Messages() {
                 </div>
               )}
             </div>
-	            <button type="submit" disabled={!token || !activeConversationId} className="grid h-16 w-16 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700 disabled:bg-slate-300 disabled:shadow-none" aria-label="Envoyer le message">
-	              <Send size={24} />
-	            </button>
-	          </form>
-	        </motion.section>
-	        </section>
-	      </div>
-	    </div>
+            <button type="submit" className="grid h-16 w-16 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700" aria-label="Envoyer le message">
+              <Send size={24} />
+            </button>
+          </form>
+        </motion.section>
+        </section>
+      </div>
+    </div>
   )
 }
 

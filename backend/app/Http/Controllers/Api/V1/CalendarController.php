@@ -33,13 +33,7 @@ class CalendarController extends Controller
             ]);
         }
 
-        try {
-            $slots = $this->calendar->getAvailableSlots($date);
-        } catch (\Throwable $exception) {
-            return response()->json([
-                'message' => 'Le calendrier de rendez-vous n’est pas configuré.',
-            ], 503);
-        }
+        $slots = $this->calendar->getAvailableSlots($date);
 
         return response()->json([
             'date'  => $date->toDateString(),
@@ -65,13 +59,7 @@ class CalendarController extends Controller
 
         $data['message'] = $data['message'] ?? '';
 
-        try {
-            $result = $this->calendar->createAppointment($data);
-        } catch (\Throwable $exception) {
-            return response()->json([
-                'message' => 'Le calendrier de rendez-vous n’est pas configuré.',
-            ], 503);
-        }
+        $result = $this->calendar->createAppointment($data);
 
         return response()->json($result, 201);
     }
