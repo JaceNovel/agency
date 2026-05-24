@@ -464,11 +464,12 @@ function SettingsHubWindow({ onClose }) {
 }
 
 function SettingsPageFrame({ title, children }) {
+  const navigate = useNavigate()
   return (
     <div className="settings-page -m-5 min-h-screen overflow-hidden bg-[#f7f8fb] px-6 py-8 text-slate-950 lg:-m-8 lg:px-[58px]">
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }} className="mb-8 flex items-center justify-between gap-5">
         <div className="flex items-center gap-4">
-          <Link to="/" className="grid h-12 w-12 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-md shadow-slate-200/70"><ChevronDown className="rotate-90" size={22} /></Link>
+          <button type="button" onClick={() => navigate(-1)} className="grid h-12 w-12 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-md shadow-slate-200/70"><ChevronDown className="rotate-90" size={22} /></button>
           <h1 className="text-2xl font-black tracking-tight">{title}</h1>
         </div>
         <div className="hidden items-center gap-3 text-sm font-semibold text-slate-500 lg:flex">Explorer <ChevronDown className="-rotate-90" size={16} /> <span className="text-slate-800">{title}</span></div>
@@ -556,13 +557,12 @@ function BillingSettings() {
           <button type="button" className="mt-6 inline-flex h-12 items-center gap-3 rounded-lg bg-amber-400 px-7 font-black text-white shadow-lg shadow-amber-200"><Plus size={20} />Ajoutez votre première adresse</button>
         </div>
       </motion.section>
-      <SettingsBackLink />
     </SettingsPageFrame>
   )
 }
 
 function PaymentSettings() {
-  const [openMethod, setOpenMethod] = useState('bank')
+  const [openMethods, setOpenMethods] = useState({ bank: false, mobile: false })
   const countryDialOptions = [
     ['🇹🇬', '+228', 'Togo'],
     ['🇫🇷', '+33', 'France'],
@@ -602,8 +602,8 @@ function PaymentSettings() {
         <h2 className="text-3xl font-black">Méthodes de paiement</h2>
         <p className="mt-3 font-semibold text-slate-500">Gérez vos méthodes de paiement.</p>
       </motion.div>
-      <div className="grid gap-7 xl:grid-cols-2">
-        <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} open={openMethod === 'bank'} onToggle={() => setOpenMethod((value) => value === 'bank' ? '' : 'bank')}>
+      <div className="grid items-start gap-7 xl:grid-cols-2">
+        <PaymentMethodCard icon={CreditCard} title="Virement bancaire" text="Entrez les détails de votre compte bancaire." tone="blue" index={0} open={openMethods.bank} onToggle={() => setOpenMethods((value) => ({ ...value, bank: !value.bank }))}>
           <div className="grid gap-4 md:grid-cols-2">
             <PaymentField label="Nom" placeholder="KOMI" />
             <PaymentField label="Prénom" placeholder="Christelle" />
@@ -613,7 +613,7 @@ function PaymentSettings() {
             <Plus size={19} />Enregistrer le compte bancaire
           </button>
         </PaymentMethodCard>
-        <PaymentMethodCard icon={Smartphone} title="Mobile money" text="Ajoutez les numéros autorisés pour les paiements." tone="orange" index={1} open={openMethod === 'mobile'} onToggle={() => setOpenMethod((value) => value === 'mobile' ? '' : 'mobile')}>
+        <PaymentMethodCard icon={Smartphone} title="Mobile money" text="Ajoutez les numéros autorisés pour les paiements." tone="orange" index={1} open={openMethods.mobile} onToggle={() => setOpenMethods((value) => ({ ...value, mobile: !value.mobile }))}>
           <div className="space-y-3">
             {mobileMoneyNumbers.map(([flag, provider, phone, owner]) => (
               <div key={`${provider}-${phone}`} className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
@@ -647,7 +647,6 @@ function PaymentSettings() {
           <div><h3 className="font-black text-blue-950">Informations de versement</h3><p className="mt-3 font-semibold leading-7 text-blue-800">Vos gains sont versés selon la méthode spécifiée ici. Veuillez vous assurer que vos informations sont correctes.</p></div>
         </div>
       </motion.section>
-      <SettingsBackLink />
     </SettingsPageFrame>
   )
 }
@@ -716,13 +715,8 @@ function LoginHistorySettings() {
           </div>
         ))}
       </motion.section>
-      <SettingsBackLink />
     </SettingsPageFrame>
   )
-}
-
-function SettingsBackLink() {
-  return <Link to="/settings/profile" className="mt-8 inline-flex items-center gap-3 font-semibold text-slate-500 hover:text-blue-800"><ArrowRight className="rotate-180" size={18} />Retour au profil</Link>
 }
 
 function StatCard({ icon: Icon, label, value, tone = 'blue' }) {
@@ -1549,7 +1543,7 @@ function Housing() {
                     {chips.map((chip) => <span key={chip} className={`housing-choice-chip rounded-full px-3 py-2 text-xs font-black ${tone === 'blue' ? 'housing-choice-chip-blue' : 'housing-choice-chip-emerald'}`}>{chip}</span>)}
                   </span>
                 </span>
-                <span className={`absolute right-7 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-xl text-white shadow-lg transition group-hover:translate-x-1 ${tone === 'blue' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-500 shadow-emerald-200'}`}><ArrowRight size={23} /></span>
+                <span className={`housing-choice-arrow absolute right-7 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-xl text-white shadow-lg transition group-hover:translate-x-1 ${tone === 'blue' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-500 shadow-emerald-200'}`}><ArrowRight size={23} /></span>
               </motion.button>
             ))}
           </div>
@@ -2367,17 +2361,30 @@ function UniversityApplication() {
   }
 
   return (
-    <div className="space-y-7">
-      <Link to={`/universites/${formationId}`} className="inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour à la formation</Link>
-      <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
-        <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">Postuler</span>
-        <h1 className="mt-5 text-3xl font-black text-slate-950">{formation.formation_name}</h1>
-        <p className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold leading-6 text-slate-500"><span>{formation.university_name ?? 'Établissement français'}</span><span>·</span><MapPin size={15} />{location}</p>
-      </section>
+    <div className="university-application-page space-y-7">
+      <Link to={`/universites/${formationId}`} className="university-application-back inline-flex items-center gap-2 text-sm font-black text-blue-800"><ChevronDown className="rotate-90" size={18} />Retour à la formation</Link>
+      <motion.section initial={{ opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1] }} className="university-application-hero overflow-hidden rounded-2xl border border-blue-100 bg-white p-7 shadow-sm">
+        <div className="grid gap-6 lg:grid-cols-[1fr_310px] lg:items-center">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700"><GraduationCap size={16} />Postuler</span>
+            <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-slate-950">{formation.formation_name}</h1>
+            <p className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold leading-6 text-slate-500"><span>{formation.university_name ?? 'Établissement français'}</span><span>·</span><MapPin size={15} />{location}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm">Dossier guidé</span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm">CV optimisé</span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm">Suivi StudyWay</span>
+            </div>
+          </div>
+          <div className="university-application-mini-cv hidden rounded-2xl bg-white p-5 shadow-xl shadow-blue-950/10 lg:block">
+            <div className="flex items-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-xl bg-blue-600 font-black text-white">CV</span><div><b className="block text-slate-950">CV formation</b><span className="text-sm font-semibold text-slate-500">Adapté à votre vœu</span></div></div>
+            <div className="mt-5 space-y-2"><span /><span /><span /></div>
+          </div>
+        </div>
+      </motion.section>
 
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black text-slate-950">Profil académique</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{hasSavedAcademicProfile ? 'Votre dossier académique StudyWay est déjà enregistré. Vous pouvez le modifier si une information a changé.' : 'Renseignez votre situation actuelle pour que StudyWay adapte le dossier : bac récent, étudiant en L1/L2, reprise d’études ou diplôme déjà obtenu.'}</p>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -2390,9 +2397,9 @@ function UniversityApplication() {
               <ApplicationField label="Moyenne générale indicative" placeholder="Ex : 13,5/20" value={profile.average ?? ''} onChange={(value) => updateProfile('average', value)} />
               <ApplicationField as="select" label="Situation du bac" value={profile.bacStatus ?? ''} onChange={(value) => updateProfile('bacStatus', value)} options={['Bac déjà obtenu', 'Bac en cours', 'Équivalence / diplôme étranger', 'Études supérieures déjà commencées']} />
             </div>
-          </section>
+          </motion.section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black text-slate-950">Dossier demandé</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{hasSavedAcademicProfile ? 'Votre dossier académique général est réutilisé. Pour ce nouveau vœu, ajoutez seulement les éléments spécifiques à la formation.' : 'La liste ci-dessous s’adapte automatiquement au profil académique renseigné : bac en cours, bac obtenu, études supérieures commencées ou reprise d’études.'}</p>
             {!profile.studyLevel ? (
@@ -2404,7 +2411,7 @@ function UniversityApplication() {
                 ))}
               </div>
             )}
-          </section>
+          </motion.section>
         </div>
 
         <aside className="space-y-5">
@@ -2421,11 +2428,27 @@ function UniversityApplication() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
-            <h2 className="font-black text-blue-950">CV adapté à la formation</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">Vous pouvez envoyer votre CV, ou payer 5 € pour que StudyWay prépare un CV propre et adapté à cette formation.</p>
-            <button type="button" onClick={() => setCvService((value) => !value)} className={`mt-5 flex w-full items-center justify-between rounded-lg border p-4 text-left transition ${cvService ? 'border-blue-600 bg-white text-blue-900' : 'border-blue-200 bg-white/70 text-slate-700'}`}>
-              <span className="font-black">Créer mon CV avec StudyWay</span>
+          <section className="university-cv-card overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <div className="grid gap-5 sm:grid-cols-[1fr_118px]">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-black text-blue-700 shadow-sm"><Award size={14} />Option recommandée</span>
+                <h2 className="mt-4 text-xl font-black text-blue-950">CV adapté à la formation</h2>
+                <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">StudyWay transforme votre parcours en CV clair, ciblé et cohérent avec cette formation.</p>
+              </div>
+              <div className="university-cv-preview">
+                <span className="cv-photo" />
+                <span className="cv-line wide" />
+                <span className="cv-line" />
+                <span className="cv-section" />
+                <span className="cv-line wide" />
+                <span className="cv-line short" />
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3 text-sm font-bold text-blue-950">
+              {['Mise en page professionnelle', 'Compétences alignées à la formation', 'Texte relu par un conseiller'].map((item) => <span key={item} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-emerald-600" />{item}</span>)}
+            </div>
+            <button type="button" onClick={() => setCvService((value) => !value)} className={`university-cv-button mt-5 flex w-full items-center justify-between rounded-xl border p-4 text-left transition ${cvService ? 'border-blue-600 bg-white text-blue-900 shadow-lg shadow-blue-200/60' : 'border-blue-200 bg-white/80 text-slate-700'}`}>
+              <span className="font-black">{cvService ? 'CV StudyWay activé' : 'Créer mon CV avec StudyWay'}</span>
               <span className="rounded-full bg-blue-600 px-3 py-1 text-sm font-black text-white">5 €</span>
             </button>
           </section>
@@ -2435,7 +2458,7 @@ function UniversityApplication() {
             {hasReachedApplicationLimit && <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-800">Vous avez déjà 5 candidatures en cours. Attendez une décision ou contactez StudyWay pour remplacer un vœu.</div>}
             <div className="mt-4 flex justify-between text-sm font-semibold text-slate-600"><span>Documents requis</span><b>{Math.min(uploadedCount, requiredCount)}/{requiredCount}</b></div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-600" style={{ width: `${Math.min(100, (uploadedCount / requiredCount) * 100)}%` }} /></div>
-            <button type="button" disabled={!canSubmit} onClick={submitApplication} className={`support-start-button mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-lg font-black text-white ${canSubmit ? 'bg-blue-600 shadow-lg shadow-blue-600/20' : 'cursor-not-allowed bg-slate-300'}`}>Postuler <ArrowRight className="support-start-arrow" size={18} /></button>
+            <button type="button" disabled={!canSubmit} onClick={submitApplication} className={`support-start-button university-submit-button mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl font-black text-white ${canSubmit ? 'bg-blue-600 shadow-lg shadow-blue-600/20' : 'cursor-not-allowed bg-slate-300'}`}>Postuler <ArrowRight className="support-start-arrow" size={18} /></button>
             {!canSubmit && !hasReachedApplicationLimit && <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{hasAcademicProfile ? 'Ajoutez toutes les pièces obligatoires pour envoyer la candidature.' : 'Complétez d’abord le profil académique pour déterminer le dossier à demander.'}</p>}
           </section>
         </aside>
@@ -4121,7 +4144,7 @@ function Transport() {
   }
 
   return (
-    <div className="airfrance-page min-h-screen bg-white text-[#071333]">
+    <div className="airfrance-page -m-5 min-h-screen bg-white text-[#071333] lg:-m-8">
       {isPaymentReturn && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4">
           <motion.div initial={{ opacity: 0, y: 18, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-7 shadow-2xl">
