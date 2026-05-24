@@ -395,7 +395,13 @@ function Shell() {
   const isSettingsPage = location.pathname.startsWith('/parametres') || location.pathname.startsWith('/settings')
   const isSettingsRoute = location.pathname.startsWith('/settings')
   const sidebarOpen = sidebarHover
-  const activeNavIndex = navItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
+  const publicNavItems = [
+    { label: 'Accueil', icon: LayoutDashboard, to: '/' },
+    { label: 'Universités', icon: Building2, to: '/universites' },
+    { label: 'Guides', icon: FileText, to: '/guides' },
+  ]
+  const effectiveNavItems = token ? navItems : publicNavItems
+  const activeNavIndex = effectiveNavItems.findIndex(({ to }) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)))
 
   if (isSettingsPage) {
     return (
@@ -423,55 +429,60 @@ function Shell() {
           </motion.div>
         )}
       </AnimatePresence>
-      {token && (
-        <aside
-          onMouseEnter={() => setSidebarHover(true)}
-          onMouseLeave={() => setSidebarHover(false)}
-          className={`shell-sidebar fixed inset-y-0 left-0 z-50 overflow-hidden bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 ${sidebarOpen ? 'is-open' : ''}`}
-        >
-          <div className="flex h-full min-h-0 flex-col p-4">
-            <div className="sidebar-header flex h-14 items-center gap-3">
-              <div className="rail-menu-button grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" aria-hidden="true">
-                <img src="/studyway-menu-logo.jpeg" alt="" className="h-10 w-10 rounded-xl object-cover" />
-              </div>
-              <div className="sidebar-brand min-w-0">
-                <div>
-                  <div className="text-2xl font-black tracking-tight text-white">Study<span className="text-blue-300">Way</span></div>
-                  <div className="text-[11px] font-medium text-blue-100">Votre avenir, notre mission</div>
-                </div>
+      <aside
+        onMouseEnter={() => setSidebarHover(true)}
+        onMouseLeave={() => setSidebarHover(false)}
+        className={`shell-sidebar fixed inset-y-0 left-0 z-50 overflow-hidden bg-[#061b47] text-white shadow-2xl shadow-slate-950/30 ${sidebarOpen ? 'is-open' : ''}`}
+      >
+        <div className="flex h-full min-h-0 flex-col p-4">
+          <div className="sidebar-header flex h-14 items-center gap-3">
+            <div className="rail-menu-button grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" aria-hidden="true">
+              <img src="/studyway-menu-logo.jpeg" alt="" className="h-10 w-10 rounded-xl object-cover" />
+            </div>
+            <div className="sidebar-brand min-w-0">
+              <div>
+                <div className="text-2xl font-black tracking-tight text-white">Study<span className="text-blue-300">Way</span></div>
+                <div className="text-[11px] font-medium text-blue-100">Votre avenir, notre mission</div>
               </div>
             </div>
-            <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
-              {navItems.map(({ label, icon: Icon, to, badge }, index) => {
-                const isActive = index === activeNavIndex
-                return (
-                  <NavLink key={label} to={to} className={`shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold ${isActive ? 'is-active' : 'text-blue-50'}`}>
-                    {isActive && (
-                      <motion.span
-                        layoutId="sidebar-active-pill"
-                        className="shell-nav-active-pill"
-                        transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.82 }}
-                      />
-                    )}
-                    <span className="shell-nav-icon-wrap">
-                      <Icon className="shell-nav-icon" size={22} />
-                    </span>
-                    <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
-                    {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
-                  </NavLink>
-                )
-              })}
-            </nav>
-            <div className="sidebar-scroll-cue grid place-items-center text-blue-100"><ChevronDown size={22} /></div>
-	            <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
-	              <div className="font-black">Besoin d’aide ?</div>
-	              <p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p>
-	              <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Messages</span></Link>
-	            </div>
           </div>
-        </aside>
-      )}
-	      <div className={`shell-content ${token ? (sidebarOpen ? 'is-compressed' : '') : 'no-sidebar'}`}>
+          <nav className="sidebar-nav mt-8 min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+            {effectiveNavItems.map(({ label, icon: Icon, to, badge }, index) => {
+              const isActive = index === activeNavIndex
+              return (
+                <NavLink key={label} to={to} className={`shell-nav-link flex h-12 items-center gap-3 rounded-2xl px-3 text-sm font-bold ${isActive ? 'is-active' : 'text-blue-50'}`}>
+                  {isActive && (
+                    <motion.span
+                      layoutId="sidebar-active-pill"
+                      className="shell-nav-active-pill"
+                      transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.82 }}
+                    />
+                  )}
+                  <span className="shell-nav-icon-wrap">
+                    <Icon className="shell-nav-icon" size={22} />
+                  </span>
+                  <span className="shell-nav-label flex-1 whitespace-nowrap">{label}</span>
+                  {badge && <span className="shell-nav-badge grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs">{badge}</span>}
+                </NavLink>
+              )
+            })}
+          </nav>
+          <div className="sidebar-scroll-cue grid place-items-center text-blue-100"><ChevronDown size={22} /></div>
+          <div className="sidebar-help mt-6 shrink-0 rounded-2xl border border-white/10 bg-blue-600/20 p-5">
+            <div className="font-black">Besoin d’aide ?</div>
+            <p className="mt-2 text-sm text-blue-100">Notre équipe est disponible 24h/7j.</p>
+            {token ? (
+              <Link to="/messages" className="message-menu-button mt-4 flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-bold"><span>Messages</span></Link>
+            ) : (
+              <div className="mt-4 grid gap-2">
+                <Link to="/login" className="message-menu-button flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-white text-sm font-black text-blue-800"><span>Connexion</span></Link>
+                <Link to="/register" className="message-menu-button flex h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-600 text-sm font-black text-white"><span>Inscription</span></Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+	      <div className={`shell-content ${sidebarOpen ? 'is-compressed' : ''}`}>
 	        <header className="sticky top-0 z-30 grid h-20 grid-cols-[1fr_auto] items-center gap-4 border-b border-slate-200 bg-slate-100/95 px-5 backdrop-blur lg:px-8">
 	          <div className="mx-auto hidden h-12 w-full max-w-[520px] items-center gap-3 rounded-lg bg-slate-200/80 px-4 text-slate-500 md:flex"><span className="flex-1 text-sm font-semibold">Rechercher un service...</span><Search size={19} className="text-slate-600" /></div>
 	          <div className="flex items-center gap-4">

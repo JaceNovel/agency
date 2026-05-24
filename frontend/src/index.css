@@ -164,10 +164,6 @@ a:hover {
     filter 420ms ease;
 }
 
-.shell-content.no-sidebar {
-  margin-left: 0;
-}
-
 .shell-content.is-compressed {
   margin-left: 292px;
 }
